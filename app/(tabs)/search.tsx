@@ -1,4 +1,4 @@
-import InfiniteChartList from "@/components/InfiniteChartList";
+import InfiniteChartList from "@/components/ChartList";
 import SearchBar from "@/components/SearchBar";
 import { images } from "@/constants/images";
 import React, { useCallback, useRef, useState } from "react";

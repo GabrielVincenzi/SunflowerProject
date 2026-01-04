@@ -1,7 +1,9 @@
+import QuestionCard from "@/components/cards/QuestionCard";
 import CategoryCarousel from "@/components/CategoryCarousel";
+import HomeHeader from "@/components/HomeHeader";
 import { images } from "@/constants/images";
 import { router } from "expo-router";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function Index() {
 
@@ -12,8 +14,16 @@ export default function Index() {
             scrollEnabled={true}
             className="flex-1 bg-background px-4">
             <View className="pt-10 pb-6">
-                {/* Logo */}
-                <Image source={images.logoMain} style={{ width: 64, height: 64, alignSelf: "center", marginBottom: 12 }} />
+                <HomeHeader
+                    userName="Gabriel"
+                    logo={images.logoMain}
+                    avatar={images.sunflower}
+                    onLogoPress={() => console.log("logo pressed")}
+                    onNotifPress={() => { }}
+                />
+
+                {/* Question of the day */}
+                <QuestionCard title="Question" />
 
                 {/* Categories title + horizontal list */}
                 <Text className="mt-6 mb-4 font-elms-bold text-xl text-dark">By Category</Text>

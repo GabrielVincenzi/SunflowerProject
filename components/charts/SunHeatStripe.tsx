@@ -26,17 +26,19 @@ function pickXTicks(labels: string[] = [], count = 6) {
     return Array.from(new Set(result));
 }
 
-export default function HeatStripeByGeoSimpleStrict({
+function SunHeatStripe({
     screenWidth,
     apiData,
-    heightPerRow = 44,
     rowGap = 6,
     xTickCount = 6,
+    maxHeight = 260,
+    maxRowHeigth = 100,
     colorRange,
 }: {
     screenWidth: number;
     apiData: ApiResponse;
-    heightPerRow?: number;
+    maxRowHeigth?: number;
+    maxHeight?: number;
     rowGap?: number;
     xTickCount?: number;
     colorRange?: [string, string];
@@ -124,9 +126,10 @@ export default function HeatStripeByGeoSimpleStrict({
     // layout
     const width = screenWidth;
     const rowsCount = normalizedRows.length;
-    // each row occupies heightPerRow, but we add rowGap between rows.
-    // total stripes area height = rowsCount * heightPerRow + (rowsCount - 1) * rowGap
-    const stripesAreaHeight = rowsCount * heightPerRow + Math.max(0, rowsCount - 1) * rowGap;
+    const totalGaps = Math.max(0, rowsCount - 1) * rowGap;
+    const heightPerRow = Math.min(maxRowHeigth, (maxHeight - totalGaps - margin.top - margin.bottom) / rowsCount);
+
+    const stripesAreaHeight = rowsCount * heightPerRow + totalGaps;
     const chartHeight = margin.top + stripesAreaHeight + margin.bottom + 48;
 
     const xScale = scaleBand<string>()
@@ -151,7 +154,6 @@ export default function HeatStripeByGeoSimpleStrict({
         <View>
             {/* Header + legend */}
             <View style={{ alignItems: "center", marginBottom: 6 }}>
-                <Text style={{ fontSize: 14, fontWeight: "600" }}>Stripe chart</Text>
                 <View style={{ flexDirection: "row", alignItems: "center", marginTop: 6 }}>
                     <View style={{ width: 10, height: 10, backgroundColor: colorScaleFn(vMin), borderRadius: 2, marginRight: 6 }} />
                     <Text style={{ color: "grey", fontSize: 12 }}>{formatSmall(vMin)}</Text>
@@ -243,3 +245,5 @@ export default function HeatStripeByGeoSimpleStrict({
         </View>
     );
 }
+
+export default SunHeatStripe;

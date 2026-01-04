@@ -1,8 +1,16 @@
-import { categories } from "@/constants/utilities";
+import { fetchCategories } from "@/services/api";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FlatList, View } from "react-native";
 import CategoryCard from "./cards/CategoryCard";
 
 const CategoryCarousel = () => {
+    // Fetch saved graphs
+    const queryClient = useQueryClient();
+    const { data: categories, isPending: isPendingDbAvailable, error: errorDb } = useQuery({
+        queryKey: ['dbs', "categories"],
+        queryFn: () => fetchCategories(),
+    });
+
     return (
         <FlatList
             data={categories}

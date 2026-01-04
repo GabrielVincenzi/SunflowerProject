@@ -1,6 +1,8 @@
-import { useSSO } from "@clerk/clerk-expo";
+import { useTranslations } from "@/services/useTranslation";
+import { useAuth, useSSO } from "@clerk/clerk-expo";
 import { OAuthStrategy } from "@clerk/types";
 import { AntDesign } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import * as WebBrowser from 'expo-web-browser';
 import {
@@ -18,10 +20,19 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SignIn = () => {
+    const { isLoaded } = useAuth();          // Clerk readiness
+    const { data } = useTranslations();
+    const { startSSOFlow } = useSSO();
+
     const insets = useSafeAreaInsets();
     const keyboardVerticalOffset = insets.top + 10;
+    const queryclient = useQueryClient();
 
-    const { startSSOFlow } = useSSO();
+    if (!isLoaded || !data) {
+        return null;
+    }
+    const t: any = data.payload;
+
     const handleSocialSignIn = async (provider: string) => {
         try {
             const { createdSessionId, setActive, signIn, signUp } = await startSSOFlow({
@@ -67,7 +78,7 @@ const SignIn = () => {
                                     source={require('@/assets/images/logoMain.png')}
                                 />
                             </View>
-                            <Text className="text-2xl">Sign In</Text>
+                            <Text className="text-2xl">{t.signIn.title}</Text>
                         </View>
 
                         <View className="gap-6">
@@ -76,7 +87,7 @@ const SignIn = () => {
                                 onPress={() => handleSocialSignIn('oauth_apple')}
                             >
                                 <AntDesign name="apple" size={20} color={'#000'} />
-                                <Text className="text-medium">Continue with Apple</Text>
+                                <Text className="text-medium">{t.signIn.socialButtons.apple}</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
@@ -84,13 +95,13 @@ const SignIn = () => {
                                 onPress={() => handleSocialSignIn('oauth_google')}
                             >
                                 <AntDesign name="google" size={20} color={'#000'} />
-                                <Text className="text-medium">Continue with Google</Text>
+                                <Text className="text-medium">{t.signIn.socialButtons.google}</Text>
                             </TouchableOpacity>
                         </View>
 
                         <View className="flex-row items-center my-4 gap-4">
                             <View className="flex-1 h-0.5 bg-slate-300" />
-                            <Text className="text-sm text-slate-400">OR</Text>
+                            <Text className="text-sm text-slate-400">{t.signIn.orSeparator}</Text>
                             <View className="flex-1 h-0.5 bg-slate-300" />
                         </View>
 
@@ -107,23 +118,22 @@ const SignIn = () => {
                             />
 
                             <TouchableOpacity className="bg-secondary text-base p-4 rounded-lg items-center justify-center">
-                                <Text className="text-md">Next</Text>
+                                <Text className="text-md">{t.signIn.nextButton}</Text>
                             </TouchableOpacity>
 
                             <Link href={"/(tabs)/home"} replace asChild>
                                 <TouchableOpacity className="text-base p-2 items-center justify-center">
-                                    <Text className="text-secondary mt-2 font-bold">Skip for now</Text>
+                                    <Text className="text-secondary mt-2 font-bold">{t.signIn.skip}</Text>
                                 </TouchableOpacity>
                             </Link>
                         </View>
 
                         <View className="mt-6">
                             <Text className="text-sm text-slate-400 items-center text-center">
-                                By proceeding, you agree to: {'\n'}
-                                Sunflower's <Text className="text-secondary underline" onPress={openLink}>Terms of Service</Text>
+                                {t.signIn.termsPrefix}
+                                <Text className="text-secondary underline" onPress={openLink}>{t.signIn.termsLink}</Text>
                             </Text>
                         </View>
-
                     </SafeAreaView>
                 </ScrollView>
             </TouchableWithoutFeedback>

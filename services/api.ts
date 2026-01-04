@@ -2,21 +2,24 @@
 // Casa nuova http://192.168.0.105:5013
 // Casa Bolo http://192.168.1.114:5013
 // Cell work http://172.20.10.4:5013
+// Cell http://172.20.10.3:5013
 
 // OLD: http://192.168.1.114:5013
 
-const baseUrl = 'http://172.20.10.3:5013'
+const baseUrl = 'http://192.168.1.114:5013'
 
 // Chart GET requests
 export const fetchAllChartDetails = async ({
     query,
     category,
+    lang,
     limit,
     afterId,
     signal,
 }: {
     query?: string;
     category?: string;
+    lang?: string;
     limit?: number;
     afterId?: number | null;
     signal?: AbortSignal; // optional for cancellation
@@ -24,6 +27,7 @@ export const fetchAllChartDetails = async ({
     const params = new URLSearchParams();
     if (query?.trim()) params.set("search", query.trim());
     if (category?.trim()) params.set("category", category.trim());
+    if (lang?.trim()) params.set("lang", lang.trim());
     if (limit != null) params.set("limit", String(limit));
     if (afterId != null) params.set("afterId", String(afterId));
 
@@ -32,7 +36,6 @@ export const fetchAllChartDetails = async ({
             ? `${baseUrl}/chart/allCharts?${params.toString()}`
             : `${baseUrl}/chart/allCharts`;
 
-    //console.log(apiUrl)
     const response = await fetch(apiUrl, { signal });
     if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
@@ -57,6 +60,7 @@ export const fetchAllChartDetails = async ({
 export const fetchRecommendedCharts = async ({
     userId,
     limit,
+    lang,
     afterCursor,
     excludeSeenDays,
     signal,
@@ -66,6 +70,7 @@ export const fetchRecommendedCharts = async ({
     const params = new URLSearchParams();
     params.set("userId", userId.trim());
     if (limit != null) params.set("limit", String(limit));
+    if (lang?.trim()) params.set("lang", lang.trim());
     if (excludeSeenDays != null) params.set("excludeSeenDays", String(excludeSeenDays));
 
     if (afterCursor && afterCursor.lastSimilarity != null && afterCursor.lastId != null) {
@@ -97,6 +102,7 @@ export const fetchRecommendedCharts = async ({
 
 export const fetchRandomCharts = async ({
     limit,
+    lang,
     afterCursor,
     signal,
 }: ApiRandomChartParams): Promise<ApiAllChartResponse & { nextCursor?: AfterCursorRandom | null }> => {
@@ -104,12 +110,13 @@ export const fetchRandomCharts = async ({
 
     const params = new URLSearchParams();
     if (limit != null) params.set("limit", String(limit));
+    if (lang?.trim()) params.set("lang", lang.trim());
 
     // Only send cursor fields that the simplified API expects
     if (afterCursor) {
         if (afterCursor.seed != null) params.set("seed", String(afterCursor.seed));
         if (afterCursor.lastSortKey != null) params.set("lastSortKey", String(afterCursor.lastSortKey));
-        if (afterCursor.lastId != null) params.set("lastId", String(afterCursor.lastId));
+        if (afterCursor.lastId != null) params.set("afterId", String(afterCursor.lastId)); // <- FIX
     }
 
     const apiUrl = `${baseUrl}/chart/random?${params.toString()}`;
@@ -173,7 +180,7 @@ export const fetchChartData = async ({
 
 
 // Database GET requests
-export const fetchDbAvailabilities = async ({ db }: { db: string }) => {
+export const fetchDbAvailabilities = async ({ db }: { db: string }): Promise<ApiDbResponse> => {
     const params = new URLSearchParams({
         Name: db,
     });
@@ -190,13 +197,30 @@ export const fetchDbAvailabilities = async ({ db }: { db: string }) => {
     }
 };
 
+export const fetchCategories = async (): Promise<string[]> => {
+    const apiUrl = `${baseUrl}/db/categories`
+
+    const response = await fetch(apiUrl)
+    if (!response.ok) {
+        throw new Error("Failed to fetch categories")
+    }
+
+    return response.json()
+};
+
 // Saved GET requests
 export const fetchSavedEvents = async (
     userId: string,
+    lang: string,
     { timeoutMs = 10000 } = {}
 ): Promise<SavedCardProps[]> => {
     if (!userId) return [];
-    const apiUrl = `${baseUrl}/events/saved?userId=${encodeURIComponent(userId)}`;
+
+    const params = new URLSearchParams();
+    if (userId != null) params.set("userId", String(userId));
+    if (lang?.trim()) params.set("lang", lang.trim());
+
+    const apiUrl = `${baseUrl}/events/saved?${params.toString()}`;
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -325,7 +349,7 @@ export const fetchUserQuestions = async ({
     userId,
     numQuestions = 1,
 }: {
-    userId: number;
+    userId: string;
     numQuestions: number;
 }) => {
 
@@ -334,10 +358,17 @@ export const fetchUserQuestions = async ({
         numQuestions: String(numQuestions),
     });
 
-    const apiUrl = `${baseUrl}/questions?${params.toString()}`;
+    const apiUrl = `${baseUrl}/questionnaire/dailyquestion?${params.toString()}`;
 
     try {
         const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+            const text = await response.text(); // fallback for empty or non-JSON
+            console.error("API error:", text);
+            throw new Error(text);
+        }
+
         const data: ApiUserQuestionsResponse = await response.json();
         return data;
     } catch (error) {
@@ -345,3 +376,12 @@ export const fetchUserQuestions = async ({
         throw error;
     }
 };
+
+// Translations GET requests
+export async function fetchTranslations(lang: string) {
+    const res = await fetch(
+        `${baseUrl}/translations/mobilePages?lang=${lang}`
+    )
+    if (!res.ok) throw new Error('Failed to fetch translations')
+    return res.json() // { version, payload }
+}

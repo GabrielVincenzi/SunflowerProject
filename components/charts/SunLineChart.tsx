@@ -1,4 +1,5 @@
 import { animationDuration, colors, margin } from "@/constants/utilities";
+import { detectGranularity, formatPeriod } from "@/functions/dateHandlers";
 import { max, min } from "d3-array";
 import { scaleLinear, scalePoint } from "d3-scale";
 import { line } from "d3-shape";
@@ -137,46 +138,72 @@ function SunLineChart({
 
     // Build chartData
     const chartData = hasData
-        ? apiData.activeGeos.length > 1
-            ? apiData.activeGeos.map((geo: any, idx: number) => {
-                const key = Object.keys(apiData.series).find((k) => k.endsWith(`_${geo}`));
-                const values = key && apiData.series[key] ? apiData.series[key] : [];
-                return {
-                    geo,
-                    label: geo,
-                    data: values.map((pt: any, i: number) => {
-                        const date = apiData.activePeriods?.[i] ? new Date(apiData.activePeriods[i]) : null;
-                        const year = date ? date.getFullYear().toString() : "";
-                        return { value: pt?.value ?? 0, label: year };
-                    }),
-                    color: safeColors[idx % safeColors.length],
-                };
-            })
-            : (() => {
-                const geo = apiData.activeGeos[0];
-                const variableKeys = Object.keys(apiData.series).filter((k) => k.endsWith(`_${geo}`));
-                return variableKeys.map((key, idx) => {
-                    const variableName = key.replace(`_${geo}`, "");
-                    const values = apiData.series[key] || [];
-                    return {
+        ? (() => {
+            const multipleGeos = apiData.activeGeos.length > 1;
+            const variableKeysByGeo = (geo: string) =>
+                Object.keys(apiData.series).filter((k) => k.endsWith(`_${geo}`));
+
+            let seriesCounter = 0; // global index for color assignment
+
+            const granularity = useMemo(
+                () => detectGranularity(apiData.activePeriods.map((p: any) => new Date(p))),
+                [apiData.activePeriods]
+            )
+
+            if (multipleGeos && apiData.variables?.length === 1) {
+                // multiple geos, only one variable → label = geo
+                return apiData.activeGeos.map((geo: string) => {
+                    const key = variableKeysByGeo(geo)[0];
+                    const values = key && apiData.series[key] ? apiData.series[key] : [];
+                    const series = {
                         geo,
-                        label: variableName,
+                        label: geo,
                         data: values.map((pt: any, i: number) => {
                             const date = apiData.activePeriods?.[i] ? new Date(apiData.activePeriods[i]) : null;
-                            const year = date ? date.getFullYear().toString() : "";
-                            return { value: pt?.value ?? 0, label: year };
+                            const label = date ? formatPeriod(date, granularity) : ""
+                            return { value: pt?.value ?? 0, label };
                         }),
-                        color: safeColors[idx % safeColors.length],
+                        color: safeColors[seriesCounter % safeColors.length],
                     };
+                    seriesCounter++;
+                    return series;
                 });
-            })()
+            } else {
+                // multiple variables or single geo → label = variableName (geo)
+                return apiData.activeGeos.flatMap((geo: string) => {
+                    return variableKeysByGeo(geo).map((key: string) => {
+                        const variableName = key.replace(`_${geo}`, "");
+                        const values = apiData.series[key] || [];
+                        const series = {
+                            geo,
+                            label: `${variableName} (${geo})`,
+                            data: values.map((pt: any, i: number) => {
+                                const date = apiData.activePeriods?.[i] ? new Date(apiData.activePeriods[i]) : null;
+                                const label = date ? formatPeriod(date, granularity) : ""
+                                return { value: pt?.value ?? 0, label };
+                            }),
+                            color: safeColors[seriesCounter % safeColors.length],
+                        };
+                        seriesCounter++;
+                        return series;
+                    });
+                });
+            }
+        })()
         : [];
+
 
     const width = screenWidth;
     const allDataPoints = chartData.flatMap((s: any) => s.data);
-    const xLabels = Array.from(
-        new Set(allDataPoints.map((d: any) => d.label as string))
-    ) as string[];
+    const xLabels: string[] = Array.from(
+        new Set<string>(allDataPoints.map((d: any) => d.label))
+    ).sort((a, b) => {
+        const parse = (s: string) => {
+            const [y, q] = s.split("Q")
+            return Number(y) * 10 + (q ? Number(q) : 0)
+        }
+        return parse(a) - parse(b)
+    })
     const yValues = allDataPoints.map((d: any) => d.value);
 
     // detect scale for Y axis labels (Thousands / Millions)
@@ -203,7 +230,7 @@ function SunLineChart({
     const displayedXLabels = pickXTicks(xLabels, xTickCount);
 
     return (
-        <View>
+        <View className="w-full bg-background">
             {/* Legend */}
             <View className="items-center">
                 <View className="flex-row flex-wrap justify-center mt-1">

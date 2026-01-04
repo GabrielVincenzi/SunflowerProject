@@ -149,7 +149,7 @@ const Profile = () => {
             <BigPlanet
                 size={500} // tune this for how round the arc looks
                 visible_height={10} // how much of the top is visible
-                color="#F7DA8A"
+                color="#F2BB16"
                 onPress={handlePlanetTap}
             />
         </View>

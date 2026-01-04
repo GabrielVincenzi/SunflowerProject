@@ -47,29 +47,24 @@ function SunBarChart({ screenWidth, apiData }: ChartProps) {
     // Extract variables
     const variables = useMemo(
         () =>
-            [
-                ...new Set(
-                    Object.keys(apiData.series || {}).map((k) => k.split("_")[0])
-                ),
-            ],
+            [...new Set(
+                Object.keys(apiData.series || {}).map((k) => k.replace(/_[A-Z]{2}$/, ""))
+            )],
         [apiData]
     );
 
     // Prepare grouped data
     const data = useMemo(
         () =>
-            variables.map((variable) => ({
-                variable,
-                values: geos.map((geo, geoIdx) => {
+            geos.map((geo) => ({
+                geo,
+                values: variables.map((variable, varIdx) => {
                     const key = `${variable}_${geo}`;
-                    const value =
-                        key in apiData.series && apiData.series[key]?.[0]?.value != null
-                            ? apiData.series[key][0].value
-                            : 0;
+                    const value = apiData.series[key]?.[0]?.value ?? 0;
                     return {
-                        geo,
+                        variable,
                         value,
-                        color: safeColors[geoIdx % safeColors.length],
+                        color: safeColors[varIdx % safeColors.length],
                     };
                 }),
             })),
@@ -79,17 +74,17 @@ function SunBarChart({ screenWidth, apiData }: ChartProps) {
     const minBarWidth = 20; // minimum width per bar
 
     // Dynamic SVG width based on number of bars
-    const totalBars = variables.length * geos.length;
+    const totalBars = geos.length * variables.length;
     const svgWidth = Math.max(screenWidth * 0.9, totalBars * minBarWidth);
 
     // X scales
     const x0 = scaleBand<string>()
-        .domain(variables)
+        .domain(geos)
         .range([margin.left, svgWidth - margin.right])
         .paddingInner(0.2);
 
     const x1 = scaleBand<string>()
-        .domain(geos)
+        .domain(variables)
         .range([0, x0.bandwidth()])
         .padding(0.05);
 
@@ -99,65 +94,86 @@ function SunBarChart({ screenWidth, apiData }: ChartProps) {
     const yTicks = y.ticks(5);
 
     return (
-        <View className="w-full px-4">
+        <View className="w-full bg-background">
             {/* Legend */}
-            <View className="flex-row flex-wrap justify-center mt-4">
-                {geos.map((geo, idx) => (
-                    <View
-                        key={geo}
-                        className="flex-row items-center m-2"
-                        style={{ gap: 6 }}
-                    >
+            <View className="items-center">
+                <View className="flex-row flex-wrap justify-center mt-1">
+                    {variables.map((variable, idx) => (
                         <View
-                            style={{
-                                width: 12,
-                                height: 12,
-                                backgroundColor: safeColors[idx % safeColors.length],
-                                borderRadius: 2,
-                            }}
-                        />
-                        <Text style={{ fontSize: 12, color: "grey" }}>{geo}</Text>
-                    </View>
-                ))}
-            </View>
-            <View style={{ flexDirection: "row" }}>
-                {/* Y-axis fixed */}
-                <Svg width={margin.left} height={height}>
-                    {/* Vertical axis line */}
-                    <Line
-                        x1={margin.left - 1}
-                        y1={margin.top}
-                        x2={margin.left - 1}
-                        y2={height - margin.bottom}
-                        stroke="grey"
-                        strokeWidth={1}
-                    />
-
-                    {/* Y-axis ticks and labels */}
-                    {yTicks.map((tick) => (
-                        <SvgText
-                            key={tick}
-                            x={margin.left - 5}
-                            y={y(tick)}
-                            fontSize={10}
-                            fill="grey"
-                            textAnchor="end"
-                            alignmentBaseline="middle"
+                            key={variable}
+                            className="flex-row items-center m-2"
+                            style={{ gap: 6 }}
                         >
-                            {tick}
-                        </SvgText>
+                            <View
+                                style={{
+                                    width: 12,
+                                    height: 12,
+                                    backgroundColor: safeColors[idx % safeColors.length],
+                                    borderRadius: 2,
+                                }}
+                            />
+                            <Text style={{ fontSize: 12, color: "grey" }}>{variable}</Text>
+                        </View>
                     ))}
-                </Svg>
-
-                {/* Scrollable Bars */}
+                </View>
+            </View>
+            <View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <Svg width={svgWidth + margin.left} height={height}>
+                    <Svg width={svgWidth} height={height}>
+
+                        {/* X Axis */}
+                        <G transform={`translate(0, ${height - margin.bottom})`}>
+                            <Line
+                                x1={margin.left}
+                                x2={svgWidth - margin.right}
+                                stroke="grey"
+                                strokeWidth={1}
+                            />
+
+                            {geos.map((geo) => (
+                                <G
+                                    key={geo}
+                                    transform={`translate(${(x0(geo) ?? 0) + x0.bandwidth() / 2}, 0)`}
+                                >
+                                    <Line y2={6} stroke="grey" />
+                                    <SvgText y={20} fontSize={13} fill="grey" textAnchor="middle">
+                                        {geo}
+                                    </SvgText>
+                                </G>
+                            ))}
+                        </G>
+
+                        {/* Y Axis */}
+                        <G transform={`translate(${margin.left}, 0)`}>
+                            {yTicks.map((tick) => (
+                                <G key={tick} transform={`translate(0, ${y(tick)})`}>
+                                    <Line x2={-6} stroke="grey" />
+                                    <SvgText
+                                        x={-10}
+                                        dy="0.32em"
+                                        fontSize={13}
+                                        fill="grey"
+                                        textAnchor="end"
+                                    >
+                                        {tick}
+                                    </SvgText>
+                                </G>
+                            ))}
+
+                            <Line
+                                y1={margin.top}
+                                y2={height - margin.bottom}
+                                stroke="grey"
+                                strokeWidth={1}
+                            />
+                        </G>
+
                         {/* Horizontal gridlines */}
                         {yTicks.map((tick) => (
                             <Line
                                 key={tick}
-                                x1={0}
-                                x2={svgWidth}
+                                x1={margin.left}
+                                x2={svgWidth - margin.right}
                                 y1={y(tick)}
                                 y2={y(tick)}
                                 stroke="#e0e0e0"
@@ -167,35 +183,23 @@ function SunBarChart({ screenWidth, apiData }: ChartProps) {
 
                         {/* Bars */}
                         {data.map((group) => (
-                            <G key={group.variable} x={x0(group.variable) || 0}>
+                            <G key={group.geo} x={x0(group.geo) || 0}>
                                 {group.values.map((d) => (
                                     <AnimatedBar
-                                        key={`${group.variable}-${d.geo}`}
-                                        x={x1(d.geo) || 0}
+                                        key={`${group.geo}-${d.variable}`}
+                                        x={x1(d.variable) || 0}
                                         width={x1.bandwidth() || minBarWidth}
                                         color={d.color}
                                         value={d.value}
                                         yScale={y}
                                         chartHeight={height - margin.bottom}
                                     />
-
                                 ))}
-
-                                {/* X-axis label */}
-                                <SvgText
-                                    x={(x0.bandwidth() || minBarWidth) / 2}
-                                    y={height - margin.bottom + 15}
-                                    fontSize={12}
-                                    fill="grey"
-                                    textAnchor="middle"
-                                >
-                                    {group.variable}
-                                </SvgText>
                             </G>
                         ))}
+
                     </Svg>
                 </ScrollView>
-
             </View>
         </View>
     );

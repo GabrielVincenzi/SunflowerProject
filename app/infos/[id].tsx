@@ -1,8 +1,10 @@
 import SunAreaChart from "@/components/charts/SunAreaChart";
 import SunBarChart from "@/components/charts/SunBarChart";
+import SunHeatStripe from "@/components/charts/SunHeatStripe";
 import SunLineChart from "@/components/charts/SunLineChart";
+import SunPieChart from "@/components/charts/SunPieChart";
 import SunRadarChart from "@/components/charts/SunRadarChart";
-import SunPieChart from "@/components/old/SunPieChart";
+import SunButton from "@/components/SunButton";
 import { defaultGeo } from "@/constants/utilities";
 import { buildPeriodOptions, normalizePeriod } from '@/functions/dateHandlers';
 import { deleteSavedEvent, fetchChartData, fetchDbAvailabilities, fetchSavedIdsEvents, postNewEvent } from '@/services/api';
@@ -10,7 +12,7 @@ import useSeen from "@/services/useSeen";
 import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import React, { ComponentRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Dimensions, Pressable, ScrollView, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
@@ -18,22 +20,37 @@ import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTimi
 const chartComponents: { [key: string]: React.ElementType } = {
     line: SunLineChart,
     radar: SunRadarChart,
-    bar: SunBarChart,
+    hist: SunBarChart,
     area: SunAreaChart,
     pie: SunPieChart,
+    heatstripe: SunHeatStripe,
     // add more chart mappings here
+};
+
+const chartSelectionConfig: Record<
+    string,
+    { allowMultiGeo?: boolean; allowMultiVariable?: boolean }
+> = {
+    radar: { allowMultiGeo: false },
+    // e.g. some custom chart that only supports a single variable can set allowMultiVariable: false
+    // custom_chart_type: { allowMultiVariable: false },
 };
 
 const ChartPage = () => {
     const screenWidth = Dimensions.get("window").width * 0.9;
     const { user } = useUser();
-    const { id, title, description, db, variables, chart_type } = useLocalSearchParams();
+    const { id, chart_id, title, description, db, variables, chart_type } = useLocalSearchParams();
     const queryClient = useQueryClient();
 
     /////////////////////////////// Fetching availabilities  ////////////////////////////////
     // Fetch db availability
+    const chartDb = String(db);
+    //console.log(
+    //    "DB cache:",
+    //    queryClient.getQueryData(['dbs', chartDb])
+    //);
     const { data: availableData, isPending: isPendingDbAvailable, error: errorDb } = useQuery({
-        queryKey: ['dbs', db],
+        queryKey: ['dbs', chartDb],
         queryFn: () => fetchDbAvailabilities({ db: chartDb }),
     });
 
@@ -42,23 +59,36 @@ const ChartPage = () => {
         .map((g) => ({ label: g, value: g })) ?? [];
     const periodOptions = buildPeriodOptions(availableData?.availablePeriods);
     const dbSource = availableData?.dbSource ?? [];
-
     const lastPeriods = periodOptions.slice(-6);
 
     /////////////////////////////// Parameters ////////////////////////////////
+    const chartGeosCleaned = defaultGeo ? String(defaultGeo).replace(/^"|"$/g, "").split("+").filter(Boolean) : [];
+
     const userId = user?.id ?? "";
-    const chartId = id as string;
-    const chartType = chart_type as string;
-    const chartTitle = title as string;
-    const chartDescr = description as string;
-    const chartDb = db as string;
-    const chartVariables = variables ? JSON.parse(variables as string) : [];
-    const chartGeosArray = defaultGeo ? (defaultGeo as string).replace(/^"|"$/g, "").split("+").filter(Boolean) : [];
+    const chartId = String(chart_id);
+    const chartType = String(chart_type);
+    const chartTitle = String(title);
+    const chartDescr = String(description);
+    const chartVariables = String(variables);
+    const chartVariablesArray: string[] = Array.isArray(variables)
+        ? variables : String(variables || "").split("+").filter(Boolean);
     const chartStartPeriod: string | null = lastPeriods.length > 0 ? lastPeriods[0].value : null;
     const chartEndPeriod: string | null =
         lastPeriods.length > 0
             ? lastPeriods[lastPeriods.length - 1].value
             : null;
+
+    const chartGeosArray = useMemo(() => {
+        if (geoOptions.length === 0) return [];
+
+        const allValid = chartGeosCleaned.every(geo =>
+            geoOptions.some(option => option.value === geo)
+        );
+
+        return allValid ? chartGeosCleaned : [geoOptions[0].value];
+    }, [chartGeosCleaned, geoOptions]);
+
+    const variableOptions = chartVariablesArray.map((g) => ({ label: g, value: g }));
 
     /////////////////////////////// Handle selections ////////////////////////////////
     // Allow multiple geos only if one variable
@@ -71,14 +101,57 @@ const ChartPage = () => {
         variableCount = variables.length;
     }
 
-    const isMultiGeo = variableCount <= 1;
+    const isMultiGeo = true;//variableCount <= 1;
+
+    ////////////////////// Selection rules  //////////////////////
+    // read overrides from config for this chart type with defaults true
+    const selectionConfig = chartSelectionConfig[chartType] ?? {};
+    const allowMultiGeo = selectionConfig.allowMultiGeo ?? true;
+    const allowMultiVariable = selectionConfig.allowMultiVariable ?? true;
+
+    ////////////////////// Handle selections //////////////////////
+    // Define a default variable to be plotted (no crowded graph)
+    const defaultVariables: string[] =
+        chartVariablesArray.length === 0
+            ? []
+            : chartVariablesArray.length > 3
+                ? chartVariablesArray.slice(0, 3)
+                : chartVariablesArray.slice(0, 1);
 
     // State for editable inputs
-    const [selectedGeosArray, setSelectedGeosArray] = useState<string[]>(chartGeosArray);
-    const [selectedStartPeriod, setSelectedStartPeriod] = useState<string | null>(chartStartPeriod ? chartStartPeriod : null);
-    const [selectedEndPeriod, setSelectedEndPeriod] = useState<string | null>(chartEndPeriod ? chartEndPeriod : null);
+    const [selectedGeosArray, setSelectedGeosArray] = useState<string[]>([]);
+    const [selectedVariablesArray, setSelectedVariablesArray] = useState<string[]>(defaultVariables);
+    const [selectedStartPeriod, setSelectedStartPeriod] = useState<string | null>(chartStartPeriod ?? null);
+    const [selectedEndPeriod, setSelectedEndPeriod] = useState<string | null>(chartEndPeriod ?? null);
 
-    // Handle selected geos safely
+    // query state for chart
+    const [query, setQuery] = useState({
+        geos: "", // will be set after geoOptions load
+        variables: defaultVariables.join("+"),
+        startPeriod: normalizePeriod(selectedStartPeriod),
+        endPeriod: normalizePeriod(selectedEndPeriod),
+    });
+
+    useEffect(() => {
+        if (!geoOptions || geoOptions.length === 0) return;
+
+        // Determine initial geo
+        const initialGeo = (chartGeosArray && chartGeosArray.length > 0)
+            ? chartGeosArray[0]
+            : geoOptions[0].value;
+
+        // update selected geos state
+        setSelectedGeosArray([initialGeo]);
+
+        // update query so first fetch uses this default
+        setQuery(q => ({
+            ...q,
+            geos: initialGeo,
+        }));
+    }, [geoOptions.join("+")]); // run only when geoOptions change
+
+
+
     const setSelectedGeosSafe = useCallback((val:
         string | string[] | null | ((prev: string[]) => string[] | string | null)
     ) => {
@@ -110,24 +183,16 @@ const ChartPage = () => {
     // User seen analytics
     useSeen({ userId, objectId: chartId, delayMs: 20000 });
 
-    // Query state
-    const [query, setQuery] = useState({
-        geos: isMultiGeo
-            ? selectedGeosArray.join("+")
-            : selectedGeosArray[0] ?? "",
-        startPeriod: normalizePeriod(selectedStartPeriod),
-        endPeriod: normalizePeriod(selectedEndPeriod),
-    });
-
     const { data: apiData, isLoading: isLoadingChartData, isPending: isPendingChartData, isError, error } = useQuery({
-        queryKey: ['charts', chartDb, chartVariables, query.geos, query.startPeriod, query.endPeriod],
+        queryKey: ['charts', chartDb, query.variables, query.geos, query.startPeriod, query.endPeriod],
         queryFn: () => fetchChartData({
             db: chartDb,
-            variables: chartVariables,
+            variables: query.variables,
             geos: query.geos,
             startPeriod: query.startPeriod,
             endPeriod: query.endPeriod,
         }),
+        enabled: !!query.geos,
         placeholderData: keepPreviousData,
     });
 
@@ -135,6 +200,7 @@ const ChartPage = () => {
     const handleOk = () => {
         setQuery({
             geos: selectedGeosArray.join("+"),
+            variables: selectedVariablesArray.join("+"),
             startPeriod: normalizePeriod(selectedStartPeriod),
             endPeriod: normalizePeriod(selectedEndPeriod),
         });
@@ -145,6 +211,7 @@ const ChartPage = () => {
         setSelectedGeosSafe(localSelectedGeos);
         setSelectedStartPeriod(localStartPeriod);
         setSelectedEndPeriod(localEndPeriod);
+        setSelectedVariablesArray(localSelectedVariables);
 
         // call existing fetch/handler
         handleOk();
@@ -170,82 +237,90 @@ const ChartPage = () => {
     }, [savedSet, chartId]);
 
     const savedMutation = useMutation({
-        mutationFn: ({ userId, objectId }: any) => postNewEvent({ userId, action: 'saved', objectId, time: new Date().toISOString() }),
-        onMutate: async ({ userId, objectId }) => {
+        // input param uses chartId
+        mutationFn: ({ userId, chartId }: { userId: string; chartId: string }) =>
+            postNewEvent({
+                userId,
+                action: 'saved',
+                objectId: chartId,
+                time: new Date().toISOString(),
+            }),
+
+        onMutate: async ({ userId, chartId }) => {
             await Promise.all([
                 queryClient.cancelQueries({ queryKey: ['charts', 'savedIds', userId] }),
                 queryClient.cancelQueries({ queryKey: ['charts', 'saved', userId] }),
-            ])
+            ]);
 
             const prev = queryClient.getQueryData<Set<string>>(['charts', 'savedIds', userId]);
+
             queryClient.setQueryData(['charts', 'savedIds', userId], (old) => {
                 const s = new Set(old instanceof Set ? Array.from(old) : []);
-                s.add(String(objectId));
+                s.add(chartId);
                 return s;
             });
+
             setIsSaved(true);
             return { prev };
         },
+
         onError: (_err, vars, context) => {
-            // rollback...
             if (context?.prev) queryClient.setQueryData(['charts', 'savedIds', vars.userId], context.prev);
-            setIsSaved(Boolean(context?.prev?.has?.(String(vars.objectId))));
+            setIsSaved(Boolean(context?.prev?.has(vars.chartId)));
         },
+
         onSettled: async (_data, _err, vars) => {
             await Promise.all([
                 queryClient.invalidateQueries({ queryKey: ['charts', 'saved', vars.userId], exact: true, refetchType: 'all' }),
-                //queryClient.refetchQueries({ queryKey: ['charts', 'saved', vars.userId], exact: true, type: 'all' })
-            ])
-        }
+                queryClient.invalidateQueries({ queryKey: ['charts', 'savedIds', vars.userId], exact: true, refetchType: 'all' }),
+            ]);
+        },
     });
 
+
     const deleteSavedMutation = useMutation({
-        mutationFn: ({ userId, objectId }: any) => deleteSavedEvent({ userId, objectId }),
-        onMutate: async ({ userId, objectId }: any) => {
-            // cancel queries that might be reading/writing these caches
+        mutationFn: ({ userId, chartId }: { userId: string; chartId: string }) =>
+            deleteSavedEvent({ userId, objectId: chartId }), // map chartId -> objectId
+
+        onMutate: async ({ userId, chartId }) => {
             await Promise.all([
                 queryClient.cancelQueries({ queryKey: ['charts', 'savedIds', userId] }),
                 queryClient.cancelQueries({ queryKey: ['charts', 'saved', userId] }),
             ]);
 
-            // snapshot previous
             const prev = queryClient.getQueryData<Set<string>>(['charts', 'savedIds', userId]);
 
-            // optimistic: remove the id from the Set
             queryClient.setQueryData(['charts', 'savedIds', userId], (old) => {
                 const s = new Set(old instanceof Set ? Array.from(old) : []);
-                s.delete(String(objectId));
+                s.delete(chartId);
                 return s;
             });
 
-            // update local UI
             setIsSaved(false);
-
             return { prev };
         },
-        onError: (_err, vars: any, context: any) => {
-            // rollback if server fails
+
+        onError: (_err, vars, context) => {
             if (context?.prev) queryClient.setQueryData(['charts', 'savedIds', vars.userId], context.prev);
-            setIsSaved(Boolean(context?.prev?.has?.(String(vars.objectId))));
+            setIsSaved(Boolean(context?.prev?.has(vars.chartId)));
         },
-        onSettled: async (_data, _err, vars: any) => {
-            // refetch/invalidates so server and client stay in sync
+
+        onSettled: async (_data, _err, vars) => {
             await Promise.all([
                 queryClient.invalidateQueries({ queryKey: ['charts', 'saved', vars.userId], exact: true, refetchType: 'all' }),
-                //queryClient.refetchQueries({ queryKey: ['charts', 'saved', vars.userId], exact: true, type: 'all' })
+                queryClient.invalidateQueries({ queryKey: ['charts', 'savedIds', vars.userId], exact: true, refetchType: 'all' }),
             ]);
         },
     });
+
 
     const handleSave = useCallback(() => {
         if (!user) return;
 
         if (isSaved) {
-            // currently saved -> delete it
-            deleteSavedMutation.mutate({ userId: userId, objectId: chartId });
+            deleteSavedMutation.mutate({ userId, chartId });
         } else {
-            // currently not saved -> save it
-            savedMutation.mutate({ userId: userId, objectId: chartId });
+            savedMutation.mutate({ userId, chartId });
         }
     }, [user, isSaved, chartId, savedMutation, deleteSavedMutation]);
 
@@ -265,11 +340,13 @@ const ChartPage = () => {
     // UI state
     const [overlayOpen, setOverlayOpen] = useState(false);
     const [showCountryList, setShowCountryList] = useState(false);
+    const [showVariableList, setShowVariableList] = useState(false);
     const [showStartPeriodList, setShowStartPeriodList] = useState(false);
     const [showEndPeriodList, setShowEndPeriodList] = useState(false);
 
     // local selection copies
     const [localSelectedGeos, setLocalSelectedGeos] = useState<string[]>(selectedGeosArray ?? []);
+    const [localSelectedVariables, setLocalSelectedVariables] = useState<string[]>(selectedVariablesArray ?? []);
     const [localStartPeriod, setLocalStartPeriod] = useState<string | null>(selectedStartPeriod ?? null);
     const [localEndPeriod, setLocalEndPeriod] = useState<string | null>(selectedEndPeriod ?? null);
 
@@ -388,6 +465,8 @@ const ChartPage = () => {
         width: circleSize,
         height: circleSize,
         borderRadius: circleSize / 2,
+        borderWidth: 0.1,
+        borderColor: "#343a40",
         backgroundColor: "#F7DA8A",
         overflow: "hidden" as const,
     };
@@ -414,6 +493,28 @@ const ChartPage = () => {
                         // persist immediately for single-select as well
                         setSelectedGeosSafe(next);
                     }
+                }}
+                className="px-4 py-3 border-b border-neutral-200 flex-row justify-between items-center"
+            >
+                <Text className="text-base">{item.label}</Text>
+                <View className={`${selected ? "w-5 h-5 rounded-full bg-secondary" : "w-5 h-5 rounded-full border border-neutral-300"}`} />
+            </TouchableOpacity>
+        );
+    };
+
+    const renderVariableRow = (item: variableOption) => {
+        const selected = localSelectedVariables.includes(item.value);
+        return (
+            <TouchableOpacity
+                key={item.value}
+                activeOpacity={0.8}
+                onPress={() => {
+                    setLocalSelectedVariables((prev) => {
+                        const next = prev.includes(item.value) ? prev.filter((v) => v !== item.value) : [...prev, item.value];
+                        // persist immediately so collapsing the list doesn't lose selection
+                        setSelectedVariablesArray(next);
+                        return next;
+                    });
                 }}
                 className="px-4 py-3 border-b border-neutral-200 flex-row justify-between items-center"
             >
@@ -542,13 +643,7 @@ const ChartPage = () => {
                 </View>
             </ScrollView >
             {/* Bottom button */}
-            < TouchableOpacity
-                className="absolute bottom-6 left-6 right-6 bg-secondary rounded-2xl py-4 flex-row items-center justify-center"
-                onPress={() => router.back()}
-                activeOpacity={0.85}
-            >
-                <Text className="text-white font-semibold text-base">Go back</Text>
-            </TouchableOpacity >
+            <SunButton text="Go back" />
 
             {/* Overlay Filters*/}
             {overlayOpen && (
@@ -585,6 +680,28 @@ const ChartPage = () => {
                             <ScrollView showsVerticalScrollIndicator={false}>
                                 <View className="bg-transparent">
                                     <Text className="text-white text-2xl font-semibold mb-4">Filters</Text>
+
+                                    {/* Variable card */}
+                                    <View className="bg-white rounded-xl p-4 mb-4">
+                                        <View className="flex-row justify-between items-center mb-2">
+                                            <Text className="text-neutral-900 font-medium text-lg">Variable</Text>
+                                            <Pressable
+                                                onPress={() => setShowVariableList((s) => !s)}
+                                                style={({ pressed }) => [{ transform: [{ rotate: showVariableList ? "180deg" : "0deg" }], opacity: pressed ? 0.7 : 1 }]}
+                                                accessibilityRole="button"
+                                                hitSlop={8}
+                                            >
+                                                <Text className="text-neutral-500 text-lg">{showVariableList ? "▴" : "▾"}</Text>
+                                            </Pressable>
+                                        </View>
+                                        {showVariableList && (
+                                            <View style={{ maxHeight: 240 }} className="border-t border-neutral-200 mt-2">
+                                                <ScrollView nestedScrollEnabled contentContainerStyle={{ paddingBottom: 8 }}>
+                                                    {variableOptions.map((g) => renderVariableRow(g))}
+                                                </ScrollView>
+                                            </View>
+                                        )}
+                                    </View>
 
                                     {/* Country card */}
                                     <View className="bg-white rounded-xl p-4 mb-4">

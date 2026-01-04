@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-const SunCard = ({ id, title, description, db_name, vars, chart_type }: CardProps) => {
+const SunCard = ({ id, chart_id, title, description, db_name, vars, chart_type }: CardProps) => {
     return (
         <TouchableOpacity
             className='w-full bg-background rounded-xl p-4 flex flex-row border-dark'
@@ -15,11 +15,12 @@ const SunCard = ({ id, title, description, db_name, vars, chart_type }: CardProp
                     pathname: "/infos/[id]", // /infos/[id]
                     params: {
                         id,
+                        chart_id,
                         title,
                         description,
                         db: db_name,
                         chart_type,
-                        variables: JSON.stringify(vars)
+                        variables: vars
                     }
                 })
             }>

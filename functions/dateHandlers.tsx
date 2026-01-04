@@ -30,11 +30,17 @@ export function normalizePeriod(period: string | null): string | null {
 export function buildPeriodOptions(periodRange?: string): PeriodOption[] {
     if (!periodRange) return [];
 
-    const [rawStart, rawEnd] = periodRange.split("+").map(s => s?.trim());
-    if (!rawStart || !rawEnd) return [];
-
-    const isQuarterString = (s: string) => !!s && /^\d{4}[-]?Q[1-4]$/i.test(s);
+    const isQuarterString = (s: string) => !!s && /^\d{4}-?Q[1-4]$/i.test(s);
     const normalizeQuarter = (s: string) => s.replace("-", "").toUpperCase(); // "2023-Q1" -> "2023Q1"
+
+    const parts = periodRange.split("+").map(s => s.trim()).filter(Boolean);
+
+    // If more than 2 pieces, treat as a list of specific periods
+    if (parts.length !== 2) {
+        return parts.map(p => ({ label: p, value: p }));
+    }
+
+    const [rawStart, rawEnd] = parts;
 
     // If either side is quarter-like, produce quarters
     if (isQuarterString(rawStart) || isQuarterString(rawEnd)) {
@@ -86,4 +92,20 @@ export function buildPeriodOptions(periodRange?: string): PeriodOption[] {
         years.push({ label: str, value: str });
     }
     return years;
+}
+
+// Date helpers for quarterly and monthly data
+export function formatPeriod(date: Date, granularity: "year" | "quarter") {
+    if (granularity === "year") {
+        return date.getFullYear().toString()
+    }
+
+    const year = date.getFullYear()
+    const quarter = Math.floor(date.getMonth() / 3) + 1
+    return `${year}Q${quarter}`
+}
+
+export function detectGranularity(periods: Date[]) {
+    const years = periods.map(d => d.getFullYear())
+    return new Set(years).size < periods.length ? "quarter" : "year"
 }

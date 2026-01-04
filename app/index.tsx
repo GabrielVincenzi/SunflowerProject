@@ -1,6 +1,9 @@
 import { useAuth } from "@clerk/clerk-expo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
-import { Redirect } from "expo-router";
+import { RelativePathString, router } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 
 const HomeIndex = () => {
     const [loaded] = useFonts({
@@ -14,15 +17,34 @@ const HomeIndex = () => {
         "Elms-Thin": require("../assets/fonts/ElmsSans-Thin.ttf"),
     });
 
-    const { isSignedIn } = useAuth();
+    const { isLoaded, sessionId } = useAuth(); // use `isLoaded` to ensure auth is ready
 
-    if (!loaded) return null;
-    if (!isSignedIn) {
-        return <Redirect href="/(auth)/welcome" />
-    }
+    useEffect(() => {
+        const checkRedirect = async () => {
+            if (!isLoaded || !loaded) return; // wait for fonts & auth
+            if (sessionId === undefined) return; // wait until Clerk *knows* whether a session exists
 
+            const lang = await AsyncStorage.getItem("language");
+            let replacedUrl = "/(tabs)/home" as RelativePathString; // default
+
+            if (!lang) {
+                replacedUrl = "/(auth)/lang" as RelativePathString;
+            }
+            else if (!sessionId) {
+                replacedUrl = "/(auth)/sign-in" as RelativePathString;
+            }
+
+            router.replace(replacedUrl);
+
+            // hide splash AFTER navigation decision
+            await SplashScreen.hideAsync();
+        };
+
+        checkRedirect();
+    }, [sessionId, isLoaded, loaded]);
+
+    // while waiting for fonts/auth, render nothing
+    return null;
 };
 
 export default HomeIndex;
-
-// <Redirect href="/(auth)/welcome" />

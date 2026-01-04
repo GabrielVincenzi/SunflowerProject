@@ -5,7 +5,16 @@ export const colors = [
 export const height = 280;
 export const animationDuration = 1500;
 export const margin = { top: 20, right: 20, bottom: 40, left: 40 };
-export const categories = ["population", "government", "energy", "employment"]
 
 // User-defined variables
 export const defaultGeo = "IT"
+export const defaultLang = "en"
+
+const LANGUAGE_TITLES = [
+    'Choose your language',
+    'Scegli la tua lingua',
+    'Choisissez votre langue',
+    'Sprache auswählen',
+    'Elige tu idioma',
+    'Kies je taal',
+];

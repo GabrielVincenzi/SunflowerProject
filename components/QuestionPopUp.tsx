@@ -1,15 +1,40 @@
 // QuestionPopup.tsx
-import React, { useEffect } from "react";
-import { Modal, Text, TouchableOpacity, View } from "react-native";
+import { fetchUserQuestions } from "@/services/api";
+import { useAuth, useUser } from "@clerk/clerk-expo";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useRef, useState } from "react";
+import {
+    Dimensions,
+    Modal,
+    Platform,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import Animated, {
     Easing,
     useAnimatedStyle,
     useSharedValue,
+    withSpring,
     withTiming,
 } from "react-native-reanimated";
 
-const ANIM_DURATION = 260;
-const AnimatedViewAny = (Animated.View as unknown) as any;
+type QuestionPopupProps<T = any> = {
+    visible: boolean;
+    info?: T | string;
+    onClose: () => void;
+    title?: string;
+    popupContent?: React.ReactNode;
+};
+
+const SPRING_CONFIG = { damping: 12, stiffness: 120, mass: 1 };
+const BOUNCE_IN_MS = 480;
+const EXPAND_MS = 480;
+const CONTENT_FADE_MS = 360;
+const BACKDROP_IN_MS = BOUNCE_IN_MS + 120;
+const BACKDROP_OUT_MS = CONTENT_FADE_MS + 120;
+const SHRINK_MS = 360;
+const SLIDE_DOWN_MS = 360;
 
 export default function QuestionPopup<T = any>({
     visible,
@@ -18,119 +43,204 @@ export default function QuestionPopup<T = any>({
     title = "Details",
     popupContent,
 }: QuestionPopupProps<T>) {
-    // Shared values for animation
-    const translateY = useSharedValue(120);
+    const { isSignedIn } = useAuth();
+    const { user } = useUser();
+    const userId = user?.id ?? "";
+    const queryclient = useQueryClient();
+
+    // Fetch saved graphs
+    const { data, isLoading, error, refetch } = useQuery({
+        queryKey: ['questionnaire', 'odd', userId],
+        queryFn: () => fetchUserQuestions({ userId, numQuestions: 1 }),
+        enabled: false, //!!userId,
+    });
+
+    ///// Entrance and exit animations
+    const { width, height } = Dimensions.get("window");
+
+    const SMALL_SQ = Math.round(Math.min(width, height) * 0.24);
+    const scaleToCover = (Math.max(width, height) / SMALL_SQ) * 1.2;
+
+    const [mounted, setMounted] = useState(visible);
+    const [isInteractive, setIsInteractive] = useState(false);
+    const timersRef = useRef<number[]>([]);
+
+    // Shared animation values
+    const dummyScale = useSharedValue(1);
+    const dummyTranslateY = useSharedValue(height); // offscreen
+    const contentOpacity = useSharedValue(0);
+    const contentScale = useSharedValue(0.98);
     const backdropOpacity = useSharedValue(0);
 
-    // animated styles
-    const cardStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: translateY.value }],
+    // Animated styles
+    const backdropStyle = useAnimatedStyle(() => ({ opacity: backdropOpacity.value }));
+    const dummyStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: dummyTranslateY.value }, { scale: dummyScale.value }],
+    }));
+    const contentStyle = useAnimatedStyle(() => ({
+        opacity: contentOpacity.value,
+        transform: [{ scale: contentScale.value }],
     }));
 
-    const backdropStyle = useAnimatedStyle(() => ({
-        opacity: backdropOpacity.value,
-    }));
+    // Clear timers on unmount
+    useEffect(() => () => timersRef.current.forEach((t) => clearTimeout(t)), []);
 
-    // when visible turns true, animate in
+    // Entrance animation
     useEffect(() => {
         if (!visible) return;
 
-        // reset start states
-        translateY.value = 120;
+        setMounted(true);
+        setIsInteractive(false);
+
+        dummyTranslateY.value = height;
+        dummyScale.value = 1;
+        contentOpacity.value = 0;
+        contentScale.value = 0.98;
         backdropOpacity.value = 0;
 
-        backdropOpacity.value = withTiming(1, {
-            duration: ANIM_DURATION,
-            easing: Easing.out(Easing.cubic),
-        });
+        // fade in backdrop gradually
+        backdropOpacity.value = withTiming(1, { duration: BACKDROP_IN_MS, easing: Easing.out(Easing.cubic) });
 
-        translateY.value = withTiming(0, {
-            duration: ANIM_DURATION,
-            easing: Easing.out(Easing.cubic),
-        });
-    }, [visible, translateY, backdropOpacity]);
+        // bounce dummy square from bottom to center
+        dummyTranslateY.value = withSpring(0, SPRING_CONFIG);
 
-    // close handler that plays exit animation then calls onClose after timeout
-    const requestClose = () => {
-        // animate out
-        backdropOpacity.value = withTiming(0, {
-            duration: ANIM_DURATION,
-            easing: Easing.in(Easing.cubic),
-        });
+        timersRef.current.push(
+            setTimeout(() => {
+                // expand square to cover screen
+                dummyScale.value = withTiming(scaleToCover, { duration: EXPAND_MS, easing: Easing.out(Easing.cubic) });
 
-        translateY.value = withTiming(120, {
-            duration: ANIM_DURATION,
-            easing: Easing.in(Easing.cubic),
-        });
+                // fade in popup content after expand
+                timersRef.current.push(
+                    setTimeout(() => {
+                        contentOpacity.value = withTiming(1, { duration: CONTENT_FADE_MS, easing: Easing.out(Easing.cubic) });
+                        contentScale.value = withTiming(1, { duration: CONTENT_FADE_MS, easing: Easing.out(Easing.cubic) });
+                        setIsInteractive(true);
+                    }, EXPAND_MS + 8)
+                );
+            }, BOUNCE_IN_MS)
+        );
+    }, [visible]);
 
-        // call onClose after animation finishes (avoid runOnJS)
-        setTimeout(() => {
-            onClose();
-        }, ANIM_DURATION);
+    // Exit animation
+    useEffect(() => {
+        if (visible) return;
+        if (!mounted) return;
+
+        setIsInteractive(false);
+
+        contentOpacity.value = withTiming(0, { duration: CONTENT_FADE_MS / 1.1, easing: Easing.in(Easing.cubic) });
+        contentScale.value = withTiming(0.98, { duration: CONTENT_FADE_MS / 1.1, easing: Easing.in(Easing.cubic) });
+        backdropOpacity.value = withTiming(0, { duration: BACKDROP_OUT_MS, easing: Easing.in(Easing.cubic) });
+
+        timersRef.current.push(
+            setTimeout(() => {
+                dummyScale.value = withTiming(1, { duration: SHRINK_MS, easing: Easing.in(Easing.cubic) });
+                timersRef.current.push(
+                    setTimeout(() => {
+                        dummyTranslateY.value = withTiming(height, { duration: SLIDE_DOWN_MS, easing: Easing.in(Easing.quad) });
+                        timersRef.current.push(
+                            setTimeout(() => {
+                                setMounted(false);
+                                onClose();
+                            }, SLIDE_DOWN_MS + 8)
+                        );
+                    }, SHRINK_MS + 8)
+                );
+            }, 90)
+        );
+    }, [visible, mounted]);
+
+    const startClose = () => {
+        if (!mounted) return;
+        setIsInteractive(false);
+
+        contentOpacity.value = withTiming(0, { duration: CONTENT_FADE_MS / 1.1, easing: Easing.in(Easing.cubic) });
+        contentScale.value = withTiming(0.98, { duration: CONTENT_FADE_MS / 1.1, easing: Easing.in(Easing.cubic) });
+        backdropOpacity.value = withTiming(0, { duration: BACKDROP_OUT_MS, easing: Easing.in(Easing.cubic) });
+
+        timersRef.current.push(
+            setTimeout(() => {
+                dummyScale.value = withTiming(1, { duration: SHRINK_MS, easing: Easing.in(Easing.cubic) });
+                timersRef.current.push(
+                    setTimeout(() => {
+                        dummyTranslateY.value = withTiming(height, { duration: SLIDE_DOWN_MS, easing: Easing.in(Easing.quad) });
+                        timersRef.current.push(
+                            setTimeout(() => {
+                                setMounted(false);
+                                onClose();
+                            }, SLIDE_DOWN_MS + 8)
+                        );
+                    }, SHRINK_MS + 8)
+                );
+            }, 90)
+        );
     };
 
-    // Render nothing if not visible (parent can choose to mount/unmount; we keep modal controlled by `visible`)
+    if (!mounted) return null;
+
     return (
-        <Modal transparent visible={visible} animationType="none" onRequestClose={() => { }}>
-            {/* Animated backdrop (not pressable) */}
-            <AnimatedViewAny
-                className="absolute inset-0 bg-black/40"
-                style={backdropStyle}
-                pointerEvents="auto"
-            />
+        <Modal visible={mounted} transparent animationType="none" statusBarTranslucent>
+            <View style={{ width, height, justifyContent: "center", alignItems: "center" }}>
+                {/* Backdrop */}
+                <Animated.View
+                    pointerEvents={isInteractive ? "auto" : "none"}
+                    className="absolute inset-0 bg-background"
+                    style={[{ zIndex: 10 }, backdropStyle]}
+                />
 
-            {/* Bottom sheet container */}
-            <View className="absolute inset-0 justify-end items-center p-5">
-                <AnimatedViewAny
-                    className="bg-white rounded-2xl p-5 border border-dark w-full max-w-[720px]"
-                    style={cardStyle}
-                    accessible
-                    accessibilityRole="dialog"
-                    accessibilityLabel={`${title} details`}
+                {/* Dummy square */}
+                <Animated.View
+                    pointerEvents="none"
+                    style={[
+                        {
+                            width: SMALL_SQ,
+                            height: SMALL_SQ,
+                            borderRadius: 12,
+                            backgroundColor: "#F2BB16",
+                            position: "absolute",
+                            zIndex: 20,
+                            elevation: Platform.OS === "android" ? 30 : undefined,
+                            shadowColor: "#F2BB16",
+                            shadowOpacity: 0.24,
+                            shadowRadius: 12,
+                            shadowOffset: { width: 0, height: 6 },
+                        },
+                        dummyStyle,
+                    ]}
+                />
+
+                {/* Popup content */}
+                <Animated.View
+                    pointerEvents={isInteractive ? "auto" : "none"}
+                    className="p-8 inset-0 absolute justify-center items-center z-20"
+                    style={[contentStyle]}
                 >
-                    {/* Header: title + explicit X */}
-                    <View className="flex-row justify-between items-start">
-                        <Text className="text-xl font-elms-bold text-dark">{title}</Text>
+                    <View className="flex-1 bg-background rounded-2xl p-6 border border-dark w-full">
+                        {/* Header */}
+                        <View className="flex-row justify-between items-start">
+                            <Text className="text-xl font-elms-bold text-dark">{title}</Text>
+                            <TouchableOpacity onPress={startClose} className="p-2">
+                                <Text className="text-lg font-bold text-grey">✕</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                        <TouchableOpacity
-                            onPress={requestClose}
-                            className="p-2"
-                            accessibilityRole="button"
-                            accessibilityLabel={`Close ${title} dialog`}
-                        >
-                            <Text className="text-lg font-bold text-grey">✕</Text>
-                        </TouchableOpacity>
-                    </View>
+                        {/* Body */}
+                        <View className="my-2 flex-1">
+                            {popupContent ? popupContent : info ? (
+                                <Text className="text-sm text-grey">{typeof info === "string" ? info : JSON.stringify(info, null, 2)}</Text>
+                            ) : (
+                                <Text className="text-sm text-grey">No details provided.</Text>
+                            )}
+                        </View>
 
-                    {/* Body: either popupContent or a default render of info */}
-                    <View className="my-2">
-                        {popupContent ? (
-                            popupContent
-                        ) : (
-                            <>
-                                {/* Default rendering: stringify small info object */}
-                                {info ? (
-                                    <Text className="text-sm text-grey">
-                                        {typeof info === "string"
-                                            ? info
-                                            : JSON.stringify(info, null, 2)}
-                                    </Text>
-                                ) : (
-                                    <Text className="text-sm text-grey">
-                                        No details provided.
-                                    </Text>
-                                )}
-                            </>
-                        )}
+                        {/* Footer */}
+                        <View className="mt-4 flex-row justify-end">
+                            <TouchableOpacity onPress={startClose} className="px-3 py-2">
+                                <Text className="text-primary font-medium">Close</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-
-                    {/* Footer close */}
-                    <View className="mt-4 flex-row justify-end">
-                        <TouchableOpacity onPress={requestClose} className="px-3 py-2" accessibilityRole="button">
-                            <Text className="text-primary font-medium">Close</Text>
-                        </TouchableOpacity>
-                    </View>
-                </AnimatedViewAny>
+                </Animated.View>
             </View>
         </Modal>
     );

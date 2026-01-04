@@ -19,6 +19,15 @@ interface GeoOption {
   value: string;
 }
 
+interface variableOption {
+  label: string;
+  value: string;
+}
+
+type Translations = {
+  payload: Record<string, string>
+}
+
 
 // Styling props
 interface ButtonProps {
@@ -32,6 +41,7 @@ interface ButtonProps {
 
 interface CardProps {
   id: number;
+  chart_id: string;
   title: string;
   description: string;
   db_name: string;
@@ -53,6 +63,23 @@ type QuestionPopupProps<T = any> = {
   onClose: () => void; // called after exit animation completes
   title?: string;
   popupContent?: React.ReactNode; // optional custom content; if present, used instead of info rendering
+};
+
+type PopupChoice = {
+  id: number;
+  text: string;
+};
+
+type PopupQuestion = {
+  questionId: number;
+  objectId: string;
+  title: string;
+  body: string;
+  explanation?: string | null;
+  difficulty?: number | null;
+  sponsor?: string | null;
+  consecutiveCorrect: number;
+  choices: PopupChoice[];
 };
 
 type GenericCardProps = {
@@ -151,6 +178,7 @@ type ApiAllChartResponse = {
 type ApiRecommChartParams = {
   userId: string;
   limit?: number;
+  lang?: string;
   excludeSeenDays: number;
   signal?: AbortSignal;
   afterCursor?: AfterCursor;
@@ -159,6 +187,7 @@ type ApiRecommChartParams = {
 type ApiRandomChartParams = {
   limit: number;
   limit?: number;
+  lang?: string;
   afterCursor?: AfterCursorRandom | null;
   signal?: AbortSignal | null;
 }
@@ -181,6 +210,7 @@ type Fetcher = (opts: {
   query?: string;
   category?: string;
   limit?: number;
+  lang?: string;
   afterId?: number | null | undefined;
   signal?: AbortSignal;
 }) => Promise<PaginatedResponse>;

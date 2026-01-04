@@ -1,5 +1,6 @@
 import SunSavedCard from '@/components/cards/SunSavedCard';
 import AnimatedItemWrapper from '@/components/WrapperEntranceList';
+import { defaultLang } from '@/constants/utilities';
 import { fetchSavedEvents } from '@/services/api';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -11,11 +12,12 @@ const Saved = () => {
     const { user } = useUser();
     const userId = user?.id ?? "";
     const queryclient = useQueryClient();
+    const lang = defaultLang;
 
     // Fetch saved graphs
     const { data, isLoading, error, refetch } = useQuery({
         queryKey: ['charts', 'saved', userId],
-        queryFn: () => fetchSavedEvents(userId),
+        queryFn: () => fetchSavedEvents(userId, lang),
         staleTime: 0,
         refetchOnWindowFocus: true,
         refetchOnMount: true,
@@ -31,8 +33,8 @@ const Saved = () => {
             contentInsetAdjustmentBehavior="automatic"
             className="flex-1 bg-background">
             {isSignedIn &&
-                <View className="px-10">
-                    <Text className="text-lg text-black font-bold mt-5 mb-3">Saved Charts</Text>
+                <View className="px-10 mt-8">
+                    <Text className="text-dark mb-4 text-4xl tracking-tight font-elms-bold">Saved Charts</Text>
                     <FlatList<SavedCardProps>
                         data={data}
                         renderItem={({ item, index }: ListRenderItemInfo<SavedCardProps>) => (

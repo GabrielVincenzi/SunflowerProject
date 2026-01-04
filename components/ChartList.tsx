@@ -1,7 +1,7 @@
 import { defaultLang } from "@/constants/utilities";
-import { fetchAllChartDetails, fetchRandomCharts, fetchRecommendedCharts } from "@/services/api";
+import { fetchAllChartDetails } from "@/services/api";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { ActivityIndicator, FlatList, ListRenderItemInfo, Text, View } from "react-native";
 import AnimatedItemWrapper from "./WrapperEntranceList";
 import SunCard from "./cards/SunCard";
@@ -12,104 +12,39 @@ export default function InfiniteChartList({
     renderHeader,
     pageLimit = 5,
     fetcher = fetchAllChartDetails as Fetcher,
-    recommended = false,
-    excludeSeenDays = 2,
-    random = false,
-    userId,
 }: ChartListProps) {
     const queryclient = useQueryClient();
 
     const {
         data,
         isLoading,
+        isFetching,
         isFetchingNextPage,
         fetchNextPage,
         hasNextPage,
         refetch,
         isRefetching,
         error,
-    } = useInfiniteQuery<ApiAllChartResponseWithCursor>({
-        queryKey: recommended
-            ? ["charts", "recommended", userId, pageLimit]
-            : random
-                ? ["charts", "random", pageLimit]
-                : ["charts", "all", searchQuery, searchCategory, pageLimit],
-        queryFn: ({ pageParam = null, signal }: { pageParam?: any; signal?: AbortSignal | undefined }) => {
-
-            // Type guard for recommended cursor
-            const isAfterCursor = (p: any): p is Exclude<AfterCursor, null> => {
-                return p !== null && typeof p === "object" && ("lastSimilarity" in p || "lastId" in p);
-            };
-
-            // Type guard for random cursor
-            const isAfterCursorRandom = (p: any): p is Exclude<AfterCursorRandom, null> => {
-                return p !== null && typeof p === "object" && ("seed" in p || "lastSortKey" in p || "lastId" in p);
-            };
-
-            // Recommended
-            if (recommended) {
-                if (!userId) throw new Error("userId is required for recommended charts");
-
-                const afterCursor: AfterCursor = isAfterCursor(pageParam) ? pageParam : null;
-
-                return fetchRecommendedCharts({
-                    userId,
-                    limit: pageLimit,
-                    lang: defaultLang,
-                    excludeSeenDays,
-                    afterCursor, // correctly typed: AfterCursor | undefined (we pass null which is allowed)
-                    signal,
-                });
-            }
-
-            // Random
-            if (random) {
-                const afterCursorRandom: AfterCursorRandom = isAfterCursorRandom(pageParam) ? pageParam : null;
-
-                return fetchRandomCharts({
-                    limit: pageLimit,
-                    lang: defaultLang,
-                    afterCursor: afterCursorRandom,
-                    signal,
-                }) as Promise<ApiAllChartResponseWithCursor>;
-            }
-
-            const numericAfterId =
-                typeof pageParam === "number"
-                    ? pageParam
-                    : isAfterCursor(pageParam)
-                        ? pageParam!.lastId
-                        : undefined;
-
+    } = useInfiniteQuery({
+        queryKey: ["charts", searchQuery, searchCategory, pageLimit],
+        queryFn: ({ pageParam = undefined, signal }: { pageParam?: number | undefined; signal?: AbortSignal | undefined; }) => {
             return fetcher({
                 query: searchQuery,
                 category: searchCategory,
                 lang: defaultLang,
                 limit: pageLimit,
-                afterId: pageParam,
+                afterId: pageParam ?? undefined,
                 signal,
-            }) as Promise<ApiAllChartResponseWithCursor>;
+            });
         },
-        initialPageParam: undefined,
-        getNextPageParam: (lastPage: ApiAllChartResponse & { hasMore?: boolean }) =>
-            lastPage.hasMore ? lastPage.nextCursor : undefined,
+        initialPageParam: 0,
+        getNextPageParam: (lastPage: ApiAllChartResponse, pages) => lastPage.nextCursor,
         refetchOnWindowFocus: false,
     });
 
     const charts: CardProps[] = useMemo(() => {
         if (!data?.pages) return [];
-        const seen = new Set<string>();
-        const out: CardProps[] = [];
-        for (const p of data.pages) {
-            for (const item of p.data ?? []) {
-                const key = String(item.chart_id ?? item.id);
-                if (!seen.has(key)) {
-                    seen.add(key);
-                    out.push(item);
-                }
-            }
-        }
-        return out;
+        return data.pages.flatMap((p) => p.data ?? []);
     }, [data]);
 
     const throttle = <T extends (...args: any[]) => void>(fn: T, wait = 800) => {
@@ -131,6 +66,10 @@ export default function InfiniteChartList({
         }, 800),
         [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]
     );
+
+    const onRefresh = useCallback(() => {
+        refetch();
+    }, [refetch]);
 
     const renderFooter = () =>
         isFetchingNextPage ? (
@@ -181,13 +120,14 @@ export default function InfiniteChartList({
             data={charts}
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
-            keyExtractor={(item) => String(item.chart_id ?? item.id)}
+            keyExtractor={(item) => String(item.id)}
             ListHeaderComponent={headerNodeElement ?? undefined}
             ListEmptyComponent={<EmptyComponent />}
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
             ListFooterComponent={renderFooter}
             refreshing={isRefetching}
+            onRefresh={onRefresh}
             contentContainerStyle={{ paddingBottom: 120 }}
             ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
             initialNumToRender={pageLimit}
