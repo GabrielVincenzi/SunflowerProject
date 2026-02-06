@@ -31,8 +31,8 @@ export default function useSeen({
     }, []);
 
     const seenMutation = useMutation({
-        mutationFn: ({ userId, objectId, time }: { userId: string; objectId: string; time: string }) =>
-            postNewEvent({ userId, action: "seen", objectId, time }),
+        mutationFn: ({ userId, objectId }: { userId: string; objectId: string }) =>
+            postNewEvent({ userId, action: "seen", objectId }),
         onError: (err) => {
             // optional: keep sentRef false so we can retry on next mount/active
             console.warn("postNewEvent(seen) failed:", err);
@@ -51,7 +51,7 @@ export default function useSeen({
         timerRef.current = setTimeout(() => {
             // final guard
             if (!userId || !objectId) return;
-            seenMutation.mutate({ userId, objectId, time: new Date().toISOString() });
+            seenMutation.mutate({ userId, objectId });
             sentRef.current = true;
             timerRef.current = null;
         }, delayMs);

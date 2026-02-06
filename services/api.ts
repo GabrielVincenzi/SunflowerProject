@@ -103,6 +103,7 @@ export const fetchRecommendedCharts = async ({
 export const fetchRandomCharts = async ({
     limit,
     lang,
+    categories,
     afterCursor,
     signal,
 }: ApiRandomChartParams): Promise<ApiAllChartResponse & { nextCursor?: AfterCursorRandom | null }> => {
@@ -110,6 +111,7 @@ export const fetchRandomCharts = async ({
 
     const params = new URLSearchParams();
     if (limit != null) params.set("limit", String(limit));
+    if (categories != null) params.set("categories", String(categories));
     if (lang?.trim()) params.set("lang", lang.trim());
 
     // Only send cursor fields that the simplified API expects
@@ -270,6 +272,7 @@ export const fetchSavedIdsEvents = async (
 
         const json = await res.json();
         if (!json?.ids) return new Set();
+        console.log(json)
 
         return new Set(
             json.ids
@@ -309,12 +312,11 @@ export const deleteSavedEvent = async ({ userId, objectId }: { userId: string; o
 };
 
 // Event (User action on Object) POST requests
-export const postNewEvent = async ({ userId, action, objectId, time,
+export const postNewEvent = async ({ userId, action, objectId,
 }: {
     userId: string;
     action: string;
     objectId: string;
-    time: string; // or Date.toISOString()
 }): Promise<Set<string>> => {
     const apiUrl = `${baseUrl}/events/new`;
 
@@ -322,7 +324,6 @@ export const postNewEvent = async ({ userId, action, objectId, time,
         userId,
         action,
         objectId,
-        time,
     };
 
     const response = await fetch(apiUrl, {

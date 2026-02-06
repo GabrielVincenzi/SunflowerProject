@@ -68,6 +68,7 @@ export default function InfiniteChartList({
 
                 return fetchRandomCharts({
                     limit: pageLimit,
+                    categories: 3,
                     lang: defaultLang,
                     afterCursor: afterCursorRandom,
                     signal,

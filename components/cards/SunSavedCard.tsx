@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-const SunSavedCard = ({ data: { id, title, description, db_name, vars, chart_type }, savedAt }: SavedCardProps) => {
+const SunSavedCard = ({ data: { id, title, description, db_name, vars, chart_type, chart_id, }, savedAt }: SavedCardProps) => {
 
     return (
         <TouchableOpacity
@@ -15,11 +15,12 @@ const SunSavedCard = ({ data: { id, title, description, db_name, vars, chart_typ
                     pathname: "/infos/[id]", // /infos/[id]
                     params: {
                         id,
+                        chart_id,
                         title,
                         description,
                         db: db_name,
                         chart_type,
-                        variables: JSON.stringify(vars)
+                        variables: vars
                     }
                 })
             }>

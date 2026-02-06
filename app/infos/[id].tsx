@@ -40,6 +40,7 @@ const ChartPage = () => {
     const screenWidth = Dimensions.get("window").width * 0.9;
     const { user } = useUser();
     const { id, chart_id, title, description, db, variables, chart_type } = useLocalSearchParams();
+    console.log(chart_id)
     const queryClient = useQueryClient();
 
     /////////////////////////////// Fetching availabilities  ////////////////////////////////
@@ -226,6 +227,7 @@ const ChartPage = () => {
         queryKey: ['charts', 'savedIds', userId],
         queryFn: () => fetchSavedIdsEvents(userId),
     });
+    console.log("Saved graphs: ", savedSet, userId)
 
     const [saving, setSaving] = useState(false);
     const [isSaved, setIsSaved] = useState<boolean>(() =>
@@ -243,7 +245,6 @@ const ChartPage = () => {
                 userId,
                 action: 'saved',
                 objectId: chartId,
-                time: new Date().toISOString(),
             }),
 
         onMutate: async ({ userId, chartId }) => {
@@ -270,10 +271,10 @@ const ChartPage = () => {
         },
 
         onSettled: async (_data, _err, vars) => {
-            await Promise.all([
-                queryClient.invalidateQueries({ queryKey: ['charts', 'saved', vars.userId], exact: true, refetchType: 'all' }),
-                queryClient.invalidateQueries({ queryKey: ['charts', 'savedIds', vars.userId], exact: true, refetchType: 'all' }),
-            ]);
+            //await Promise.all([
+            //    queryClient.invalidateQueries({ queryKey: ['charts', 'saved', vars.userId], exact: true, refetchType: 'all' }),
+            //    queryClient.invalidateQueries({ queryKey: ['charts', 'savedIds', vars.userId], exact: true, refetchType: 'all' }),
+            //]);
         },
     });
 

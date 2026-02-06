@@ -186,7 +186,7 @@ type ApiRecommChartParams = {
 
 type ApiRandomChartParams = {
   limit: number;
-  limit?: number;
+  categories?: number;
   lang?: string;
   afterCursor?: AfterCursorRandom | null;
   signal?: AbortSignal | null;
