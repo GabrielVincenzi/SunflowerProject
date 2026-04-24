@@ -1,19 +1,15 @@
-import InfiniteChartList from "@/components/ChartList";
+import ChartList from "@/components/ChartList";
+import RequestDataPopup from "@/components/RequestDataPopup";
 import SearchBar from "@/components/SearchBar";
 import { images } from "@/constants/images";
 import React, { useCallback, useRef, useState } from "react";
-import {
-    Image,
-    Keyboard,
-    Text,
-    TextInput,
-    TouchableWithoutFeedback,
-    View
-} from "react-native";
+import { Image, Keyboard, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 const SearchPage = () => {
     const [input, setInput] = useState<string>("");
-    const [committedQuery, setCommittedQuery] = useState<string>(""); // only updated when Search pressed
+    const [committedQuery, setCommittedQuery] = useState<string>("");
+    const [requestVisible, setRequestVisible] = useState(false);
     const inputRef = useRef<TextInput | null>(null);
 
     const handleSearch = useCallback(() => {
@@ -21,58 +17,91 @@ const SearchPage = () => {
         inputRef.current?.blur();
     }, [input]);
 
-    const renderHeader = useCallback(() => (
-        <View>
-            <View className="w-full flex-row justify-center mt-20 items-center">
-                <Image source={images.logoMain} className="w-16 h-16" />
-            </View>
+    const renderHeader = () => (
+        <View className="pt-16 pb-8 px-8">
+            <Animated.View entering={FadeInDown.duration(800).delay(100)} className="items-center mb-12">
+                {/* Branding Block */}
+                <View className="w-20 h-20 bg-white rounded-[24px] items-center justify-center">
+                    <Image source={images.logoMain} className="w-14 h-14" resizeMode="contain" />
+                </View>
+                <Text className="text-[10px] uppercase font-elms-bold tracking-[0.5em] text-dark/30 mt-6 text-center">
+                    SIGNAL DISCOVERY ENGINE
+                </Text>
+            </Animated.View>
 
-            <View className="my-5 px-6">
+            <View className="mb-10">
                 <SearchBar
-                    placeholder="Search ..."
+                    placeholder="Search global signals..."
                     value={input}
                     onChangeText={setInput}
-                    onPress={handleSearch} // the Search button inside SearchBar will call this
-                    // pass inputRef so SearchBar can wire it to TextInput (optional)
+                    onPress={handleSearch}
                     inputRef={inputRef}
-                    editable={true}
                     autoFocus={true}
                 />
             </View>
 
-            {/* Show a small "results for" when there's a committed query */}
             {committedQuery ? (
-                <View className="px-6 mb-2">
-                    <Text className="text-xl text-black font-bold">
-                        Search results for{" "}
-                        <Text className="text-accent">{committedQuery}</Text>
-                    </Text>
+                <View className="space-y-4">
+                    <View className="flex-row items-baseline gap-2">
+                        <Text className="text-2xl font-elms-bold text-dark tracking-tighter italic">Results for</Text>
+                        <Text className="text-2xl font-elms-bold italic text-white">"{committedQuery}"</Text>
+                    </View>
+
+                    <TouchableOpacity
+                        onPress={() => setRequestVisible(true)}
+                        activeOpacity={0.6}
+                        className="py-3 border-b-2 border-dark/5 self-start"
+                    >
+                        <Text className="text-[10px] font-elms-bold uppercase tracking-[0.3em] text-dark/40">
+                            CAN'T FIND WHAT YOU NEED? <Text className="text-dark/60">REQUEST DATA</Text>
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             ) : null}
         </View>
-    ), [input, committedQuery, handleSearch]);
+    );
 
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-            <View className="flex-1 bg-background px-4">
-                {renderHeader()}
+        <>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View className="flex-1 bg-primary">
+                    {!committedQuery ? (
+                        <View className="flex-1">
+                            {renderHeader()}
+                            <View className="flex-1 justify-center items-center pb-32 px-10">
+                                <View className="w-2 h-2 rounded-full bg-primary mb-6 animate-pulse" />
+                                <Text className="text-center text-dark/40 font-elms-bold italic text-2xl tracking-tighter leading-tight">
+                                    The future of data{"\n"}synthesis starts here.
+                                </Text>
 
-                {!committedQuery ? (
-                    <View className="flex-1 justify-center px-4">
-                        <Text className="text-center text-gray-500">
-                            The future of Data Driven Information is here
-                        </Text>
-                    </View>
-                ) : (
-                    <InfiniteChartList
-                        searchQuery={committedQuery}
-                        searchCategory={""}
-                        renderHeader={null}
-                        pageLimit={5}
-                    />
-                )}
-            </View>
-        </TouchableWithoutFeedback>
+                                <TouchableOpacity
+                                    onPress={() => setRequestVisible(true)}
+                                    activeOpacity={0.8}
+                                    className="mt-12 flex-row items-center gap-3 px-8 py-4 rounded-full border-2 border-dark bg-white"
+                                >
+                                    <Text className="text-[10px] font-elms-bold uppercase tracking-[0.4em] text-dark">
+                                        REQUEST DATA FEED
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    ) : (
+                        <ChartList
+                            searchQuery={committedQuery}
+                            searchCategory={""}
+                            renderHeader={renderHeader}
+                            pageLimit={5}
+                        />
+                    )}
+                </View>
+            </TouchableWithoutFeedback>
+
+            <RequestDataPopup
+                visible={requestVisible}
+                onClose={() => setRequestVisible(false)}
+                prefillQuery={input}
+            />
+        </>
     );
 };
 

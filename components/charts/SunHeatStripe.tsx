@@ -58,7 +58,7 @@ function SunHeatStripe({
         );
     }
 
-    const rows = useMemo(() => {
+    const chartData = useMemo(() => {
         const seriesKeys = Object.keys(apiData.series || {});
         const geos = apiData.activeGeos || [];
 
@@ -95,13 +95,13 @@ function SunHeatStripe({
     });
 
     // Normalize rows so each has values aligned to periods length
-    const normalizedRows = rows.map((r) => {
+    const normalizedchartData = chartData.map((r) => {
         const values = periods.map((_, i) => (r.values?.[i] !== undefined ? r.values[i] : null));
         return { ...r, values };
     });
 
     // compute global min/max across all rows (excluding nulls) and ensure numbers
-    const allNumeric = normalizedRows.flatMap((r) =>
+    const allNumeric = normalizedchartData.flatMap((r) =>
         r.values.filter((v) => v !== null && v !== undefined)
     ) as number[];
 
@@ -125,7 +125,7 @@ function SunHeatStripe({
 
     // layout
     const width = screenWidth;
-    const rowsCount = normalizedRows.length;
+    const rowsCount = normalizedchartData.length;
     const totalGaps = Math.max(0, rowsCount - 1) * rowGap;
     const heightPerRow = Math.min(maxRowHeigth, (maxHeight - totalGaps - margin.top - margin.bottom) / rowsCount);
 
@@ -173,7 +173,7 @@ function SunHeatStripe({
                 </Defs>
 
                 {/* Rows */}
-                {normalizedRows.map((row, rIdx) => {
+                {normalizedchartData.map((row, rIdx) => {
                     // compute y offset for this row (account for previous rows + gaps)
                     const yOffset =
                         margin.top +
@@ -247,3 +247,4 @@ function SunHeatStripe({
 }
 
 export default SunHeatStripe;
+

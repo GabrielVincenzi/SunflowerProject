@@ -1,173 +1,76 @@
-import { animationDuration, colors } from "@/constants/utilities";
+import { animationDuration, CHART_COLORS, HEIGHT, THEME_COLORS } from "@/constants/utilities";
 import { arc, pie, PieArcDatum } from "d3-shape";
 import React, { useEffect, useMemo } from "react";
 import { Text, View } from "react-native";
-import Animated, { useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
-import Svg, { G, Path } from "react-native-svg";
+import Animated, { Easing, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
+import Svg, { G, Path, PathProps } from "react-native-svg";
+import ChartLegend from "../ChartLegend";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
+// ─── Animated arc ─────────────────────────────────────────────
 function AnimatedArc({ d, color }: { d: string; color: string }) {
     const progress = useSharedValue(0);
 
     useEffect(() => {
         progress.value = 0;
-        progress.value = withTiming(1, { duration: animationDuration });
+        progress.value = withTiming(1, { duration: animationDuration, easing: Easing.bezier(0.16, 1, 0.3, 1) });
     }, [d]);
 
-    const animatedProps = useAnimatedProps(() => ({
+    const animatedProps = useAnimatedProps<PathProps>(() => ({
         opacity: progress.value,
     }));
 
-    return (
-        <AnimatedPath
-            d={d}
-            fill={color}
-            animatedProps={animatedProps}
-        />
-    );
+    return <AnimatedPath d={d} fill={color} stroke={THEME_COLORS.dark} strokeWidth={2.5} animatedProps={animatedProps} />;
 }
 
-function SunPieChart({ screenWidth, apiData }: ChartProps) {
-    const size = Math.min(screenWidth, 280);
+// ─── Component ────────────────────────────────────────────────
+function SunPieChart({ screenWidth, screenHeight, apiData }: ChartProps) {
+    const size = Math.min(screenWidth, screenHeight ? screenHeight * 0.4 : HEIGHT);
     const radius = size / 2;
     const innerRadius = radius * 0.6;
-
     const geos = apiData.activeGeos || [];
-    const safeColors = colors || ["#000"];
+    const safeColors = CHART_COLORS || ["#000"];
 
     const variables = useMemo(
-        () =>
-            Array.from(
-                new Set(
-                    Object.keys(apiData.series || {}).map(k =>
-                        k.substring(0, k.lastIndexOf("_"))
-                    )
-                )
-            ),
+        () => Array.from(new Set(Object.keys(apiData.series || {}).map((k) => k.substring(0, k.lastIndexOf("_"))))),
         [apiData]
     );
 
+    const lastPeriodIndex = Math.max(0, (apiData.activePeriods?.length ?? 1) - 1);
+
     const chartData = useMemo(() => {
-        if (geos.length === 1) {
-            const geo = geos[0];
-            return variables.map((v, i) => ({
-                label: v,
-                value: apiData.series?.[`${v}_${geo}`]?.[0]?.value ?? 0,
-                color: safeColors[i % safeColors.length],
-            }));
-        }
+        const geo = geos[0];
+        if (!geo) return [];
+        return variables.map((variable, varIdx) => ({
+            label: apiData.variableLabels?.[variable] ?? variable,
+            value: Math.abs(apiData.series?.[`${variable}_${geo}`]?.[lastPeriodIndex]?.value ?? 0),
+            color: safeColors[varIdx % safeColors.length],
+        }));
+    }, [apiData, geos, variables, lastPeriodIndex, safeColors]);
 
-        if (variables.length === 1) {
-            const variable = variables[0];
-            return geos.map((geo, i) => ({
-                label: geo,
-                value: apiData.series?.[`${variable}_${geo}`]?.[0]?.value ?? 0,
-                color: safeColors[i % safeColors.length],
-            }));
-        }
-
-        return [];
-    }, [apiData, geos, variables]);
-
-    const pieGenerator = useMemo(
-        () =>
-            pie<typeof chartData[number]>()
-                .value(d => d.value)
-                .sort(null),
-        []
+    const legendItems = useMemo<LegendItem[]>(
+        () => chartData.map(({ label, color }) => ({ label, color })),
+        [chartData]
     );
 
-    const arcs = useMemo(
-        () => pieGenerator(chartData),
-        [pieGenerator, chartData]
-    );
-
-    const arcGenerator = useMemo(
-        () =>
-            arc<PieArcDatum<typeof chartData[number]>>()
-                .innerRadius(innerRadius)
-                .outerRadius(radius),
-        [innerRadius, radius]
-    );
-
-    console.log(chartData)
-
-    const centerLabel =
-        geos.length === 1 ? geos[0] : variables[0];
+    const pieGenerator = useMemo(() => pie<typeof chartData[number]>().value((d) => d.value).sort(null), []);
+    const arcs = useMemo(() => pieGenerator(chartData), [pieGenerator, chartData]);
+    const arcGen = useMemo(() => arc<PieArcDatum<typeof chartData[number]>>().innerRadius(innerRadius).outerRadius(radius), [innerRadius, radius]);
+    const centerLabel = geos[0] ?? "";
 
     return (
-        <View className="w-full px-4 items-center">
-
-            {/* Legend */}
-            <View className="flex-row flex-wrap justify-center mb-4">
-                {chartData.map(d => (
-                    <View
-                        key={d.label}
-                        className="flex-row items-center m-2"
-                        style={{ gap: 6 }}
-                    >
-                        <View
-                            style={{
-                                width: 12,
-                                height: 12,
-                                backgroundColor: d.color,
-                                borderRadius: 2,
-                            }}
-                        />
-                        <Text style={{ fontSize: 12, color: "grey" }}>
-                            {d.label}
-                        </Text>
-                    </View>
-                ))}
-            </View>
-
-            {/* Donut */}
-            <View
-                style={{
-                    width: size,
-                    height: size,
-                    position: "relative",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
+        <View className="w-full bg-background items-center py-8">
+            <ChartLegend items={legendItems} />
+            <View style={{ width: size, height: size, justifyContent: "center", alignItems: "center" }}>
                 <Svg width={size} height={size}>
                     <G transform={`translate(${radius}, ${radius})`}>
-                        {arcs.map(a => {
-                            const d = arcGenerator(a);
-                            if (!d) return null;
-
-                            return (
-                                <AnimatedArc
-                                    key={a.data.label}
-                                    d={d}
-                                    color={a.data.color}
-                                />
-                            );
-                        })}
+                        {arcs.map((a, i) => <AnimatedArc key={i} d={arcGen(a)!} color={a.data.color} />)}
                     </G>
                 </Svg>
-
-                {/* Center label */}
-                <View
-                    style={{
-                        position: "absolute",
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                    pointerEvents="none"
-                >
-                    <Text
-                        style={{
-                            fontSize: 14,
-                            fontWeight: "600",
-                            color: "grey",
-                            textAlign: "center",
-                        }}
-                    >
-                        {centerLabel}
-                    </Text>
+                <View className="absolute items-center" pointerEvents="none">
+                    <Text className="text-[10px] font-black italic text-dark opacity-30">SIGNAL_NODE</Text>
+                    <Text className="text-xl font-black italic text-dark tracking-tighter">{(geos[0] || "").toUpperCase()}</Text>
                 </View>
             </View>
         </View>

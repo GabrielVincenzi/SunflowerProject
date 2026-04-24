@@ -4,6 +4,7 @@ import type { AppStateStatus } from "react-native";
 import { AppState } from "react-native";
 import { postNewEvent } from "./api";
 import { useAppState } from "./useAppState";
+import { useAuthFetch } from "./useAuthFetch";
 
 type Params = {
     userId?: string | null;
@@ -19,6 +20,7 @@ export default function useSeen({
     enabled = true,
 }: Params) {
     const queryClient = useQueryClient();
+    const authFetch = useAuthFetch();
 
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const sentRef = useRef(false); // prevents duplicate sends per mounted instance
@@ -31,8 +33,8 @@ export default function useSeen({
     }, []);
 
     const seenMutation = useMutation({
-        mutationFn: ({ userId, objectId }: { userId: string; objectId: string }) =>
-            postNewEvent({ userId, action: "seen", objectId }),
+        mutationFn: ({ objectId, authFetch }: { objectId: string; authFetch: AuthFetch }) =>
+            postNewEvent({ action: "seen", objectId, authFetch }),
         onError: (err) => {
             // optional: keep sentRef false so we can retry on next mount/active
             console.warn("postNewEvent(seen) failed:", err);
@@ -45,17 +47,17 @@ export default function useSeen({
         clearTimer();
 
         if (!enabled) return;
-        if (!userId || !objectId) return;
+        if (!objectId) return;
         if (sentRef.current) return;
 
         timerRef.current = setTimeout(() => {
             // final guard
-            if (!userId || !objectId) return;
-            seenMutation.mutate({ userId, objectId });
+            if (!objectId) return;
+            seenMutation.mutate({ objectId, authFetch });
             sentRef.current = true;
             timerRef.current = null;
         }, delayMs);
-    }, [clearTimer, delayMs, enabled, userId, objectId, seenMutation]);
+    }, [clearTimer, delayMs, enabled, objectId, seenMutation]);
 
     // AppState change handler: start timer when active; clear timer when not active.
     const onAppStateChange = useCallback(

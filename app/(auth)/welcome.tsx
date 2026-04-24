@@ -1,7 +1,6 @@
 import CustomButton from "@/components/CustomButton";
 import { images } from "@/constants/images";
 import { useTranslations } from "@/services/useTranslation";
-import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
 import { Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
@@ -9,85 +8,67 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Swiper from "react-native-swiper";
 
 const Onboarding = () => {
-    const queryclient = useQueryClient();
     const { data } = useTranslations();
-    if (!data) {
-        return <View><Text>NO DATA</Text></View>
-    }
-    const t: any = data.payload;
-
     const swiperRef = useRef<Swiper>(null);
     const [activeIndex, setActiveIndex] = useState(0);
-    const isLastSlide = activeIndex === 3 - 1;
+
+    if (!data) return null;
+    const t: any = data.payload;
+    const isLastSlide = activeIndex === 2;
 
     return (
-        <SafeAreaView className="flex h-full items-center justify-between bg-background">
-            <TouchableOpacity
-                onPress={() => { router.replace("/(tabs)/home") }}
-                className="w-full flex justify-end items-end p-5"
-            >
-                <Text className="text-black text-medium font-elms-regular">{t.welcome.skip}</Text>
+        <SafeAreaView className="flex h-full bg-primary">
+            {/* Minimalist System Skip */}
+            <TouchableOpacity onPress={() => router.replace("/(tabs)/home")} className="w-full flex items-end px-8 pt-4">
+                <Text className="text-dark/40 font-elms-bold uppercase tracking-[0.4em] text-[10px]">{t.welcome.skip}</Text>
             </TouchableOpacity>
+
             <Swiper
                 ref={swiperRef}
                 loop={false}
-                dot={<View className="w-[32px] h-[4px] mx-1 bg-slate-100 rounded-full" />}
-                activeDot={<View className="w-[32px] h-[4px] mx-1 bg-accent rounded-full" />}
+                dot={<View className="w-[40px] h-[3px] mx-1 bg-dark/10 rounded-full" />}
+                activeDot={<View className="w-[40px] h-[3px] mx-1 bg-dark rounded-full" />}
                 onIndexChanged={(index) => setActiveIndex(index)}
             >
-                {/*Slide 0*/}
-                <View key={0} className="flex-1 px-4 pt-6">
-                    <View className="flex-1 relative">
-                        <View className="justify-start h-full pr-16">
-                            <Text className="text-dark text-5xl font-elms-bold">{t.welcome.slides[0].title}</Text>
-                            {t.welcome.slides[0].description ? (
-                                <Text className="text-md font-semibold mt-4 text-grey">{t.welcome.slides[0].description}</Text>
-                            ) : null}
-                        </View>
-                        <Image
-                            source={images.sunflower}
-                            className="w-full h-full absolute right-[-48px] bottom-[-128px]"
-                            resizeMode="cover"
-                        />
-                    </View>
+                {/* Visual Archetype Slide */}
+                <View key={0} className="flex-1 px-8 pt-12">
+                    <View className="h-[2px] w-12 bg-dark mb-6" />
+                    <Text className="text-dark text-7xl font-elms-bold italic tracking-tighter leading-[0.85]">{t.welcome.slides[0].title}</Text>
+                    <Text className="text-xl font-elms-bold italic mt-8 text-dark/60 leading-relaxed">{t.welcome.slides[0].description}</Text>
+                    <Image source={images.sunflower} className="w-[120%] h-full absolute right-[-100] bottom-[-200] opacity-20" resizeMode="contain" />
                 </View>
 
-                {/*Slide 1*/}
+                {/* Data Network Slide */}
                 <View key={1} className="flex-1">
-                    <ImageBackground source={images.europe} style={{ flex: 1 }} resizeMode="cover">
-                        <View className="flex-1 justify-center items-center px-6">
-                            <Text className="text-dark text-5xl font-elms-bold text-center">{t.welcome.slides[1].title}</Text>
-
+                    <ImageBackground source={images.europe} style={{ flex: 1 }} className="px-8 items-center justify-center opacity-80">
+                        <View className="bg-dark p-10 rounded-[50px] border-4 border-primary">
+                            <Text className="text-white text-5xl font-elms-bold italic text-center leading-none">{t.welcome.slides[1].title}</Text>
                         </View>
                     </ImageBackground>
                 </View>
 
-                {/*Slide 2*/}
-                <View key={2} className="flex-1 pt-6">
-                    <View className="flex-1 relative items-center">
-                        <View className="justify-start h-full px-6">
-                            <Text className="text-dark text-5xl font-elms-bold text-center">{t.welcome.slides[2].title}</Text>
-                            <Text className="text-md font-semibold mt-4 text-grey text-center">{t.welcome.slides[2].description}</Text>
-                        </View>
-                        <Image
-                            source={images.creativity}
-                            className="w-full h-full absolute bottom-[-48px]"
-                            resizeMode="cover"
-                        />
-                    </View>
+                {/* Creative Node Slide */}
+                <View key={2} className="flex-1 px-8 pt-12 items-center">
+                    <Text className="text-dark text-6xl font-elms-bold italic text-center tracking-tighter leading-none">{t.welcome.slides[2].title}</Text>
+                    <Text className="text-xl font-elms-bold italic mt-6 text-dark/60 text-center">{t.welcome.slides[2].description}</Text>
+                    <Image source={images.creativity} className="w-full h-1/2 absolute bottom-0" resizeMode="contain" />
                 </View>
             </Swiper>
-            <CustomButton
-                title={isLastSlide ? t.welcome.buttons.getStarted : t.welcome.buttons.next}
-                classname="w-11/12mt-10 bg-accent"
-                textClassname="text-white"
-                onPress={() => isLastSlide ? router.replace('/(auth)/sign-in') : swiperRef.current?.scrollBy(1)}
-            />
+
+            {/* Brutalist "Next" Button */}
+            <View className="px-8 pb-10">
+                <View className="relative w-full">
+                    <View className="absolute inset-0 bg-dark rounded-[32px] translate-y-2" />
+                    <CustomButton
+                        title={isLastSlide ? t.welcome.buttons.getStarted.toUpperCase() : t.welcome.buttons.next.toUpperCase()}
+                        classname="bg-white border-2 border-dark py-6 rounded-[32px]"
+                        textClassname="text-dark font-elms-bold italic text-xl tracking-widest"
+                        onPress={() => isLastSlide ? router.replace('/(auth)/sign-in') : swiperRef.current?.scrollBy(1)}
+                    />
+                </View>
+            </View>
         </SafeAreaView>
     )
 }
 
 export default Onboarding;
-
-// Image for the screen:
-//  

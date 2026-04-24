@@ -57,10 +57,12 @@ const Layout = () => {
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         </Stack.Protected>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(sponsorship)" options={{ headerShown: false }} />
         <Stack.Screen name="infos/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="categories/[cat]" options={{ headerShown: false }} />
         <Stack.Screen name="categories/recomm" options={{ headerShown: false }} />
         <Stack.Screen name="categories/random" options={{ headerShown: false }} />
+        <Stack.Screen name="specific/municipality" options={{ headerShown: false }} />
       </Stack>
     </>
   )

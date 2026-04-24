@@ -1,45 +1,46 @@
-// Casa vecchia http://192.168.1.112:5013
-// Casa nuova http://192.168.0.105:5013
+// Casa nuova http://192.168.1.138:5013
 // Casa Bolo http://192.168.1.114:5013
 // Cell work http://172.20.10.4:5013
 // Cell http://172.20.10.3:5013
 
-// OLD: http://192.168.1.114:5013
+// Azure api: https://sunflowerapp-fae5a9cucggmhbbc.italynorth-01.azurewebsites.net/
 
-const baseUrl = 'http://192.168.1.114:5013'
+const baseUrl = 'http://172.20.10.3:5013'
 
-// Chart GET requests
+export type AuthFetch = (url: string, options?: RequestInit) => Promise<Response>;
+
+// ── Chart GET requests ────────────────────────────────────────────────────────
+
 export const fetchAllChartDetails = async ({
     query,
     category,
     lang,
     limit,
-    afterId,
+    afterCursor,
     signal,
+    authFetch,
 }: {
     query?: string;
     category?: string;
     lang?: string;
     limit?: number;
-    afterId?: number | null;
-    signal?: AbortSignal; // optional for cancellation
+    afterCursor?: number | null;
+    signal?: AbortSignal;
+    authFetch: AuthFetch;
 }): Promise<ApiAllChartResponse> => {
     const params = new URLSearchParams();
     if (query?.trim()) params.set("search", query.trim());
     if (category?.trim()) params.set("category", category.trim());
     if (lang?.trim()) params.set("lang", lang.trim());
     if (limit != null) params.set("limit", String(limit));
-    if (afterId != null) params.set("afterId", String(afterId));
+    if (afterCursor != null) params.set("afterId", String(afterCursor));
 
-    const apiUrl =
-        params.toString().length > 0
-            ? `${baseUrl}/chart/allCharts?${params.toString()}`
-            : `${baseUrl}/chart/allCharts`;
+    const apiUrl = params.toString().length > 0
+        ? `${baseUrl}/chart/allCharts?${params.toString()}`
+        : `${baseUrl}/chart/allCharts`;
 
-    const response = await fetch(apiUrl, { signal });
-    if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-    }
+    const response = await authFetch(apiUrl, { signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const json = await response.json();
     const data = (json?.data ?? []).map((row: any) => ({
@@ -47,54 +48,44 @@ export const fetchAllChartDetails = async ({
         id: Number(row.id),
     })) as CardProps[];
 
-    const nextCursorRaw = json?.nextCursor ?? null;
-    const nextCursor = nextCursorRaw == null ? null : Number(nextCursorRaw);
     return {
         data,
-        nextCursor,
+        nextCursor: json?.nextCursor == null ? null : Number(json.nextCursor),
         hasMore: Boolean(json?.hasMore),
         limit: json?.limit ?? data.length,
     };
 };
 
 export const fetchRecommendedCharts = async ({
-    userId,
     limit,
     lang,
     afterCursor,
     excludeSeenDays,
     signal,
-}: ApiRecommChartParams): Promise<ApiAllChartResponse & { nextCursor?: AfterCursor | null }> => {
-    if (!userId?.trim()) throw new Error("userId is required");
-
+    authFetch,
+}: Omit<ApiRecommChartParams, 'userId'>): Promise<ApiAllChartResponse & { nextCursor?: AfterCursor | null }> => {
     const params = new URLSearchParams();
-    params.set("userId", userId.trim());
+    // userId no longer sent — backend reads it from the JWT
     if (limit != null) params.set("limit", String(limit));
     if (lang?.trim()) params.set("lang", lang.trim());
     if (excludeSeenDays != null) params.set("excludeSeenDays", String(excludeSeenDays));
-
-    if (afterCursor && afterCursor.lastSimilarity != null && afterCursor.lastId != null) {
-        params.set("lastSimilarity", String(afterCursor.lastSimilarity));
-        params.set("afterId", String(afterCursor.lastId));
+    if (afterCursor) {
+        if (afterCursor.lastSimilarity != null) params.set("lastSimilarity", String(afterCursor.lastSimilarity));
+        if (afterCursor.lastId != null) params.set("afterId", String(afterCursor.lastId));
     }
 
-    const apiUrl = `${baseUrl}/chart/recommended?${params.toString()}`;
-    const res = await fetch(apiUrl, { signal });
+    const res = await authFetch(`${baseUrl}/chart/recommended?${params.toString()}`, { signal });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
 
-    // Map rows
     const data = (json?.data ?? []).map((row: any) => ({
         ...row,
         id: Number(row.id),
     })) as CardProps[];
 
-    // nextCursor from server is an object { lastSimilarity, lastId } or null
-    const nextCursor = json?.nextCursor ?? null;
-
     return {
         data,
-        nextCursor,
+        nextCursor: json?.nextCursor ?? null,
         hasMore: Boolean(json?.hasMore),
         limit: json?.limit ?? data.length,
     };
@@ -106,6 +97,7 @@ export const fetchRandomCharts = async ({
     categories,
     afterCursor,
     signal,
+    authFetch,
 }: ApiRandomChartParams): Promise<ApiAllChartResponse & { nextCursor?: AfterCursorRandom | null }> => {
     if (!limit) throw new Error("Limit is required");
 
@@ -113,16 +105,14 @@ export const fetchRandomCharts = async ({
     if (limit != null) params.set("limit", String(limit));
     if (categories != null) params.set("categories", String(categories));
     if (lang?.trim()) params.set("lang", lang.trim());
-
-    // Only send cursor fields that the simplified API expects
     if (afterCursor) {
         if (afterCursor.seed != null) params.set("seed", String(afterCursor.seed));
         if (afterCursor.lastSortKey != null) params.set("lastSortKey", String(afterCursor.lastSortKey));
-        if (afterCursor.lastId != null) params.set("afterId", String(afterCursor.lastId)); // <- FIX
+        if (afterCursor.lastId != null) params.set("afterId", String(afterCursor.lastId));
     }
 
-    const apiUrl = `${baseUrl}/chart/random?${params.toString()}`;
-    const res = await fetch(apiUrl, { signal: signal ?? undefined });
+    const res = await authFetch(`${baseUrl}/chart/random?${params.toString()}`, { signal });
+
     if (!res.ok) {
         let text: string | undefined;
         try { text = await res.text(); } catch { /* ignore */ }
@@ -130,19 +120,14 @@ export const fetchRandomCharts = async ({
     }
 
     const json = await res.json();
-
-    // Map rows, ensure id is number
     const data = (json?.data ?? []).map((row: any) => ({
         ...row,
         id: Number(row.id),
     })) as CardProps[];
 
-    // server.nextCursor expected to be { seed, lastSortKey, lastId } or null
-    const nextCursor = json?.nextCursor ?? null;
-
     return {
         data,
-        nextCursor,
+        nextCursor: json?.nextCursor ?? null,
         hasMore: Boolean(json?.hasMore),
         limit: json?.limit ?? data.length,
     };
@@ -154,92 +139,63 @@ export const fetchChartData = async ({
     geos,
     startPeriod,
     endPeriod,
+    authFetch,
 }: FetchChartParams): Promise<ApiResponse> => {
     const params = new URLSearchParams();
-
     params.append("Database", db);
     params.append("Geos", geos);
     params.append("Variables", variables);
-
     if (startPeriod != null) params.append("StartPeriod", startPeriod);
     if (endPeriod != null) params.append("EndPeriod", endPeriod);
 
-    const apiUrl = `${baseUrl}/chart/getData?${params.toString()}`;
-
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        const data: ApiResponse = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching chart data:', error);
-        throw error;
-    }
+    const response = await authFetch(`${baseUrl}/chart/getData?${params.toString()}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
 };
 
+// ── Database GET requests ─────────────────────────────────────────────────────
 
-
-// Database GET requests
-export const fetchDbAvailabilities = async ({ db }: { db: string }): Promise<ApiDbResponse> => {
-    const params = new URLSearchParams({
-        Name: db,
-    });
-
-    const apiUrl = `${baseUrl}/db?${params.toString()}`;
-
-    try {
-        const response = await fetch(apiUrl);
-        const data: ApiDbResponse = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error fetching chart data:", error);
-        throw error;
-    }
+export const fetchDbAvailabilities = async ({
+    db,
+    authFetch,
+}: {
+    db: string;
+    authFetch: AuthFetch;
+}): Promise<ApiDbResponse> => {
+    const params = new URLSearchParams({ Name: db });
+    const response = await authFetch(`${baseUrl}/db?${params.toString()}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
 };
 
-export const fetchCategories = async (): Promise<string[]> => {
-    const apiUrl = `${baseUrl}/db/categories`
-
-    const response = await fetch(apiUrl)
-    if (!response.ok) {
-        throw new Error("Failed to fetch categories")
-    }
-
-    return response.json()
+export const fetchCategories = async (authFetch: AuthFetch): Promise<string[]> => {
+    const response = await authFetch(`${baseUrl}/db/categories`);
+    if (!response.ok) throw new Error("Failed to fetch categories");
+    return response.json();
 };
 
-// Saved GET requests
+// ── Saved GET requests ────────────────────────────────────────────────────────
+
 export const fetchSavedEvents = async (
-    userId: string,
     lang: string,
+    authFetch: AuthFetch,
     { timeoutMs = 10000 } = {}
 ): Promise<SavedCardProps[]> => {
-    if (!userId) return [];
-
     const params = new URLSearchParams();
-    if (userId != null) params.set("userId", String(userId));
     if (lang?.trim()) params.set("lang", lang.trim());
-
-    const apiUrl = `${baseUrl}/events/saved?${params.toString()}`;
+    // userId no longer sent — backend reads it from the JWT
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-        const response = await fetch(apiUrl, {
+        const response = await authFetch(`${baseUrl}/events/saved?${params.toString()}`, {
             method: "GET",
             signal: controller.signal,
-            headers: {
-                "Accept": "application/json",
-            },
         });
-
         clearTimeout(timeout);
 
         const json: ApiSavedEventsResponse = await response.json();
-
         if (!json || !Array.isArray(json.data)) return [];
 
         return json.data.map(item => ({
@@ -247,38 +203,33 @@ export const fetchSavedEvents = async (
             data: item.data ?? {},
         }));
     } catch (err: any) {
-        if (err.name === "AbortError") {
-            console.error("fetchSavedEvents aborted (timeout)", apiUrl);
-            throw new Error("Request timed out");
-        }
-        console.error("Error fetching saved events:", err);
+        clearTimeout(timeout);
+        if (err.name === "AbortError") throw new Error("Request timed out");
         throw err;
     }
 };
 
 export const fetchSavedIdsEvents = async (
-    userId: string,
+    authFetch: AuthFetch,
     { timeoutMs = 10000 } = {}
-): Promise<Set<string>> => {
-    if (!userId) return new Set();
-
-    const url = `${baseUrl}/events/savedIds?userId=${encodeURIComponent(userId)}`;
+): Promise<string[]> => {
+    // userId no longer sent — backend reads it from the JWT
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-        const res = await fetch(url, { signal: controller.signal });
+        const res = await authFetch(`${baseUrl}/events/savedIds`, {
+            signal: controller.signal,
+        });
         clearTimeout(timeout);
 
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-        if (!json?.ids) return new Set();
-        console.log(json)
+        if (!Array.isArray(json)) return [];
 
-        return new Set(
-            json.ids
-                .map((v: any) => String(v).trim())
-                .filter((s: string) => s.length > 0)
-        );
+        return json
+            .map((v: any) => String(v).trim())
+            .filter((s: string) => s.length > 0);
     } catch (err: any) {
         clearTimeout(timeout);
         if (err.name === "AbortError") throw new Error("Request timed out");
@@ -286,103 +237,113 @@ export const fetchSavedIdsEvents = async (
     }
 };
 
-// Saved DELETE requests
-export const deleteSavedEvent = async ({ userId, objectId }: { userId: string; objectId: string }): Promise<Set<string>> => {
-    const params = new URLSearchParams({
-        userId: userId,
-        objectId: objectId,
-    });
+// ── Saved DELETE requests ─────────────────────────────────────────────────────
 
-    const apiUrl = `${baseUrl}/events/saved/del?${params.toString()}`;
-    const payload = { userId, objectId };
-
-    const response = await fetch(apiUrl, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-    });
-
+export const deleteSavedEvent = async ({
+    objectId,
+    authFetch,
+}: {
+    objectId: string;  // userId removed — backend reads it from the JWT
+    authFetch: AuthFetch;
+}): Promise<void> => {
+    const params = new URLSearchParams({ objectId });
+    const response = await authFetch(
+        `${baseUrl}/events/saved/del?${params.toString()}`,
+        { method: "DELETE" }
+    );
     if (!response.ok) {
         const txt = await response.text();
         throw new Error(`Delete failed: ${response.status} ${txt}`);
     }
-    return response.json(); // server returns { deleted: rows }
 };
 
-// Event (User action on Object) POST requests
-export const postNewEvent = async ({ userId, action, objectId,
+// ── Event POST requests ───────────────────────────────────────────────────────
+
+export const postNewEvent = async ({
+    action,
+    objectId,
+    authFetch,
 }: {
-    userId: string;
     action: string;
     objectId: string;
-}): Promise<Set<string>> => {
-    const apiUrl = `${baseUrl}/events/new`;
-
-    const payload = {
-        userId,
-        action,
-        objectId,
-    };
-
-    const response = await fetch(apiUrl, {
+    authFetch: AuthFetch;
+}): Promise<void> => {
+    const response = await authFetch(`${baseUrl}/events/new`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ action, objectId }),
     });
-
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
-
-    const json = await response.json();
-    const data = json?.data ?? json;
-    return data;
 };
 
+// ── Questions GET requests ────────────────────────────────────────────────────
 
-// Questions GET requests
 export const fetchUserQuestions = async ({
-    userId,
     numQuestions = 1,
+    authFetch,
 }: {
-    userId: string;
-    numQuestions: number;
+    numQuestions: number;  // userId removed — backend reads it from the JWT
+    authFetch: AuthFetch;
 }) => {
-
     const params = new URLSearchParams({
-        userId: String(userId),
         numQuestions: String(numQuestions),
     });
 
-    const apiUrl = `${baseUrl}/questionnaire/dailyquestion?${params.toString()}`;
-
-    try {
-        const response = await fetch(apiUrl);
-
-        if (!response.ok) {
-            const text = await response.text(); // fallback for empty or non-JSON
-            console.error("API error:", text);
-            throw new Error(text);
-        }
-
-        const data: ApiUserQuestionsResponse = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error fetching user questions:", error);
-        throw error;
+    const response = await authFetch(
+        `${baseUrl}/questionnaire/dailyquestion?${params.toString()}`
+    );
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text);
     }
+    return response.json() as Promise<ApiUserQuestionsResponse>;
 };
 
-// Translations GET requests
-export async function fetchTranslations(lang: string) {
-    const res = await fetch(
-        `${baseUrl}/translations/mobilePages?lang=${lang}`
-    )
-    if (!res.ok) throw new Error('Failed to fetch translations')
-    return res.json() // { version, payload }
-}
+// ── UserQuestionStates POST requests ─────────────────────────────────────────
+
+export const postUserQuestionState = async ({
+    questionId,
+    consecutiveCorrect,
+    authFetch,
+}: {
+    questionId: number;        // userId removed — backend reads it from the JWT
+    consecutiveCorrect: number;
+    authFetch: AuthFetch;
+}) => {
+    const response = await authFetch(`${baseUrl}/questionnaire/userquestionstate`, {
+        method: "POST",
+        body: JSON.stringify({
+            question_id: questionId,
+            consecutive_correct: consecutiveCorrect,
+            next_due_at: null,
+        }),
+    });
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text);
+    }
+    return response.json();
+};
+
+// ── Translations GET requests ─────────────────────────────────────────────────
+
+export const fetchTranslations = async (lang: string) => {
+    const response = await fetch(`${baseUrl}/translations/mobilePages?lang=${lang}`);
+    if (!response.ok) throw new Error("Failed to fetch translations");
+    return response.json();
+};
+
+// ── Data Request POST requests ────────────────────────────────────────────────
+
+export const postDataRequest = async (message: string, authFetch: AuthFetch): Promise<void> => {
+    const response = await authFetch(`${baseUrl}/requests/new`, {
+        method: "POST",
+        body: JSON.stringify({ message }),
+    });
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+};

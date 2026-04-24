@@ -1,22 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
-import {
-    Image,
-    ImageSourcePropType,
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
-
-export type HomeHeaderProps = {
-    userName?: string;
-    logo: ImageSourcePropType;
-    avatar?: ImageSourcePropType;
-    onLogoPress?: () => void;
-    onAvatarPress?: () => void;
-    onSearchPress?: () => void;
-    onNotifPress?: () => void;
-};
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 export default function HomeHeader({
     userName,
@@ -28,66 +12,47 @@ export default function HomeHeader({
     const timeGreeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
     return (
-        <View accessibilityRole="header" className="w-full px-4 pt-3 pb-3 bg-transparent">
+        <View className="w-full pt-4 pb-2 bg-transparent">
             <View className="flex-row items-center justify-between">
-                {/* Left: greetings */}
-                <View className="flex-row items-center flex-1 gap-2">
+                {/* 1. IDENTITY SECTION */}
+                <View className="flex-row items-center flex-1 gap-5">
+                    {/* Logo Block: High-contrast Dark background with high radius */}
                     <TouchableOpacity
                         onPress={onLogoPress}
-                        accessibilityLabel="Open app info"
-                        accessibilityHint="Opens the app/about or brand area"
                         activeOpacity={0.85}
+                        className="w-14 h-14 bg-white rounded-[20px] items-center justify-center"
                     >
-                        <Image source={logo} className="w-14 h-14 rounded-lg" resizeMode="contain" accessible accessibilityLabel="App logo" />
+                        <Image source={logo} className="w-10 h-10" resizeMode="contain" />
                     </TouchableOpacity>
+
                     <View className="flex-shrink">
-                        <Text className="text-xl font-elms-bold text-slate-900" numberOfLines={1} accessible>
-                            {timeGreeting}
-                            {userName ? `, ${userName}` : '!'}
-                        </Text>
-                        <Text className="text-sm font-medium text-slate-500" numberOfLines={1}>
-                            Ready for today’s challenge?
+                        {/* Greeting: Bold Italic with tight tracking for editorial impact */}
+                        <Text
+                            className="text-2xl font-elms-bold text-dark tracking-tighter italic leading-none"
+                            numberOfLines={2}
+                        >
+                            {timeGreeting}{userName ? `, ${userName}` : '!'}
                         </Text>
                     </View>
                 </View>
 
-                {/* Right: actions + logo */}
-                <View className="flex-row items-center space-x-3">
+                {/* 2. ACTIONS SECTION: Brutalist Notification Button */}
+                <View className="relative">
+                    {/* Shadow Layer: 4px offset for a tighter button feel */}
+                    <View
+                        className="absolute inset-0 bg-dark rounded-2xl"
+                        style={{ transform: [{ translateX: 4 }, { translateY: 4 }] }}
+                    />
+                    {/* Floating Layer: White background with a rigid border */}
                     <TouchableOpacity
                         onPress={onNotifPress}
-                        accessibilityLabel="Notifications"
-                        accessibilityHint="Open notifications"
                         activeOpacity={0.75}
-                        className="p-2 rounded-md"
+                        className="w-12 h-12 items-center justify-center rounded-2xl border-2 border-dark bg-white"
                     >
-                        <Feather name="bell" size={18} />
+                        <Feather name="bell" size={20} color="#141414" />
                     </TouchableOpacity>
-
-
                 </View>
             </View>
         </View>
     );
 }
-
-/*
-Usage example (place in your screen file):
-
-import HomeHeader from './components/HomeHeader';
-import images from '../assets/images';
-
-<HomeHeader
-  userName={user.name}
-  logo={images.logoMain}
-  avatar={images.userAvatar}
-  onLogoPress={() => console.log('logo pressed')}
-  onAvatarPress={() => router.push('/profile')}
-  onSearchPress={() => router.push('/search')}
-  onNotifPress={() => router.push('/notifications')}
-/>
-
-Notes:
-- This file uses NativeWind `className` for styling. Ensure NativeWind is configured in your project.
-- Icons use `@expo/vector-icons` (Feather). Replace or remove if you don't use Expo.
-- If you want strict React.FC typing or React.memo, I can add that.
-*/

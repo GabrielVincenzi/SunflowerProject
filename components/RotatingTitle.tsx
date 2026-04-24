@@ -4,15 +4,7 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from 'react-native-reanimated';
-
-const TITLES = [
-    'Choose your language',
-    'Scegli la tua lingua',
-    'Choisissez votre langue',
-    'Sprache auswählen',
-    'Elige tu idioma',
-    'Kies je taal',
-];
+import { LANGUAGE_TITLES } from '../constants/utilities';
 
 const LanguageRotatingTitle = ({ classname }: { classname?: string }) => {
     const [index, setIndex] = useState(0);
@@ -21,7 +13,7 @@ const LanguageRotatingTitle = ({ classname }: { classname?: string }) => {
     useEffect(() => {
         const interval = setInterval(() => {
             opacity.value = withTiming(0, { duration: 250 });
-            setIndex((prev) => (prev + 1) % TITLES.length);
+            setIndex((prev) => (prev + 1) % LANGUAGE_TITLES.length);
             opacity.value = withTiming(1, { duration: 250 });
         }, 1500);
 
@@ -37,7 +29,7 @@ const LanguageRotatingTitle = ({ classname }: { classname?: string }) => {
             style={animatedStyle}
             className={`text-dark text-2xl font-elms-bold text-center ${classname}`}
         >
-            {TITLES[index]}
+            {LANGUAGE_TITLES[index]}
         </Animated.Text>
     );
 };

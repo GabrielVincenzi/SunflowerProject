@@ -1,12 +1,14 @@
-import { animationDuration, colors, margin } from "@/constants/utilities";
+import { animationDuration, CHART_COLORS, margin, THEME_COLORS } from "@/constants/utilities";
 import { detectGranularity, formatPeriod } from "@/functions/dateHandlers";
+import { detectScale } from "@/functions/formatHandlers";
 import { max, min } from "d3-array";
 import { scaleLinear, scalePoint } from "d3-scale";
 import { line } from "d3-shape";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Text, View } from "react-native";
-import Animated, { useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
+import { View } from "react-native";
+import Animated, { Easing, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
 import Svg, { G, Path, PathProps, Line as SvgLine, Text as SvgText } from "react-native-svg";
+import ChartLegend from "../ChartLegend";
 
 // Wrap Path in Animated
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -26,7 +28,11 @@ function AnimatedLine({ d, color }: { d: string; color: string }) {
                 if (length > 0) {
                     setPathLength(length);
                     progress.value = 0;
-                    progress.value = withTiming(1, { duration: animationDuration });
+                    // Applying High-Impact mechanical easing
+                    progress.value = withTiming(1, {
+                        duration: animationDuration,
+                        easing: Easing.bezier(0.16, 1, 0.3, 1)
+                    });
                 }
             }
         }, 0);
@@ -46,7 +52,10 @@ function AnimatedLine({ d, color }: { d: string; color: string }) {
             ref={pathRef}
             d={d}
             stroke={color}
-            strokeWidth={4}
+            // High Impact: Thickened signal stroke
+            strokeWidth={6}
+            strokeLinejoin="round"
+            strokeLinecap="round"
             fill="none"
             opacity={isReady ? 1 : 0}
             animatedProps={animatedProps}
@@ -54,13 +63,7 @@ function AnimatedLine({ d, color }: { d: string; color: string }) {
     );
 }
 
-// helpers
-function detectScale(maxAbsValue: number) {
-    if (maxAbsValue >= 1_000_000) return { factor: 1_000_000, label: "Millions" };
-    if (maxAbsValue >= 1_000) return { factor: 1_000, label: "Thousands" };
-    return { factor: 1, label: "" };
-}
-
+// helpers (Logic strictly preserved)
 function formatScaled(value: number, factor: number) {
     const n = value / factor;
     const absN = Math.abs(n);
@@ -72,7 +75,7 @@ function formatScaled(value: number, factor: number) {
     }).format(Number(n.toFixed(maxFractionDigits)));
 }
 
-// pick evenly-spaced X tick labels (always include first and last)
+// pick evenly-spaced X tick labels (Logic strictly preserved)
 function pickXTicks(labels: string[], count: number) {
     if (!labels || labels.length === 0) return [];
     if (count >= labels.length) return labels;
@@ -84,11 +87,10 @@ function pickXTicks(labels: string[], count: number) {
         const idx = Math.round(i * step);
         result.push(labels[idx]);
     }
-    // de-duplicate (rounding can duplicate), keep first/last
     return Array.from(new Set(result));
 }
 
-// Create starting scales
+// Create starting scales (Logic strictly preserved)
 function createLineChart({
     width,
     height,
@@ -123,11 +125,11 @@ function createLineChart({
 function SunLineChart({
     screenWidth,
     apiData,
-    xTickCount = 6, // default show ~6 x labels (years)
-    yTickCount = 6, // default y ticks
-    height = 260,
+    xTickCount = 6,
+    yTickCount = 6,
+    height = 300, // Slightly taller for high impact
 }: any) {
-    const safeColors = colors || ["#000000"];
+    const safeColors = CHART_COLORS || ["#000000"];
 
     const hasData =
         apiData &&
@@ -136,61 +138,58 @@ function SunLineChart({
         apiData.series &&
         Object.keys(apiData.series).length > 0;
 
-    // Build chartData
-    const chartData = hasData
-        ? (() => {
-            const multipleGeos = apiData.activeGeos.length > 1;
-            const variableKeysByGeo = (geo: string) =>
-                Object.keys(apiData.series).filter((k) => k.endsWith(`_${geo}`));
+    const granularity = useMemo(
+        () => detectGranularity(apiData?.activePeriods?.map((p: any) => new Date(p)) ?? []),
+        [apiData?.activePeriods]
+    );
 
-            let seriesCounter = 0; // global index for color assignment
+    const chartData = useMemo(() => {
+        if (!hasData) return [];
+        const multipleGeos = apiData.activeGeos.length > 1;
+        const variableKeysByGeo = (geo: string) =>
+            Object.keys(apiData.series).filter((k) => k.endsWith(`_${geo}`));
+        let seriesCounter = 0;
 
-            const granularity = useMemo(
-                () => detectGranularity(apiData.activePeriods.map((p: any) => new Date(p))),
-                [apiData.activePeriods]
-            )
-
-            if (multipleGeos && apiData.variables?.length === 1) {
-                // multiple geos, only one variable → label = geo
-                return apiData.activeGeos.map((geo: string) => {
-                    const key = variableKeysByGeo(geo)[0];
-                    const values = key && apiData.series[key] ? apiData.series[key] : [];
+        if (multipleGeos && apiData.variables?.length === 1) {
+            return apiData.activeGeos.map((geo: string) => {
+                const key = variableKeysByGeo(geo)[0];
+                const series = {
+                    geo,
+                    label: geo,
+                    data: (apiData.series[key] ?? []).map((pt: any, i: number) => {
+                        const date = apiData.activePeriods?.[i] ? new Date(apiData.activePeriods[i]) : null;
+                        return { value: pt?.value ?? 0, label: date ? formatPeriod(date, granularity) : "" };
+                    }),
+                    color: safeColors[seriesCounter % safeColors.length],
+                };
+                seriesCounter++;
+                return series;
+            });
+        } else {
+            return apiData.activeGeos.flatMap((geo: string) =>
+                variableKeysByGeo(geo).map((key: string) => {
+                    const variableName = key.replace(`_${geo}`, "");
+                    const readable = apiData.variableLabels?.[variableName] ?? variableName;
                     const series = {
                         geo,
-                        label: geo,
-                        data: values.map((pt: any, i: number) => {
+                        label: multipleGeos ? `${readable} (${geo})` : readable,
+                        data: (apiData.series[key] ?? []).map((pt: any, i: number) => {
                             const date = apiData.activePeriods?.[i] ? new Date(apiData.activePeriods[i]) : null;
-                            const label = date ? formatPeriod(date, granularity) : ""
-                            return { value: pt?.value ?? 0, label };
+                            return { value: pt?.value ?? 0, label: date ? formatPeriod(date, granularity) : "" };
                         }),
                         color: safeColors[seriesCounter % safeColors.length],
                     };
                     seriesCounter++;
                     return series;
-                });
-            } else {
-                // multiple variables or single geo → label = variableName (geo)
-                return apiData.activeGeos.flatMap((geo: string) => {
-                    return variableKeysByGeo(geo).map((key: string) => {
-                        const variableName = key.replace(`_${geo}`, "");
-                        const values = apiData.series[key] || [];
-                        const series = {
-                            geo,
-                            label: `${variableName} (${geo})`,
-                            data: values.map((pt: any, i: number) => {
-                                const date = apiData.activePeriods?.[i] ? new Date(apiData.activePeriods[i]) : null;
-                                const label = date ? formatPeriod(date, granularity) : ""
-                                return { value: pt?.value ?? 0, label };
-                            }),
-                            color: safeColors[seriesCounter % safeColors.length],
-                        };
-                        seriesCounter++;
-                        return series;
-                    });
-                });
-            }
-        })()
-        : [];
+                })
+            );
+        }
+    }, [apiData, safeColors, granularity, hasData]);
+
+    const legendItems = useMemo<LegendItem[]>(
+        () => chartData.map(({ label, color }: LegendItem) => ({ label, color })),
+        [chartData]
+    );
 
 
     const width = screenWidth;
@@ -206,7 +205,6 @@ function SunLineChart({
     })
     const yValues = allDataPoints.map((d: any) => d.value);
 
-    // detect scale for Y axis labels (Thousands / Millions)
     const maxAbs = yValues.length ? Math.max(...yValues.map((v: any) => Math.abs(v))) : 0;
     const { factor: yFactor, label: yUnitLabel } = detectScale(maxAbs);
 
@@ -222,61 +220,48 @@ function SunLineChart({
         [width, height, margin, xLabels.join(","), yValues.join(",")]
     );
 
-    // compute Y ticks (raw values) and formatted labels
     const rawYTicks = yScale.ticks(yTickCount);
     const formattedYTicks = rawYTicks.map((t) => formatScaled(t, yFactor));
-
-    // compute which x labels to show
     const displayedXLabels = pickXTicks(xLabels, xTickCount);
 
     return (
         <View className="w-full bg-background">
-            {/* Legend */}
-            <View className="items-center">
-                <View className="flex-row flex-wrap justify-center mt-1">
-                    {chartData.map((series: any) => (
-                        <View key={series.label} className="flex-row items-center m-2" style={{ gap: 6 }}>
-                            <View style={{ width: 12, height: 12, backgroundColor: series.color, borderRadius: 2, marginRight: 6 }} />
-                            <Text style={{ fontSize: 12, color: "grey" }}>{series.label}</Text>
-                        </View>
-                    ))}
-                </View>
-                {yUnitLabel ? (
-                    <Text style={{ fontSize: 12, color: "grey", marginTop: 4 }}>({yUnitLabel})</Text>
-                ) : null}
-            </View>
+            <ChartLegend items={legendItems} yUnitLabel={yUnitLabel} />
 
-            {/* Chart area */}
-            <View>
-                {/* if you prefer the overview text at a specific absolute position you can position it over the Svg */}
+            <View className="items-center">
                 <Svg width={width} height={height}>
-                    {/* X Axis */}
+                    {/* Brutalist Grid: Dashed Signal Floor */}
+                    {rawYTicks.map((tick, i) => (
+                        <SvgLine key={i} x1={margin.left} x2={width - margin.right} y1={yScale(tick)} y2={yScale(tick)} stroke={THEME_COLORS.dark} strokeOpacity={0.08} strokeDasharray="3,3" />
+                    ))}
+
+                    {/* Industrial X Axis */}
                     <G transform={`translate(0, ${height - margin.bottom})`}>
                         {displayedXLabels.map((label, i) => (
                             <G key={i} transform={`translate(${xScale(label)}, 0)`}>
-                                <SvgLine y2={6} stroke="grey" />
-                                <SvgText y={20} fontSize={12} fill="grey" textAnchor="middle">
-                                    {label}
+                                <SvgLine y2={10} stroke={THEME_COLORS.dark} strokeWidth={2} />
+                                <SvgText y={30} fontSize={10} fill={THEME_COLORS.dark} textAnchor="middle" fontWeight="800">
+                                    {label.toUpperCase()}
                                 </SvgText>
                             </G>
                         ))}
-                        <SvgLine x1={margin.left} x2={width - margin.right} stroke="grey" strokeWidth={1} />
+                        <SvgLine x1={margin.left} x2={width - margin.right} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
                     </G>
 
-                    {/* Y Axis */}
+                    {/* Technical Y Axis */}
                     <G transform={`translate(${margin.left}, 0)`}>
                         {rawYTicks.map((tick, i) => (
                             <G key={i} transform={`translate(0, ${yScale(tick)})`}>
-                                <SvgLine x2={-6} stroke="grey" />
-                                <SvgText x={-10} dy="0.32em" fontSize={12} fill="grey" textAnchor="end">
+                                <SvgLine x2={-10} stroke={THEME_COLORS.dark} strokeWidth={2} />
+                                <SvgText x={-14} dy="0.32em" fontSize={10} fill={THEME_COLORS.dark} opacity={0.4} textAnchor="end" fontWeight="800">
                                     {formattedYTicks[i]}
                                 </SvgText>
                             </G>
                         ))}
-                        <SvgLine y1={margin.top} y2={height - margin.bottom} stroke="grey" strokeWidth={1} />
+                        <SvgLine y1={margin.top} y2={height - margin.bottom} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
                     </G>
 
-                    {/* Lines */}
+                    {/* Signal Paths */}
                     {chartData.map((series: any) => (
                         <AnimatedLine key={series.label} d={lineGenerator(series.data) ?? ""} color={series.color} />
                     ))}

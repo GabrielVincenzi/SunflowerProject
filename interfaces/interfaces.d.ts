@@ -143,6 +143,22 @@ type ChartListProps = {
   userId?: string;
 };
 
+type LegendItem = {
+  label: string;
+  color: string;
+}
+
+interface ChartLegendProps {
+  items: LegendItem[];
+  yUnitLabel?: string;
+}
+
+type HomeHeaderProps = {
+  userName?: string;
+  logo: ImageSourcePropType;
+  onLogoPress?: () => void;
+  onNotifPress?: () => void;
+};
 
 // API props
 type AfterCursor = {
@@ -166,6 +182,7 @@ type FetchChartParams = {
   geos: string;
   startPeriod: string | null,
   endPeriod?: string | null,
+  authFetch: AuthFetch;
 }
 
 type ApiAllChartResponse = {
@@ -182,6 +199,7 @@ type ApiRecommChartParams = {
   excludeSeenDays: number;
   signal?: AbortSignal;
   afterCursor?: AfterCursor;
+  authFetch: AuthFetch;
 }
 
 type ApiRandomChartParams = {
@@ -190,12 +208,13 @@ type ApiRandomChartParams = {
   lang?: string;
   afterCursor?: AfterCursorRandom | null;
   signal?: AbortSignal | null;
+  authFetch: AuthFetch;
 }
 
 type ApiResponse = {
   activeGeos: string[];
   activePeriods: string[];
-  activeUnits: string[];
+  variableLabels: Record<string, string>;
   series: Record<string, { value: number }[]>;
 }
 
@@ -205,15 +224,6 @@ type ApiDbResponse = {
   availablePeriods: string,
   dbSource: string,
 }
-
-type Fetcher = (opts: {
-  query?: string;
-  category?: string;
-  limit?: number;
-  lang?: string;
-  afterId?: number | null | undefined;
-  signal?: AbortSignal;
-}) => Promise<PaginatedResponse>;
 
 type ApiEventRequest = {
   userId: string;
@@ -250,4 +260,59 @@ type ApiChoiceResponse = {
   choiceId: number;
   content: string;
   isCorrect: boolean;
+}
+
+interface RequestDataPopupProps {
+  visible: boolean;
+  onClose: () => void;
+  prefillQuery?: string;
+}
+
+type AuthFetch = (url: string, options?: RequestInit) => Promise<Response>;
+
+
+type Fetcher = (opts: {
+  query?: string;
+  category?: string;
+  limit?: number;
+  lang?: string;
+  afterCursor?: number | null | undefined;
+  signal?: AbortSignal;
+  authFetch: AuthFetch;
+}) => Promise<PaginatedResponse>;
+
+interface SunButtonProps {
+  text: string;
+  onPress: () => void;
+  className?: string;
+  disabled?: boolean;
+}
+
+// Export Charts
+type ExportChartProps = {
+  chartRef: React.RefObject<ViewShot | null>;
+  title: string;
+  description: string;
+  chartType: string;
+  dataSource: string;
+  activeGeos: string[];
+  apiData: ApiResponse | undefined; // 👈 ADD THIS
+};
+
+interface ExportSheetProps {
+  onClose: () => void;
+  onExport: (format: ExportFormat) => void;
+  isExporting: boolean;
+  exportError: string | null;
+  title: string;
+  windowWidth: number;
+}
+
+type ExportFormat = "png" | "csv";
+
+interface ExportOption {
+  format: ExportFormat;
+  label: string;
+  sublabel: string;
+  icon: React.ComponentProps<typeof Feather>["name"];
 }

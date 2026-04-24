@@ -1,35 +1,41 @@
-
-import InfiniteChartList from '@/components/InfiniteChartList';
-import { icons } from '@/constants/icons';
+import ChartList from '@/components/ChartList';
+import SunButton from '@/components/SunButton';
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const RandomPage = () => {
     const renderHeader = () => (
-        <View className="px-6 mt-8 mb-4">
-            <Text className="text-dark mb-4 text-4xl tracking-tight font-elms-bold">
+        <Animated.View entering={FadeInDown.duration(800).delay(100)} className="px-8 mt-12 mb-10">
+            <View className="flex-row items-center gap-3 mb-4">
+                <View className="h-[2px] w-10 bg-dark" />
+                <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
+                    BURST THE BUBBLE
+                </Text>
+            </View>
+            <Text className="text-dark text-6xl tracking-tighter font-elms-bold italic leading-none">
                 Random
             </Text>
-        </View>
+        </Animated.View>
     );
 
     return (
-        <>
-            <View className="flex-1 bg-background px-4">
-                {/* ChartList as the main scroller with the other parts as header */}
-                <InfiniteChartList random searchQuery={""} renderHeader={renderHeader} />
+        <View className="flex-1 bg-[#FDFCF6]">
+            <View className="flex-1">
+                <ChartList
+                    searchQuery={""}
+                    renderHeader={renderHeader}
+                    pageLimit={5}
+                    random
+                />
             </View>
-            {/* Bottom button */}
-            <TouchableOpacity
-                className="absolute bottom-6 left-6 right-6 bg-secondary rounded-2xl py-4 flex-row items-center justify-center"
-                onPress={() => router.back()}
-                activeOpacity={0.85}
-            >
-                <Image source={icons.arrow} className="size-5 mr-2 rotate-180" tintColor="#fff" />
-                <Text className="text-white font-semibold text-base">Go back</Text>
-            </TouchableOpacity>
-        </>
+
+            {/* Brutalist Back Button Container */}
+            <View className="absolute bottom-4 left-0 right-0 px-8">
+                <SunButton text="GO BACK" onPress={() => router.back()} />
+            </View>
+        </View>
     );
 };
 

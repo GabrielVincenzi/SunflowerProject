@@ -1,59 +1,98 @@
+import { router } from "expo-router";
+import React, { useState } from "react";
+import { ScrollView, Text, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
+
+import { MiniCard } from "@/components/cards/MiniCard";
 import QuestionCard from "@/components/cards/QuestionCard";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import HomeHeader from "@/components/HomeHeader";
+import QuestionPopup from "@/components/QuestionPopUp";
 import { images } from "@/constants/images";
-import { router } from "expo-router";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function Index() {
+    const [questionVisible, setQuestionVisible] = useState(false);
 
     return (
-        <ScrollView
-            contentContainerStyle={{ paddingBottom: 100 }}
-            showsVerticalScrollIndicator={false}
-            scrollEnabled={true}
-            className="flex-1 bg-background px-4">
-            <View className="pt-10 pb-6">
-                <HomeHeader
-                    userName="Gabriel"
-                    logo={images.logoMain}
-                    avatar={images.sunflower}
-                    onLogoPress={() => console.log("logo pressed")}
-                    onNotifPress={() => { }}
-                />
+        <View className="flex-1 bg-primary">
+            <ScrollView
+                contentContainerStyle={{ paddingBottom: 100 }}
+                showsVerticalScrollIndicator={false}
+            >
+                <View className="pt-14 pb-6 px-6">
+                    {/* 1. Header - Cleaned up to match High-Impact spacing */}
+                    <Animated.View entering={FadeInDown.duration(800).delay(100)}>
+                        <HomeHeader
+                            userName="Gabriel"
+                            logo={images.logoMain}
+                            onLogoPress={() => console.log("logo pressed")}
+                        />
+                    </Animated.View>
 
-                {/* Question of the day */}
-                <QuestionCard title="Question" />
+                    {/* 2. Question of the Day - Shadow logic is inside the component */}
+                    <Animated.View entering={FadeInDown.duration(800).delay(300)} className="mt-8">
+                        <QuestionCard
+                            title="Question of the Day"
+                            onOpenPopup={() => setQuestionVisible(true)}
+                        />
+                    </Animated.View>
 
-                {/* Categories title + horizontal list */}
-                <Text className="mt-6 mb-4 font-elms-bold text-xl text-dark">By Category</Text>
-                <CategoryCarousel />
+                    {/* 3. Inquiry Pathways */}
+                    <Animated.View entering={FadeInDown.duration(800).delay(500)} className="mt-12">
+                        <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40 mb-6">
+                            INQUIRY PATHWAYS
+                        </Text>
+                        <View className="flex-row gap-5">
+                            {/* Recommended (Dark Path) */}
+                            <MiniCard isDark title="Go Deep" description="Expert Path" icon="01"
+                                onPress={() => router.push("/categories/recomm")}>
+                            </MiniCard>
 
-                {/* Charts title (the ChartList will render the actual items) */}
-                <Text className="mt-10 mb-2 font-elms-bold text-xl text-dark">And Today What?</Text>
-                <View className="flex-row gap-4 px-4 items-center justify-center">
-                    <TouchableOpacity
-                        className='w-1/2 rounded-xl py-16 px-4 flex flex-row border-dark bg-marked items-center justify-center'
-                        style={{ borderWidth: 1 }}
-                        activeOpacity={1}
-                        onPress={() => router.push("/categories/recomm")}>
-                        <View className='flex-col'>
-                            <Text className='text-base text-center font-elms-bold text-light mt-2' numberOfLines={1}>Recommended</Text>
-                            <Text className='text-sm text-center font-medium mt-1 text-light'>Become an Expert</Text>
+                            {/* Random (White Path) */}
+                            <MiniCard title="Pop it" description="Pop Bubble" icon="02"
+                                onPress={() => router.push("/categories/random")}>
+                            </MiniCard>
+
                         </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        className='w-1/2 rounded-xl py-16 px-4 flex flex-row border-dark bg-secondary items-center justify-center'
-                        style={{ borderWidth: 1 }}
-                        activeOpacity={1}
-                        onPress={() => router.push("/categories/random")}>
-                        <View className='flex-col'>
-                            <Text className='text-base text-center font-elms-bold text-light mt-2' numberOfLines={1}>Random</Text>
-                            <Text className='text-sm text-center font-medium mt-1 text-light'>Pop the Bubble</Text>
+                    </Animated.View>
+
+                    {/* Temporary municipality & sponsorship buttons */}
+                    <Animated.View entering={FadeInDown.duration(800).delay(500)} className="mt-12">
+                        <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40 mb-6">
+                            SPECIAL NODES
+                        </Text>
+                        <View className="flex-row gap-5">
+                            {/* Sponsorship */}
+                            <MiniCard title="Sponsors" description="Inquiry Labs" icon="??"
+                                onPress={() => router.push("/(sponsorship)")}>
+                            </MiniCard>
+
+                            {/* Municipality */}
+                            <MiniCard title="Municipal" description="Local Data" icon="??"
+                                onPress={() => router.push("/specific/municipality")}>
+                            </MiniCard>
+
                         </View>
-                    </TouchableOpacity>
+                    </Animated.View>
+
+                    {/* 4. Categories (Vertical Archive) */}
+                    <Animated.View entering={FadeInDown.duration(800).delay(700)} className="mt-16">
+                        <View className="flex-row items-baseline gap-3 mb-8">
+                            <Text className="text-4xl font-elms-bold tracking-tighter text-dark italic leading-none">By Category</Text>
+                            <Text className="text-sm italic text-dark/30 font-elms-regular">Archive</Text>
+                        </View>
+                        <CategoryCarousel />
+                    </Animated.View>
                 </View>
-            </View>
-        </ScrollView>
+            </ScrollView>
+
+            {/* Question PopUp */}
+            {questionVisible && (
+                <QuestionPopup
+                    title="Question of the Day"
+                    onClose={() => setQuestionVisible(false)}
+                />
+            )}
+        </View>
     );
 }
