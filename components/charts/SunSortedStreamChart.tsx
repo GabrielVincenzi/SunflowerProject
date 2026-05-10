@@ -1,46 +1,63 @@
-import { animationDuration, CHART_COLORS, HEIGHT, margin } from "@/constants/utilities";
+import { animationDuration, CHART_COLORS, HEIGHT, margin, THEME_COLORS } from "@/constants/utilities";
 import { detectGranularity, formatPeriod } from "@/functions/dateHandlers";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { View } from "react-native";
 import Animated, { useAnimatedProps, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
-import Svg, { G, Path, PathProps, Line as SvgLine, Text as SvgText } from "react-native-svg";
+import Svg, { ClipPath, Defs, G, Path, Rect, Line as SvgLine, Text as SvgText } from "react-native-svg";
 import ChartLegend from "../ChartLegend";
 
-const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
-// ─── Animated ribbon — identical to AnimatedLine with delay ───
-function AnimatedRibbon({ d, fill, delay = 0 }: { d: string; fill: string; delay?: number }) {
+// ─── Stable clip ID ───
+let _clipIdCounter = 0;
+function useStableId() {
+    const ref = useRef(`ribbon-clip-${_clipIdCounter++}`);
+    return ref.current;
+}
+
+// ─── Animated ribbon ───
+function AnimatedRibbon({ d, topEdge, bottomEdge, fill, delay = 0, chartWidth }: {
+    d: string;
+    topEdge: string;
+    bottomEdge: string;
+    fill: string;
+    delay?: number;
+    chartWidth: number;
+}) {
     const progress = useSharedValue(0);
-    const pathRef = useRef<Path>(null);
-    const [pathLength, setPathLength] = useState(0);
+    const clipId = useStableId();
 
     useEffect(() => {
         if (!d) return;
-        const timeout = setTimeout(() => {
-            if (pathRef.current) {
-                const length = pathRef.current.getTotalLength?.() ?? 0;
-                if (length > 0) {
-                    setPathLength(length);
-                    progress.value = 0;
-                    progress.value = withDelay(delay, withTiming(1, { duration: animationDuration }));
-                }
-            }
-        }, 0);
-        return () => clearTimeout(timeout);
+        progress.value = 0;
+        progress.value = withDelay(delay, withTiming(1, { duration: animationDuration }));
     }, [d]);
 
-    const animatedProps = useAnimatedProps<PathProps>(() => ({
-        strokeDasharray: pathLength ? [pathLength, pathLength] : [0, 0],
-        strokeDashoffset: pathLength ? pathLength * (1 - progress.value) : 0,
+    const animatedRectProps = useAnimatedProps(() => ({
+        width: progress.value * chartWidth,
     }));
 
     return (
-        <AnimatedPath ref={pathRef} d={d} fill={fill} stroke="none"
-            opacity={pathLength > 0 ? 0.88 : 0} animatedProps={animatedProps} />
+        <>
+            <Defs>
+                <ClipPath id={clipId}>
+                    <AnimatedRect x={0} y={-9999} height={99999} animatedProps={animatedRectProps} />
+                </ClipPath>
+            </Defs>
+
+            {/* Filled ribbon */}
+            <Path d={d} fill={fill} opacity={0.88} clipPath={`url(#${clipId})`} />
+
+            {/* Top edge stroke — open path, no rectangle artifacts */}
+            <Path d={topEdge} fill="none" stroke={THEME_COLORS.dark} strokeWidth={2} clipPath={`url(#${clipId})`} />
+
+            {/* Bottom edge stroke */}
+            <Path d={bottomEdge} fill="none" stroke={THEME_COLORS.dark} strokeWidth={2} clipPath={`url(#${clipId})`} />
+        </>
     );
 }
 
-// ─── Helpers ──────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────
 function pickXTicks(labels: string[], count: number): string[] {
     if (!labels.length) return [];
     if (count >= labels.length) return labels;
@@ -50,15 +67,22 @@ function pickXTicks(labels: string[], count: number): string[] {
     return Array.from(new Set(result));
 }
 
-// Cubic bezier ribbon between two time-adjacent bands
-function ribbonPath(lx: number, ly0: number, ly1: number, rx: number, ry0: number, ry1: number): string {
+// Returns fill path + the two open edge paths separately
+function ribbonPath(lx: number, ly0: number, ly1: number, rx: number, ry0: number, ry1: number): {
+    fill: string;
+    topEdge: string;
+    bottomEdge: string;
+} {
     const mx = (lx + rx) / 2;
-    return [`M ${lx} ${ly0}`, `C ${mx} ${ly0}, ${mx} ${ry0}, ${rx} ${ry0}`, `L ${rx} ${ry1}`, `C ${mx} ${ry1}, ${mx} ${ly1}, ${lx} ${ly1}`, "Z"].join(" ");
+
+    const bottomEdge = `M ${lx} ${ly0} C ${mx} ${ly0}, ${mx} ${ry0}, ${rx} ${ry0}`;
+    const topEdge = `M ${lx} ${ly1} C ${mx} ${ly1}, ${mx} ${ry1}, ${rx} ${ry1}`;
+    const fill = `${bottomEdge} L ${rx} ${ry1} C ${mx} ${ry1}, ${mx} ${ly1}, ${lx} ${ly1} Z`;
+
+    return { fill, topEdge, bottomEdge };
 }
 
-// ─── Component ────────────────────────────────────────────────
-// At each time step, series are sorted descending by value → stacked top→bottom.
-// Adjacent steps connected with bezier ribbons that cross when rankings change.
+// ─── Component ─────────────────────────────────────────────────
 function SunSortedStreamChart({ screenWidth, screenHeight, apiData }: ChartProps) {
     const safeColors = CHART_COLORS || ["#FCD34D"];
     const width = screenWidth;
@@ -104,7 +128,6 @@ function SunSortedStreamChart({ screenWidth, screenHeight, apiData }: ChartProps
     const iH = height - margin.top - margin.bottom;
     const xPos = (i: number) => margin.left + (i / Math.max(n - 1, 1)) * iW;
 
-    // For each time point: sort descending by value, compute stacked y positions
     const allStacks = useMemo(() => {
         return Array.from({ length: n }, (_, ti) => {
             const sorted = chartData.map((s) => ({ key: s.key, val: s.values[ti] ?? 0 })).sort((a, b) => b.val - a.val);
@@ -124,10 +147,8 @@ function SunSortedStreamChart({ screenWidth, screenHeight, apiData }: ChartProps
 
     return (
         <View className="w-full bg-background">
-            {/* Legend */}
             <ChartLegend items={legendItems} />
 
-            {/* Chart Section */}
             <Svg width={width} height={height}>
                 {/* Vertical grid lines */}
                 {xLabels.map((_, i) => (
@@ -135,65 +156,61 @@ function SunSortedStreamChart({ screenWidth, screenHeight, apiData }: ChartProps
                         stroke="rgba(255,255,255,0.3)" strokeWidth={1} />
                 ))}
 
-                {/* Ribbons between consecutive time steps — staggered left to right */}
+                {/* Ribbons */}
                 {n > 1 && Array.from({ length: n - 1 }, (_, ti) =>
                     chartData.map((s) => {
                         const left = allStacks[ti].find((d) => d.key === s.key);
                         const right = allStacks[ti + 1].find((d) => d.key === s.key);
                         if (!left || !right) return null;
-                        const d = ribbonPath(xPos(ti), left.y0, left.y1, xPos(ti + 1), right.y0, right.y1);
-                        return <AnimatedRibbon key={`${s.key}-${ti}`} d={d} fill={s.color} delay={ti * 60} />;
-                    })
-                )}
 
-                {/* End-cap rectangles */}
-                {[0, n - 1].map((ti) =>
-                    allStacks[ti]?.map((band, bi) => {
-                        const s = chartData.find((s) => s.key === band.key);
-                        if (!s) return null;
-                        const x = ti === 0 ? xPos(0) - 6 : xPos(n - 1);
+                        const { fill, topEdge, bottomEdge } = ribbonPath(
+                            xPos(ti), left.y0, left.y1,
+                            xPos(ti + 1), right.y0, right.y1
+                        );
+
                         return (
-                            <Path key={`cap-${ti}-${bi}`}
-                                d={`M ${x} ${band.y0} L ${x + 6} ${band.y0} L ${x + 6} ${band.y1} L ${x} ${band.y1} Z`}
-                                fill={s.color} opacity={0.88} />
+                            <AnimatedRibbon
+                                key={`${s.key}-${ti}`}
+                                d={fill}
+                                topEdge={topEdge}
+                                bottomEdge={bottomEdge}
+                                fill={s.color}
+                                delay={ti * 60}
+                                chartWidth={width}
+                            />
                         );
                     })
                 )}
 
-                {/* White gap lines between streams at each time step */}
-                {allStacks.map((stack, ti) =>
-                    stack.slice(1).map((band, bi) => (
-                        <SvgLine key={`gap-${ti}-${bi}`}
-                            x1={xPos(ti) - 5} x2={xPos(ti) + 5}
-                            y1={band.y0} y2={band.y0}
-                            stroke="white" strokeWidth={2} />
-                    ))
-                )}
-
-                {/* Inline series labels at mid time point */}
+                {/* Inline series labels */}
                 {chartData.map((s) => {
                     const midTi = Math.floor(n / 2);
                     const band = allStacks[midTi]?.find((d) => d.key === s.key);
                     if (!band || band.y1 - band.y0 < 16) return null;
                     return (
                         <SvgText key={`lbl-${s.key}`} x={xPos(midTi)} y={(band.y0 + band.y1) / 2 + 4}
-                            textAnchor="middle" fontSize={10} fontWeight="600" fill="white">
+                            textAnchor="middle" fontSize={10} fontWeight="800" fill={THEME_COLORS.background}>
                             {s.label}
                         </SvgText>
                     );
-                })}
-
+                })
+                }
                 {/* X-axis labels */}
-                <G transform={`translate(0, ${margin.top + iH + 4})`}>
-                    {displayedXLabels.map((label, i) => {
-                        const idx = xLabels.indexOf(label);
+                <G transform={`translate(0, ${margin.top + iH})`}>
+                    <SvgLine x1={margin.left} x2={width - margin.right} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
+                    {displayedXLabels.map((lbl, i) => {
+                        const idx = xLabels.indexOf(lbl);
                         return (
-                            <SvgText key={i} x={xPos(idx)} y={16} textAnchor="middle" fontSize={11} fill="grey">
-                                {label}
-                            </SvgText>
+                            <G key={i} transform={`translate(${xPos(idx)}, 0)`}>
+                                <SvgLine y2={10} stroke={THEME_COLORS.dark} strokeWidth={2} />
+                                <SvgText y={25} fontSize={10} fontWeight="900" fill={THEME_COLORS.dark} textAnchor="middle">
+                                    {lbl.toUpperCase()}
+                                </SvgText>
+                            </G>
                         );
                     })}
                 </G>
+
             </Svg>
         </View>
     );

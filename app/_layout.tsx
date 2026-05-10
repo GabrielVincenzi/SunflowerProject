@@ -53,7 +53,7 @@ const Layout = () => {
     <>
       <StatusBar hidden={false} barStyle="dark-content" />
       <Stack>
-        <Stack.Protected guard={!isSignedIn}>
+        <Stack.Protected guard={!!isSignedIn}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         </Stack.Protected>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

@@ -9,16 +9,21 @@ import AnimatedItemWrapper from '@/components/WrapperEntranceList';
 import { defaultLang } from '@/constants/utilities';
 import { fetchSavedEvents } from '@/services/api';
 import { useAuthFetch } from '@/services/useAuthFetch';
+import { useTranslations } from '@/services/useTranslation';
 
 const Saved = () => {
     const { isSignedIn } = useAuth();
     const lang = defaultLang;
     const authFetch = useAuthFetch();
+    const { data: translated } = useTranslations();
 
     const { data, isLoading } = useQuery({
         queryKey: ['charts', 'saved', lang],
         queryFn: () => fetchSavedEvents(lang, authFetch),
     });
+
+    if (!translated) return null;
+    const t: any = translated.payload;
 
     if (isLoading) return (
         <View className="flex-1 bg-[#FDFCF6] justify-center items-center">
@@ -39,11 +44,11 @@ const Saved = () => {
                     <View className="flex-row items-center gap-3 mb-4">
                         <View className="h-[2px] w-10 bg-dark" />
                         <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
-                            PERSONAL ARCHIVE // SAVED
+                            {t.saved.header.label}
                         </Text>
                     </View>
                     <Text className="text-dark text-5xl tracking-tighter font-elms-bold italic leading-tight">
-                        Saved Signals
+                        {t.saved.header.title}
                     </Text>
                 </Animated.View>
 
@@ -66,16 +71,16 @@ const Saved = () => {
                             <View className="mt-20 items-center opacity-30">
                                 <View className="w-16 h-1 bg-primary mb-8" />
                                 <Text className="text-2xl font-elms-bold italic text-dark text-center">
-                                    ARCHIVE EMPTY
+                                    {t.saved.emptyState}
                                 </Text>
                             </View>
                         )}
                     />
                 ) : (
                     <View className="mt-20 items-center justify-center p-10 bg-white rounded-[40px] border-2 border-dark">
-                        <Text className="text-dark font-elms-bold italic text-3xl text-center">Access Restricted</Text>
+                        <Text className="text-dark font-elms-bold italic text-3xl text-center">{t.saved.accessRestricted.title}</Text>
                         <Text className="text-dark/40 font-elms-regular italic mt-4 text-center leading-relaxed">
-                            Please sign in to access your personal signal archive.
+                            {t.saved.accessRestricted.description}
                         </Text>
                     </View>
                 )}

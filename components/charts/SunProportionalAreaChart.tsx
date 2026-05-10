@@ -1,4 +1,4 @@
-import { animationDuration, CHART_COLORS, CHART_TEXT_FONT } from "@/constants/utilities";
+import { animationDuration, CHART_COLORS, CHART_TEXT_FONT, THEME_COLORS } from "@/constants/utilities";
 import { scaleSqrt } from "d3-scale";
 import React, { useEffect, useMemo } from "react";
 import { View } from "react-native";
@@ -48,7 +48,7 @@ function AnimatedHalf({ cx, cy, r, fill, buildPath, delay = 0 }: {
 
     return (
         <AnimatedG animatedProps={animatedProps}>
-            <Path d={buildPath(cx, cy, r)} fill={fill} stroke="none" opacity={0.92} />
+            <Path d={buildPath(cx, cy, r)} fill={fill} stroke={THEME_COLORS.dark} strokeWidth={2} opacity={0.92} />
         </AnimatedG>
     );
 }
@@ -113,7 +113,6 @@ function SunProportionalAreaChart({ screenWidth, screenHeight, apiData }: ChartP
 
     const rightDelay = 0;
     const leftDelay = animationDuration * 0.4;
-    const labelDelay = animationDuration * 1.1;
 
     const formatVal = (v: number) => {
         if (maxVal >= 1_000_000) return (v / 1_000_000).toFixed(1) + "M";
@@ -128,10 +127,10 @@ function SunProportionalAreaChart({ screenWidth, screenHeight, apiData }: ChartP
 
             {/* Chart Section */}
             <Svg width={width} height={height}>
-                <SvgText x={cx} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontWeight="600" fill="#343a40">{firstVariable}</SvgText>
-                <SvgText x={cx - 100} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontWeight="600" fill="#343a40">{p1Label}</SvgText>
-                <SvgText x={cx + 100} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontWeight="600" fill="#343a40">{p2Label}</SvgText>
-                <SvgLine x1={cx} x2={cx} y1={34} y2={height - 10} stroke="rgba(52,58,64,0.18)" strokeWidth={1} />
+                <SvgText x={cx} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontWeight="600" fill={THEME_COLORS.dark}>{firstVariable}</SvgText>
+                <SvgText x={cx - 100} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontWeight="600" fill={THEME_COLORS.dark}>{p1Label}</SvgText>
+                <SvgText x={cx + 100} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontWeight="600" fill={THEME_COLORS.dark}>{p2Label}</SvgText>
+                <SvgLine x1={cx} x2={cx} y1={34} y2={height - 10} stroke={THEME_COLORS.dark} strokeWidth={1} />
 
                 {chartData.map((e, i) => {
                     const cy = 60 + i * rowHeight + maxR;
@@ -142,9 +141,8 @@ function SunProportionalAreaChart({ screenWidth, screenHeight, apiData }: ChartP
                         <G key={e.geo}>
                             <AnimatedHalf cx={cx} cy={cy} r={r2} fill={e.color2} buildPath={rightHalfPath} delay={rightDelay} />
                             <AnimatedHalf cx={cx} cy={cy} r={r1} fill={e.color1} buildPath={leftHalfPath} delay={leftDelay} />
-                            <SvgText x={cx} y={cy + 5} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontWeight="600" fill="#F0EFEC">{e.geo}</SvgText>
-                            <SvgText x={cx - rMax - 30} y={cy + 5} textAnchor="middle" fontSize={CHART_TEXT_FONT} fill="rgba(73,80,87)">{formatVal(e.v1)}</SvgText>
-                            <SvgText x={cx + rMax + 30} y={cy + 5} textAnchor="middle" fontSize={CHART_TEXT_FONT} fill="rgba(73,80,87)">{formatVal(e.v2)}</SvgText>
+                            <SvgText x={cx - rMax - 30} y={cy + 5} textAnchor="middle" fontSize={CHART_TEXT_FONT} fill={THEME_COLORS.dark}>{formatVal(e.v1)}</SvgText>
+                            <SvgText x={cx + rMax + 30} y={cy + 5} textAnchor="middle" fontSize={CHART_TEXT_FONT} fill={THEME_COLORS.dark}>{formatVal(e.v2)}</SvgText>
                         </G>
                     );
                 })}

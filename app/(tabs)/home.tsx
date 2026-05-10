@@ -9,9 +9,14 @@ import CategoryCarousel from "@/components/CategoryCarousel";
 import HomeHeader from "@/components/HomeHeader";
 import QuestionPopup from "@/components/QuestionPopUp";
 import { images } from "@/constants/images";
+import { useTranslations } from "@/services/useTranslation";
 
 export default function Index() {
+    const { data } = useTranslations();
     const [questionVisible, setQuestionVisible] = useState(false);
+
+    if (!data) return null;
+    const t: any = data.payload;
 
     return (
         <View className="flex-1 bg-primary">
@@ -25,14 +30,13 @@ export default function Index() {
                         <HomeHeader
                             userName="Gabriel"
                             logo={images.logoMain}
-                            onLogoPress={() => console.log("logo pressed")}
                         />
                     </Animated.View>
 
                     {/* 2. Question of the Day - Shadow logic is inside the component */}
                     <Animated.View entering={FadeInDown.duration(800).delay(300)} className="mt-8">
                         <QuestionCard
-                            title="Question of the Day"
+                            title={t.home.questionOfTheDay}
                             onOpenPopup={() => setQuestionVisible(true)}
                         />
                     </Animated.View>
@@ -40,16 +44,16 @@ export default function Index() {
                     {/* 3. Inquiry Pathways */}
                     <Animated.View entering={FadeInDown.duration(800).delay(500)} className="mt-12">
                         <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40 mb-6">
-                            INQUIRY PATHWAYS
+                            {t.home.sections.inquiryPathways}
                         </Text>
                         <View className="flex-row gap-5">
                             {/* Recommended (Dark Path) */}
-                            <MiniCard isDark title="Go Deep" description="Expert Path" icon="01"
+                            <MiniCard isDark title={t.home.cards.goDeep.title} description={t.home.cards.goDeep.description} icon="01"
                                 onPress={() => router.push("/categories/recomm")}>
                             </MiniCard>
 
                             {/* Random (White Path) */}
-                            <MiniCard title="Pop it" description="Pop Bubble" icon="02"
+                            <MiniCard title={t.home.cards.popIt.title} description={t.home.cards.popIt.description} icon="02"
                                 onPress={() => router.push("/categories/random")}>
                             </MiniCard>
 
@@ -59,16 +63,16 @@ export default function Index() {
                     {/* Temporary municipality & sponsorship buttons */}
                     <Animated.View entering={FadeInDown.duration(800).delay(500)} className="mt-12">
                         <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40 mb-6">
-                            SPECIAL NODES
+                            {t.home.sections.specialNodes}
                         </Text>
                         <View className="flex-row gap-5">
                             {/* Sponsorship */}
-                            <MiniCard title="Sponsors" description="Inquiry Labs" icon="??"
+                            <MiniCard title={t.home.cards.sponsorship.title} description={t.home.cards.sponsorship.description} icon="??"
                                 onPress={() => router.push("/(sponsorship)")}>
                             </MiniCard>
 
                             {/* Municipality */}
-                            <MiniCard title="Municipal" description="Local Data" icon="??"
+                            <MiniCard title={t.home.cards.municipal.title} description={t.home.cards.municipal.description} icon="??"
                                 onPress={() => router.push("/specific/municipality")}>
                             </MiniCard>
 
@@ -79,7 +83,7 @@ export default function Index() {
                     <Animated.View entering={FadeInDown.duration(800).delay(700)} className="mt-16">
                         <View className="flex-row items-baseline gap-3 mb-8">
                             <Text className="text-4xl font-elms-bold tracking-tighter text-dark italic leading-none">By Category</Text>
-                            <Text className="text-sm italic text-dark/30 font-elms-regular">Archive</Text>
+                            <Text className="text-sm italic text-dark/30 font-elms-regular">{t.home.sections.byCategorySubtitle}</Text>
                         </View>
                         <CategoryCarousel />
                     </Animated.View>
@@ -89,7 +93,7 @@ export default function Index() {
             {/* Question PopUp */}
             {questionVisible && (
                 <QuestionPopup
-                    title="Question of the Day"
+                    title={t.home.questionOfTheDay}
                     onClose={() => setQuestionVisible(false)}
                 />
             )}

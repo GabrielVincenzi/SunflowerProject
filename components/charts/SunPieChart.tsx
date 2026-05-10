@@ -69,7 +69,6 @@ function SunPieChart({ screenWidth, screenHeight, apiData }: ChartProps) {
                     </G>
                 </Svg>
                 <View className="absolute items-center" pointerEvents="none">
-                    <Text className="text-[10px] font-black italic text-dark opacity-30">SIGNAL_NODE</Text>
                     <Text className="text-xl font-black italic text-dark tracking-tighter">{(geos[0] || "").toUpperCase()}</Text>
                 </View>
             </View>

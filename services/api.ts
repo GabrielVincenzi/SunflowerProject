@@ -329,10 +329,11 @@ export const postUserQuestionState = async ({
 
 // ── Translations GET requests ─────────────────────────────────────────────────
 
-export const fetchTranslations = async (lang: string) => {
-    const response = await fetch(`${baseUrl}/translations/mobilePages?lang=${lang}`);
-    if (!response.ok) throw new Error("Failed to fetch translations");
-    return response.json();
+export const fetchTranslations = async (lang: string, authFetch: AuthFetch) => {
+    const response = await authFetch(`${baseUrl}/dictionaries/mobilePages?lang=${lang}`);
+    if (!response.ok) throw new Error(`Failed: ${response.status}`);
+    const data = await response.json();
+    return data;
 };
 
 // ── Data Request POST requests ────────────────────────────────────────────────

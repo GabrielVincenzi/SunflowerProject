@@ -103,7 +103,7 @@ const SignIn = () => {
                                 />
                             </View>
 
-                            <TouchableOpacity className="bg-dark py-6 rounded-[24px] items-center justify-center shadow-lg active:scale-[0.98]">
+                            <TouchableOpacity className="bg-dark py-6 rounded-[24px] items-center justify-center active:scale-[0.98]">
                                 <Text className="text-primary font-elms-bold italic text-xl tracking-widest">{t.signIn.nextButton.toUpperCase()}</Text>
                             </TouchableOpacity>
 

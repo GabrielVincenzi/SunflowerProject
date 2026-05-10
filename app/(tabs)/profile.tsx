@@ -1,3 +1,4 @@
+import { useTranslations } from "@/services/useTranslation";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { Feather } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -119,6 +120,7 @@ const BigPlanet = ({ size = 700 }) => {
 // --- Profile Screen ---
 const Profile = () => {
     const { signOut } = useAuth();
+    const { data } = useTranslations();
     const { user } = useUser();
     const [isSynthesizing, setIsSynthesizing] = useState(false);
     const [linePositions, setLinePositions] = useState<{ x: number; y: number }[]>([]);
@@ -144,6 +146,9 @@ const Profile = () => {
         setIsSynthesizing(!isSynthesizing);
     };
 
+    if (!data) return null;
+    const t: any = data.payload;
+
     return (
         <View className="flex-1 bg-primary">
             {/* Animated Background Layers */}
@@ -165,11 +170,11 @@ const Profile = () => {
                     <View className="flex-row items-center gap-3 mb-4">
                         <View className="h-[2px] w-10 bg-dark" />
                         <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
-                            PROFILE // IDENTITY
+                            {t.profile.label}
                         </Text>
                     </View>
                     <Text className="text-6xl font-elms-bold italic text-dark tracking-tighter leading-none">
-                        Self
+                        {t.profile.title}
                     </Text>
                 </Animated.View>
 
@@ -203,14 +208,14 @@ const Profile = () => {
                     <View className="flex-1 relative h-24">
                         <View className="absolute inset-0 bg-dark rounded-3xl translate-x-1.5 translate-y-1.5" />
                         <View className="flex-1 bg-white border-2 border-dark p-4 rounded-3xl justify-center">
-                            <Text className="text-[9px] font-elms-bold text-dark/40 uppercase tracking-widest mb-1">SIGNALS</Text>
+                            <Text className="text-[9px] font-elms-bold text-dark/40 uppercase tracking-widest mb-1">{t.profile.stats.signals}</Text>
                             <Text className="text-2xl font-elms-bold text-dark italic leading-none">1.2k</Text>
                         </View>
                     </View>
                     <View className="flex-1 relative h-24">
                         <View className="absolute inset-0 bg-dark rounded-3xl translate-x-1.5 translate-y-1.5" />
                         <View className="flex-1 bg-white border-2 border-dark p-4 rounded-3xl justify-center">
-                            <Text className="text-[9px] font-elms-bold text-dark/40 uppercase tracking-widest mb-1">ACCURACY</Text>
+                            <Text className="text-[9px] font-elms-bold text-dark/40 uppercase tracking-widest mb-1">{t.profile.stats.accuracy}</Text>
                             <Text className="text-2xl font-elms-bold text-dark italic leading-none">94%</Text>
                         </View>
                     </View>
@@ -218,12 +223,12 @@ const Profile = () => {
 
                 {/* Options List */}
                 <Animated.View entering={FadeInDown.delay(500)} className="space-y-4">
-                    <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.35em] mb-4">SYSTEM_SETTINGS</Text>
+                    <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.35em] mb-4">{t.profile.settings.label}</Text>
 
                     {[
-                        { icon: "settings", label: "Preferences" },
-                        { icon: "shield", label: "Secure Vault" },
-                        { icon: "help-circle", label: "Manual" },
+                        { icon: "settings", label: t.profile.settings.items.preferences },
+                        { icon: "shield", label: t.profile.settings.items.secureVault },
+                        { icon: "help-circle", label: t.profile.settings.items.manual },
                     ].map((item, idx) => (
                         <View key={idx} className="relative w-full mb-2">
                             <View className="absolute inset-0 bg-dark rounded-[24px] translate-y-1.5" />
@@ -244,7 +249,7 @@ const Profile = () => {
                         onPress={() => signOut()}
                         className="flex-row items-center justify-center py-6 border-4 border-dark rounded-[32px] mt-10 active:bg-dark group"
                     >
-                        <Text className="text-xl font-elms-bold italic text-dark uppercase tracking-widest">Terminate Session</Text>
+                        <Text className="text-xl font-elms-bold italic text-dark uppercase tracking-widest">{t.profile.settings.terminateSession}</Text>
                     </TouchableOpacity>
                 </Animated.View>
 

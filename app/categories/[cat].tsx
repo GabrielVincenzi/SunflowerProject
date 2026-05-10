@@ -1,5 +1,6 @@
 import ChartList from "@/components/ChartList";
 import SunButton from "@/components/SunButton";
+import { useTranslations } from "@/services/useTranslation";
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Text, View } from "react-native";
@@ -7,7 +8,11 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 const CategoryPage = () => {
     const { cat } = useLocalSearchParams();
+    const { data } = useTranslations();
     const category = Array.isArray(cat) ? cat[0] : cat ?? "";
+
+    if (!data) return null;
+    const t: any = data.payload;
 
     const renderHeader = () => (
         <Animated.View entering={FadeInDown.duration(800).delay(100)} className="px-6 mt-12 mb-10">
@@ -15,7 +20,7 @@ const CategoryPage = () => {
             <View className="flex-row items-center gap-3 mb-4">
                 <View className="h-[2px] w-10 bg-dark" />
                 <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
-                    ARCHIVE // {category.toUpperCase()}
+                    {t.category.archiveLabel} // {category.toUpperCase()}
                 </Text>
             </View>
 
@@ -43,7 +48,7 @@ const CategoryPage = () => {
 
             {/* Floating Back Button */}
             <View className="absolute bottom-4 left-0 right-0 px-8">
-                <SunButton text="GO BACK" onPress={() => router.back()} />
+                <SunButton text={t.common.goBack} onPress={() => router.back()} />
             </View>
         </View>
     );

@@ -1,4 +1,4 @@
-import { margin } from "@/constants/utilities";
+import { margin, THEME_COLORS } from "@/constants/utilities";
 import { max, min } from "d3-array";
 import { scaleBand, scaleLinear } from "d3-scale";
 import React, { useMemo } from "react";
@@ -109,8 +109,8 @@ function SunHeatStripe({
     const vMax = (max(allNumeric) ?? 0) as number;
 
     // sequential color scale strictly from vMin -> vMax
-    const lowColor = colorRange?.[0] ?? "#f7f7f7";
-    const highColor = colorRange?.[1] ?? "#08306b";
+    const lowColor = colorRange?.[0] ?? THEME_COLORS.primary;
+    const highColor = colorRange?.[1] ?? THEME_COLORS.dark;
 
     // If domain is degenerate (vMin === vMax), use a constant color function to avoid scale issues
     const colorScaleFn = useMemo(() => {
@@ -152,17 +152,6 @@ function SunHeatStripe({
 
     return (
         <View>
-            {/* Header + legend */}
-            <View style={{ alignItems: "center", marginBottom: 6 }}>
-                <View style={{ flexDirection: "row", alignItems: "center", marginTop: 6 }}>
-                    <View style={{ width: 10, height: 10, backgroundColor: colorScaleFn(vMin), borderRadius: 2, marginRight: 6 }} />
-                    <Text style={{ color: "grey", fontSize: 12 }}>{formatSmall(vMin)}</Text>
-                    <Text style={{ color: "grey", marginHorizontal: 6 }}>—</Text>
-                    <View style={{ width: 10, height: 10, backgroundColor: colorScaleFn(vMax), borderRadius: 2, marginRight: 6 }} />
-                    <Text style={{ color: "grey", fontSize: 12 }}>{formatSmall(vMax)}</Text>
-                </View>
-            </View>
-
             <Svg width={width} height={chartHeight}>
                 {/* gradient for colorbar (decorative) */}
                 <Defs>
@@ -182,12 +171,12 @@ function SunHeatStripe({
 
                     const stripeHeight = heightPerRow; // keep stripe height = heightPerRow
                     const labelX = 8; // left label x pos
-                    const stripesXOffset = margin.left;
+                    const stripesXOffset = margin.left / 8;
 
                     return (
                         <G key={`row-${row.key}-${rIdx}`} transform={`translate(0, ${yOffset})`}>
                             {/* geo label (left) */}
-                            <SvgText x={labelX} y={stripeHeight / 2} dy="0.35em" fontSize={12} fill="black">
+                            <SvgText x={labelX} y={stripeHeight / 2} dy="0.35em" fontSize={12} fill={THEME_COLORS.dark} fontWeight="800">
                                 {row.geo}
                             </SvgText>
 
@@ -209,18 +198,18 @@ function SunHeatStripe({
                         const xCenter = (xScale(lbl) ?? margin.left) + barWidth / 2;
                         return (
                             <G key={`xt-${i}`} transform={`translate(${xCenter}, 0)`}>
-                                <SvgLine y2={6} stroke="grey" />
-                                <SvgText y={20} fontSize={12} fill="grey" textAnchor="middle">
+                                <SvgLine y2={10} stroke={THEME_COLORS.dark} strokeWidth={2} />
+                                <SvgText y={30} fontSize={10} fill={THEME_COLORS.dark} textAnchor="middle" fontWeight="800">
                                     {lbl}
                                 </SvgText>
                             </G>
                         );
                     })}
-                    <SvgLine x1={margin.left} x2={width - margin.right} stroke="grey" strokeWidth={1} />
+                    <SvgLine x1={margin.left} x2={width - margin.right} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
                 </G>
 
                 {/* small gradient colorbar */}
-                <G transform={`translate(${margin.left}, ${margin.top + stripesAreaHeight + 40})`}>
+                <G transform={`translate(${margin.left}, ${margin.top + stripesAreaHeight + 60})`}>
                     <Rect
                         x={0}
                         y={0}
@@ -228,17 +217,18 @@ function SunHeatStripe({
                         height={8}
                         fill="url(#grad)"
                     />
-                    <SvgText x={0} y={20} fontSize={10} fill="grey" textAnchor="start">
-                        {formatSmall(vMin)}
+                    <SvgText x={0} y={20} fontSize={10} fill={THEME_COLORS.dark} textAnchor="start" fontWeight="800">
+                        {formatSmall(Math.floor(vMin))}
                     </SvgText>
                     <SvgText
                         x={Math.max(120, Math.min(240, width - margin.left - margin.right - 40))}
                         y={20}
                         fontSize={10}
-                        fill="grey"
+                        fill={THEME_COLORS.dark}
                         textAnchor="end"
+                        fontWeight="800"
                     >
-                        {formatSmall(vMax)}
+                        {formatSmall(Math.ceil(vMax))}
                     </SvgText>
                 </G>
             </Svg>

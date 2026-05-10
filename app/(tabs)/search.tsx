@@ -2,6 +2,7 @@ import ChartList from "@/components/ChartList";
 import RequestDataPopup from "@/components/RequestDataPopup";
 import SearchBar from "@/components/SearchBar";
 import { images } from "@/constants/images";
+import { useTranslations } from "@/services/useTranslation";
 import React, { useCallback, useRef, useState } from "react";
 import { Image, Keyboard, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -11,11 +12,15 @@ const SearchPage = () => {
     const [committedQuery, setCommittedQuery] = useState<string>("");
     const [requestVisible, setRequestVisible] = useState(false);
     const inputRef = useRef<TextInput | null>(null);
+    const { data: translated } = useTranslations();
 
     const handleSearch = useCallback(() => {
         setCommittedQuery(input.trim());
         inputRef.current?.blur();
     }, [input]);
+
+    if (!translated) return null;
+    const t: any = translated.payload;
 
     const renderHeader = () => (
         <View className="pt-16 pb-8 px-8">
@@ -25,13 +30,13 @@ const SearchPage = () => {
                     <Image source={images.logoMain} className="w-14 h-14" resizeMode="contain" />
                 </View>
                 <Text className="text-[10px] uppercase font-elms-bold tracking-[0.5em] text-dark/30 mt-6 text-center">
-                    SIGNAL DISCOVERY ENGINE
+                    {t.search.engineLabel}
                 </Text>
             </Animated.View>
 
             <View className="mb-10">
                 <SearchBar
-                    placeholder="Search global signals..."
+                    placeholder={t.search.placeholder}
                     value={input}
                     onChangeText={setInput}
                     onPress={handleSearch}
@@ -43,7 +48,7 @@ const SearchPage = () => {
             {committedQuery ? (
                 <View className="space-y-4">
                     <View className="flex-row items-baseline gap-2">
-                        <Text className="text-2xl font-elms-bold text-dark tracking-tighter italic">Results for</Text>
+                        <Text className="text-2xl font-elms-bold text-dark tracking-tighter italic">{t.search.resultsFor}</Text>
                         <Text className="text-2xl font-elms-bold italic text-white">"{committedQuery}"</Text>
                     </View>
 
@@ -53,7 +58,7 @@ const SearchPage = () => {
                         className="py-3 border-b-2 border-dark/5 self-start"
                     >
                         <Text className="text-[10px] font-elms-bold uppercase tracking-[0.3em] text-dark/40">
-                            CAN'T FIND WHAT YOU NEED? <Text className="text-dark/60">REQUEST DATA</Text>
+                            {t.search.requestData.prompt} <Text className="text-dark/60">{t.search.requestData.cta}</Text>
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -71,7 +76,7 @@ const SearchPage = () => {
                             <View className="flex-1 justify-center items-center pb-32 px-10">
                                 <View className="w-2 h-2 rounded-full bg-primary mb-6 animate-pulse" />
                                 <Text className="text-center text-dark/40 font-elms-bold italic text-2xl tracking-tighter leading-tight">
-                                    The future of data{"\n"}synthesis starts here.
+                                    {t.search.emptyState.tagline}
                                 </Text>
 
                                 <TouchableOpacity
@@ -80,7 +85,7 @@ const SearchPage = () => {
                                     className="mt-12 flex-row items-center gap-3 px-8 py-4 rounded-full border-2 border-dark bg-white"
                                 >
                                     <Text className="text-[10px] font-elms-bold uppercase tracking-[0.4em] text-dark">
-                                        REQUEST DATA FEED
+                                        {t.search.emptyState.button}
                                     </Text>
                                 </TouchableOpacity>
                             </View>

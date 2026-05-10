@@ -28,20 +28,24 @@ import SunRadarChart from "@/components/charts/SunRadarChart";
 import SunSortedStreamChart from "@/components/charts/SunSortedStreamChart";
 import SunStackedAreaChart from "@/components/charts/SunStackedAreaChart";
 import SunTreemapChart from "@/components/charts/SunTreemapChart";
+import { SearchableSelect } from "@/components/SearchableSelect";
+import { useTranslations } from "@/services/useTranslation";
 
-const chartComponents: { [key: string]: React.ElementType } = {
-    line: SunLineChart,
-    radar: SunRadarChart,
-    hist: SunBarChart,
-    pie: SunPieChart,
-    areaStacked: SunStackedAreaChart,
-    areaProp: SunProportionalAreaChart,
-    heatstripe: SunHeatStripe,
-    pyramid: SunPopulationPyramidChart,
-    circles: SunPackedCircleChart,
-    sortedStream: SunSortedStreamChart,
-    tree: SunTreemapChart
-};
+const CHART_REGISTRY = {
+    line: { component: SunLineChart, label: "Line", icon: "activity", group: "time_series" },
+    areaStacked: { component: SunStackedAreaChart, label: "Stacked Area", icon: "layers", group: "time_series" },
+    areaProp: { component: SunProportionalAreaChart, label: "Proportional", icon: "bar-chart-2", group: "time_series" },
+    heatstripe: { component: SunHeatStripe, label: "Heat Stripe", icon: "grid", group: "time_series" },
+    sortedStream: { component: SunSortedStreamChart, label: "Stream", icon: "wind", group: "time_series" },
+    hist: { component: SunBarChart, label: "Histogram", icon: "bar-chart", group: "distribution" },
+    pie: { component: SunPieChart, label: "Pie", icon: "pie-chart", group: "distribution" },
+    circles: { component: SunPackedCircleChart, label: "Bubbles", icon: "circle", group: "distribution" },
+    tree: { component: SunTreemapChart, label: "Treemap", icon: "square", group: "distribution" },
+    radar: { component: SunRadarChart, label: "Radar", icon: "target", group: "comparison" },
+    pyramid: { component: SunPopulationPyramidChart, label: "Pyramid", icon: "triangle", group: "comparison" },
+} as const;
+
+type ChartTypeKey = keyof typeof CHART_REGISTRY;
 
 const { width: WINDOW_WIDTH } = Dimensions.get("window");
 
@@ -50,14 +54,19 @@ const ChartPage = () => {
     const authFetch = useAuthFetch();
     const router = useRouter();
     const { user } = useUser();
+    const { data } = useTranslations();
+
+    if (!data) return null;
+    const t: any = data.payload;
 
     const { db, chart_id, title, description, variables, chart_type } = useLocalSearchParams();
     const chartDb = String(db);
     const chartId = String(chart_id);
+    const initialChartType = String(chart_type) as ChartTypeKey;
 
     const chartRef = useRef<ViewShot>(null);
 
-    // --- 1. Data Fetching & State (Logic Preserved) ---
+    // ── Data Fetching ────────────────────────────────────────────────────────
     const { data: availableData, isLoading: isLoadingAvail } = useQuery({
         queryKey: ['dbs', chartDb],
         queryFn: () => fetchDbAvailabilities({ db: chartDb, authFetch }),
@@ -67,9 +76,21 @@ const ChartPage = () => {
     const periodOptions = useMemo(() => buildPeriodOptions(availableData?.availablePeriods), [availableData]);
     const chartVariablesArray = useMemo(() => Array.isArray(variables) ? variables : String(variables || "").split("+").filter(Boolean), [variables]);
 
+
+    // ── Local State ──────────────────────────────────────────────────────────
     const [selectedGeos, setSelectedGeos] = useState<string[]>([]);
     const [selectedVars, setSelectedVars] = useState<string[]>(chartVariablesArray.slice(0, 1));
     const [periods, setPeriods] = useState<[string | null, string | null]>([null, null]);
+    const [overlayOpen, setOverlayOpen] = useState(false);
+    const [exportSheetOpen, setExportSheetOpen] = useState(false);
+    const [selectedChartType, setSelectedChartType] = useState<ChartTypeKey>(initialChartType);
+
+    const compatibleCharts = useMemo(() => {
+        const currentGroup = CHART_REGISTRY[selectedChartType]?.group;
+        return (Object.entries(CHART_REGISTRY) as [ChartTypeKey, typeof CHART_REGISTRY[ChartTypeKey]][])
+            .filter(([, meta]) => meta.group === currentGroup)
+            .map(([key, meta]) => ({ key, label: meta.label, icon: meta.icon }));
+    }, [selectedChartType]);
 
     const [query, setQuery] = useState({
         geos: "",
@@ -86,6 +107,7 @@ const ChartPage = () => {
         }
     }, [geoOptions]);
 
+    // ── Api Data ──────────────────────────────────────────────────────────
     const { data: apiData, isFetching: isFetchingChart } = useQuery({
         queryKey: ['chartData', chartDb, query],
         queryFn: () => fetchChartData({
@@ -100,6 +122,11 @@ const ChartPage = () => {
         placeholderData: keepPreviousData,
     });
 
+    const varLabelMap: Record<string, string> = useMemo(
+        () => apiData?.variableLabels ?? {},
+        [apiData]
+    );
+
     const { data: savedSet, isLoading: isLoadingSavedSet } = useQuery({
         queryKey: ['charts', 'savedIds'],
         queryFn: () => fetchSavedIdsEvents(authFetch),
@@ -108,7 +135,8 @@ const ChartPage = () => {
 
     const isSaved = savedSet?.has(String(chartId)) ?? false;
 
-    // Mutation Logic (Logic Preserved)
+
+    // ── Mutations ────────────────────────────────────────────────────────────
     const savedMutation = useMutation({
         mutationFn: ({ chartId }: { chartId: string }) => postNewEvent({ action: 'saved', objectId: chartId, authFetch }),
         onMutate: async ({ chartId }) => {
@@ -150,12 +178,13 @@ const ChartPage = () => {
         isSaved ? deleteSavedMutation.mutate({ chartId }) : savedMutation.mutate({ chartId });
     }, [user, isSaved, chartId]);
 
-    const [exportSheetOpen, setExportSheetOpen] = useState(false);
+
+    // ── Export ───────────────────────────────────────────────────────────────
     const { exportAs, isExporting, exportError } = useExportChart({
         chartRef,
         title: String(title),
         description: String(description),
-        chartType: String(chart_type),
+        chartType: selectedChartType,
         dataSource: availableData?.dbSource ?? "",
         activeGeos: apiData?.activeGeos ?? selectedGeos,
         apiData,
@@ -167,19 +196,46 @@ const ChartPage = () => {
         if (!exportError) setExportSheetOpen(false);
     }, [exportAs, exportError, apiData]);
 
-    const [overlayOpen, setOverlayOpen] = useState(false);
-    const ChartComponent = chartComponents[String(chart_type)] || SunLineChart;
-    const chartElement = useMemo(() => <ChartComponent screenWidth={WINDOW_WIDTH * 0.9} apiData={apiData} />, [ChartComponent, apiData]);
 
+    // ── Chart Rendering ──────────────────────────────────────────────────────
+    const ChartComponent = CHART_REGISTRY[selectedChartType]?.component ?? SunLineChart;
+    const chartElement = useMemo(
+        () => <ChartComponent screenWidth={WINDOW_WIDTH * 0.9} apiData={apiData} />,
+        [ChartComponent, apiData],
+    );
+
+    const geoChips = geoOptions.map((opt: { label: string; value: string }) => {
+        const active = selectedGeos.includes(opt.value);
+        return (
+            <View key={opt.value} className="relative">
+                <View className="absolute inset-0 bg-dark rounded-[24px] translate-x-1 translate-y-1" />
+                <TouchableOpacity
+                    onPress={() => setSelectedGeos(prev =>
+                        active ? prev.filter(v => v !== opt.value) : [...prev, opt.value]
+                    )}
+                    className={`px-6 py-4 rounded-[24px] border-2 border-dark ${active ? 'bg-primary' : 'bg-white'}`}
+                >
+                    <Text className="font-elms-bold italic text-dark text-lg">{opt.label}</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    });
+
+
+    // ── Early return: loading ────────────────────────────────────────────────
     if (!apiData || isLoadingSavedSet || isFetchingChart)
         return (
-            <View className="flex-1 bg-[#FDFCF6] justify-center items-center">
-                <Text className="text-dark/40 font-elms-bold italic uppercase tracking-widest">Synthesizing Signal...</Text>
+            <View className="flex-1 bg-background justify-center items-center">
+                <Text className="text-dark/40 font-elms-bold italic uppercase tracking-widest">
+                    {t.chartPage.header.signalAnalysisLabel}
+                </Text>
             </View>
         );
 
+
+    // ── Render ───────────────────────────────────────────────────────────────
     return (
-        <View className="flex-1 bg-[#FDFCF6]">
+        <View className="flex-1 bg-background">
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 150, overflow: 'visible' }}>
 
                 {/* 1. Header Section */}
@@ -187,7 +243,7 @@ const ChartPage = () => {
                     <View className="flex-row items-center gap-3 mb-4">
                         <View className="h-[2px] w-10 bg-dark" />
                         <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
-                            SIGNAL ANALYSIS // {String(chart_type).toUpperCase()}
+                            {t.chartPage.header.signalAnalysis} // {String(selectedChartType).toUpperCase()}
                         </Text>
                     </View>
                     <Text className="text-3xl font-elms-bold italic text-dark tracking-tighter leading-none">
@@ -198,7 +254,7 @@ const ChartPage = () => {
                 {/* 2. Visual Layer (ViewShot for Export) */}
                 <ViewShot ref={chartRef} options={{ format: "png", quality: 1 }} style={{ backgroundColor: "#FDFCF6", paddingBottom: 20 }}>
                     {/* Editorial Legend */}
-                    <Animated.View entering={FadeInDown.delay(200)} className="px-8 mb-6 flex-row flex-wrap gap-2">
+                    <Animated.View entering={FadeInDown.delay(200)} className="px-8 mb-2 flex-row flex-wrap gap-2">
                         {apiData?.activeGeos?.map((geo: string) => (
                             <View key={geo} className="flex-row items-center gap-2 bg-white px-4 py-2 rounded-full border-2 border-dark">
                                 <View className="w-2.5 h-2.5 rounded-full bg-primary" />
@@ -216,8 +272,8 @@ const ChartPage = () => {
                 {/* 3. Action Logic Bar */}
                 <View className="px-8 flex-row items-center justify-between">
                     <View className="flex-1 mr-4">
-                        <Text className="text-[9px] uppercase font-elms-bold text-dark/40 tracking-[0.2em] mb-1">DATA SOURCE</Text>
-                        <Text className="text-xs font-elms-bold italic text-dark uppercase leading-none">{availableData?.dbSource || "VERIFIED REPOSITORY"}</Text>
+                        <Text className="text-[9px] uppercase font-elms-bold text-dark/40 tracking-[0.2em] mb-1">{t.chartPage.actionBar.dataSourceLabel}</Text>
+                        <Text className="text-xs font-elms-bold italic text-dark uppercase leading-none">{availableData?.dbSource || t.chartPage.actionBar.dataSourceFallback}</Text>
                     </View>
 
                     <View className="flex-row gap-4">
@@ -251,7 +307,7 @@ const ChartPage = () => {
                 <Animated.View entering={FadeInDown.delay(600)} className="px-8 mt-4 pt-8 border-t border-dark/5">
                     <View className="flex-row items-center gap-2 mb-4">
                         <View className="w-2 h-2 rounded-full bg-primary" />
-                        <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.4em]">SYNTHESIS OVERVIEW</Text>
+                        <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.4em]">{t.chartPage.synthesis.label}</Text>
                     </View>
                     <Text className="text-xl font-elms-regular italic text-dark/70 leading-relaxed">
                         {description}
@@ -276,43 +332,109 @@ const ChartPage = () => {
 
             {/* --- FILTER OVERLAY --- */}
             {overlayOpen && (
-                <Animated.View entering={popupEntering} exiting={popupExiting} style={StyleSheet.absoluteFill} className="bg-[#FDFCF6]">
+                <Animated.View
+                    entering={popupEntering}
+                    exiting={popupExiting}
+                    style={StyleSheet.absoluteFill}
+                    className="bg-[#FDFCF6]"
+                >
                     <View className="p-8 flex-1">
+                        {/* Overlay Header */}
                         <View className="flex-row justify-between items-center mt-8 mb-12">
-                            <Text className="text-5xl font-elms-bold italic text-dark tracking-tighter">Signal CFG</Text>
-                            <TouchableOpacity onPress={() => setOverlayOpen(false)} className="w-12 h-12 bg-dark rounded-2xl items-center justify-center">
+                            <Text className="text-5xl font-elms-bold italic text-dark tracking-tighter">
+                                {t.chartPage.filterOverlay.title}
+                            </Text>
+                            <TouchableOpacity
+                                onPress={() => setOverlayOpen(false)}
+                                className="w-12 h-12 bg-dark rounded-2xl items-center justify-center"
+                            >
                                 <Feather name="x" size={24} color="#F7CE46" />
                             </TouchableOpacity>
                         </View>
 
                         <ScrollView showsVerticalScrollIndicator={false} className="flex-1" contentContainerStyle={{ overflow: 'visible' }}>
-                            {/* Geography */}
-                            <View className="mb-12">
-                                <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-6">TARGET_GEO</Text>
-                                <View className="flex-row flex-wrap gap-3">
-                                    {geoOptions.map(opt => {
-                                        const active = selectedGeos.includes(opt.value);
-                                        return (
-                                            <View key={opt.value} className="relative">
-                                                <View className="absolute inset-0 bg-dark rounded-[24px] translate-x-1 translate-y-1" />
-                                                <TouchableOpacity onPress={() => setSelectedGeos(prev => active ? prev.filter(v => v !== opt.value) : [...prev, opt.value])} className={`px-6 py-4 rounded-[24px] border-2 border-dark ${active ? 'bg-primary' : 'bg-white'}`}>
-                                                    <Text className="font-elms-bold italic text-dark text-lg">{opt.label}</Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                        );
-                                    })}
+
+                            {/* ── Chart Type Section ───────────────────────────────── */}
+                            {compatibleCharts.length > 1 && (
+                                <View className="mb-12">
+                                    {/* Section header */}
+                                    <View className="flex-row items-center gap-3 mb-6">
+                                        <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em]">
+                                            {t.chartPage.filterOverlay.chartTypeLabel ?? "Chart Type"}
+                                        </Text>
+                                        {/* Group badge */}
+                                        <View className="flex-row items-center gap-1.5 bg-dark/5 px-3 py-1 rounded-full">
+                                            <Text className="text-[9px] font-elms-bold text-dark/40 uppercase tracking-widest">
+                                                {CHART_REGISTRY[selectedChartType]?.group.replace("_", " ")}
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    {/* Chart type pills */}
+                                    <View className="flex-row flex-wrap gap-3">
+                                        {compatibleCharts.map(({ key, label, icon }) => {
+                                            const active = selectedChartType === key;
+                                            return (
+                                                <View key={key} className="relative">
+                                                    <View className="absolute inset-0 bg-dark rounded-[20px] translate-x-1 translate-y-1" />
+                                                    <TouchableOpacity
+                                                        onPress={() => setSelectedChartType(key)}
+                                                        className={`flex-row items-center gap-2 px-5 py-3.5 rounded-[20px] border-2 border-dark ${active ? 'bg-primary' : 'bg-white'}`}
+                                                    >
+                                                        <Feather name={icon as any} size={14} color="#141414" />
+                                                        <Text className="font-elms-bold italic text-dark text-base">{label}</Text>
+                                                        {active && (
+                                                            <View className="w-2 h-2 rounded-full bg-dark ml-1" />
+                                                        )}
+                                                    </TouchableOpacity>
+                                                </View>
+                                            );
+                                        })}
+                                    </View>
+
+                                    {/* Compatibility hint */}
+                                    <View className="flex-row items-center gap-2 mt-4 opacity-40">
+                                        <Feather name="info" size={11} color="#141414" />
+                                        <Text className="text-[9px] font-elms-bold text-dark uppercase tracking-widest">
+                                            {t.chartPage.filterOverlay.chartTypeHint
+                                                ?? "Showing compatible chart types only"}
+                                        </Text>
+                                    </View>
                                 </View>
+                            )}
+
+                            {/* ── Geography ────────────────────────────────────────── */}
+                            <View className="mb-12">
+                                <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-6">
+                                    {t.chartPage.filterOverlay.geoLabel}
+                                </Text>
+                                <SearchableSelect
+                                    options={geoOptions}
+                                    selected={selectedGeos}
+                                    onToggle={v => setSelectedGeos(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])}
+                                    placeholder="Search geographies..."
+                                />
                             </View>
 
-                            {/* Variables */}
+                            {/* ── Variables ─────────────────────────────────────────── */}
                             <View className="mb-12">
-                                <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-6">DATA VAR</Text>
+                                <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-6">
+                                    {t.chartPage.filterOverlay.varLabel}
+                                </Text>
                                 <View className="gap-y-2">
-                                    {chartVariablesArray.map(v => {
+                                    {chartVariablesArray.map((v: string) => {
                                         const active = selectedVars.includes(v);
                                         return (
-                                            <TouchableOpacity key={v} onPress={() => setSelectedVars(prev => active ? prev.filter(x => x !== v) : [...prev, v])} className={`p-6 rounded-[32px] border-2 border-dark flex-row items-center justify-between ${active ? 'bg-primary' : 'bg-white'}`}>
-                                                <Text className="text-lg font-elms-bold italic text-dark flex-1 mr-4 tracking-tight">{v}</Text>
+                                            <TouchableOpacity
+                                                key={v}
+                                                onPress={() =>
+                                                    setSelectedVars(prev =>
+                                                        active ? prev.filter(x => x !== v) : [...prev, v],
+                                                    )
+                                                }
+                                                className={`p-6 rounded-[32px] border-2 border-dark flex-row items-center justify-between ${active ? 'bg-primary' : 'bg-white'}`}
+                                            >
+                                                <Text className="text-lg font-elms-bold italic text-dark flex-1 mr-4 tracking-tight">{varLabelMap[v] ?? v}</Text>
                                                 {active && <Feather name="check-circle" size={20} color="#141414" />}
                                             </TouchableOpacity>
                                         );
@@ -320,18 +442,30 @@ const ChartPage = () => {
                                 </View>
                             </View>
 
-                            {/* Temporal Slider */}
+                            {/* ── Time Slider ───────────────────────────────────────── */}
                             {periodOptions.length > 1 && (
                                 <View className="mb-12">
-                                    <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-10">TIME_WINDOW</Text>
+                                    <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-10">
+                                        {t.chartPage.filterOverlay.timeLabel}
+                                    </Text>
                                     <View className="items-center px-4">
                                         <MultiSlider
                                             values={[0, periodOptions.length - 1]}
-                                            min={0} max={periodOptions.length - 1}
+                                            min={0}
+                                            max={periodOptions.length - 1}
                                             sliderLength={WINDOW_WIDTH - 120}
-                                            onValuesChangeFinish={(vals) => setPeriods([periodOptions[vals[0]].value, periodOptions[vals[1]].value])}
+                                            onValuesChangeFinish={vals =>
+                                                setPeriods([periodOptions[vals[0]].value, periodOptions[vals[1]].value])
+                                            }
                                             selectedStyle={{ backgroundColor: "#141414", height: 4 }}
-                                            markerStyle={{ backgroundColor: "#F7CE46", height: 24, width: 24, borderEndWidth: 2, borderStartWidth: 2, borderTopWidth: 2, borderBottomWidth: 2, borderColor: '#141414', shadowOpacity: 0 }}
+                                            markerStyle={{
+                                                backgroundColor: "#F7CE46",
+                                                height: 24, width: 24,
+                                                borderEndWidth: 2, borderStartWidth: 2,
+                                                borderTopWidth: 2, borderBottomWidth: 2,
+                                                borderColor: '#141414',
+                                                shadowOpacity: 0,
+                                            }}
                                         />
                                         <View className="flex-row justify-between w-full mt-6">
                                             <Text className="text-[10px] font-elms-bold italic text-dark">{periodOptions[0].label}</Text>
@@ -342,14 +476,25 @@ const ChartPage = () => {
                             )}
                         </ScrollView>
 
-                        <SunButton text="APPLY SYNTHESIS" onPress={() => {
-                            setQuery({ geos: selectedGeos.join("+"), variables: selectedVars.join("+"), start: normalizePeriod(periods[0]), end: normalizePeriod(periods[1]) });
-                            setOverlayOpen(false);
-                        }} />
+                        {/* Apply */}
+                        <SunButton
+                            text={t.chartPage.filterOverlay.applyButton}
+                            onPress={() => {
+                                setQuery({
+                                    geos: selectedGeos.join("+"),
+                                    variables: selectedVars.join("+"),
+                                    start: normalizePeriod(periods[0]),
+                                    end: normalizePeriod(periods[1]),
+                                });
+                                setOverlayOpen(false);
+                                // selectedChartType is already stored in state;
+                                // ChartComponent re-derives from it on next render.
+                            }}
+                        />
                     </View>
-                </Animated.View>
+                </Animated.View >
             )}
-        </View>
+        </View >
     );
 };
 

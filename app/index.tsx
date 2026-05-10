@@ -1,7 +1,6 @@
 import { useAuth } from "@clerk/clerk-expo";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
-import { RelativePathString, router } from "expo-router";
+import { Redirect } from "expo-router"; // ✅ use this instead of router.replace
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
@@ -17,34 +16,22 @@ const HomeIndex = () => {
         "Elms-Thin": require("../assets/fonts/ElmsSans-Thin.ttf"),
     });
 
-    const { isLoaded, sessionId } = useAuth(); // use `isLoaded` to ensure auth is ready
+    const { isLoaded, isSignedIn } = useAuth();
 
     useEffect(() => {
-        const checkRedirect = async () => {
-            if (!isLoaded || !loaded) return; // wait for fonts & auth
-            if (sessionId === undefined) return; // wait until Clerk *knows* whether a session exists
+        if (loaded && isLoaded) {
+            SplashScreen.hideAsync();
+        }
+    }, [loaded, isLoaded]);
 
-            const lang = await AsyncStorage.getItem("language");
-            let replacedUrl = "/(tabs)/home" as RelativePathString; // default
+    // Still loading fonts or auth — render nothing, keep splash visible
+    if (!loaded || !isLoaded) return null;
 
-            if (!lang) {
-                replacedUrl = "/(auth)/lang" as RelativePathString;
-            }
-            else if (!sessionId) {
-                replacedUrl = "/(auth)/sign-in" as RelativePathString;
-            }
+    const lang = null; // await AsyncStorage.getItem("language")
 
-            router.replace(replacedUrl);
-
-            // hide splash AFTER navigation decision
-            await SplashScreen.hideAsync();
-        };
-
-        checkRedirect();
-    }, [sessionId, isLoaded, loaded]);
-
-    // while waiting for fonts/auth, render nothing
-    return null;
+    //if (isSignedIn) return <Redirect href="/(tabs)/home" />;
+    if (!lang) return <Redirect href="/(auth)/lang" />;
+    return <Redirect href="/(auth)/sign-in" />;
 };
 
 export default HomeIndex;

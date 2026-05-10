@@ -1,5 +1,5 @@
 import { popupEntering, popupExiting } from "@/functions/animations";
-import { postUserQuestionState } from "@/services/api";
+import { postNewEvent, postUserQuestionState } from "@/services/api";
 import { useAuthFetch } from "@/services/useAuthFetch";
 import { useUser } from "@clerk/clerk-expo";
 import { Feather } from "@expo/vector-icons";
@@ -40,6 +40,10 @@ export default function QuestionPopup({ onClose, title = "Inquiry" }: any) {
         mutationFn: postUserQuestionState,
     });
 
+    const postMutationEvent = useMutation({
+        mutationFn: postNewEvent,
+    })
+
     const [selectedId, setSelectedId] = useState<number | string | null>(null);
     const [confirmed, setConfirmed] = useState(false);
     const [wasCorrect, setWasCorrect] = useState<boolean | null>(null);
@@ -59,6 +63,12 @@ export default function QuestionPopup({ onClose, title = "Inquiry" }: any) {
         postMutation.mutate({
             questionId: question.questionId,
             consecutiveCorrect: correct ? question.consecutiveCorrect + 1 : 0,
+            authFetch,
+        });
+
+        postMutationEvent.mutate({
+            objectId: question.questionId.toString(),
+            action: correct ? "correct" : "incorrect",
             authFetch,
         });
     };
