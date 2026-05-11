@@ -12,10 +12,7 @@ export function useTranslations() {
         queryFn: async () => {
             try {
                 const stored = await translationStorage.get(lang);
-                console.log('Stored translations:', stored);
                 if (stored && Object.keys(stored).length > 0) return stored;
-
-                console.log('Calling fetchTranslations for lang:', lang); // ← add this
                 const fresh = await fetchTranslations(lang, authFetch);
                 await translationStorage.set(lang, fresh);
                 return fresh;

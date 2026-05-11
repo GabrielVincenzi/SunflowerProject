@@ -1,11 +1,4 @@
-// Casa nuova http://192.168.1.138:5013
-// Casa Bolo http://192.168.1.114:5013
-// Cell work http://172.20.10.4:5013
-// Cell http://172.20.10.3:5013
-
-// Azure api: https://sunflowerapp-fae5a9cucggmhbbc.italynorth-01.azurewebsites.net/
-
-const baseUrl = 'http://172.20.10.3:5013'
+const baseUrl = process.env.EXPO_PUBLIC_AZURE_URL?.replace(/\/$/, "");
 
 export type AuthFetch = (url: string, options?: RequestInit) => Promise<Response>;
 

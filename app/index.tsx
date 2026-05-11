@@ -1,10 +1,14 @@
 import { useAuth } from "@clerk/clerk-expo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
-import { Redirect } from "expo-router"; // ✅ use this instead of router.replace
+import { Redirect } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const HomeIndex = () => {
+    const [lang, setLang] = useState<string | null>(null);
+    const [langLoaded, setLangLoaded] = useState(false);
+
     const [loaded] = useFonts({
         "Geist-Regular": require("../assets/fonts/Geist-Regular.ttf"),
         "Geist-ExtraBold": require("../assets/fonts/Geist-ExtraBold.ttf"),
@@ -19,17 +23,29 @@ const HomeIndex = () => {
     const { isLoaded, isSignedIn } = useAuth();
 
     useEffect(() => {
-        if (loaded && isLoaded) {
+        const checkLanguage = async () => {
+            try {
+                const storedLang = await AsyncStorage.getItem("language");
+                setLang(storedLang);
+            } catch (error) {
+                console.error("Failed to read language from storage:", error);
+            } finally {
+                setLangLoaded(true);
+            }
+        };
+
+        checkLanguage();
+    }, []);
+
+    useEffect(() => {
+        if (loaded && isLoaded && langLoaded) {
             SplashScreen.hideAsync();
         }
-    }, [loaded, isLoaded]);
+    }, [loaded, isLoaded, langLoaded]);
 
-    // Still loading fonts or auth — render nothing, keep splash visible
-    if (!loaded || !isLoaded) return null;
+    if (!loaded || !isLoaded || !langLoaded) return null;
 
-    const lang = null; // await AsyncStorage.getItem("language")
-
-    //if (isSignedIn) return <Redirect href="/(tabs)/home" />;
+    if (isSignedIn) return <Redirect href="/(tabs)/home" />;
     if (!lang) return <Redirect href="/(auth)/lang" />;
     return <Redirect href="/(auth)/sign-in" />;
 };
