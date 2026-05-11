@@ -22,7 +22,8 @@
         "foregroundImage": "./assets/images/logoMain.png",
         "backgroundColor": "#F2BB16"
       },
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.SunflowerData"
     },
     "web": {
       "bundler": "metro",
