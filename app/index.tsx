@@ -1,11 +1,14 @@
 import { useAuth } from "@clerk/clerk-expo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
-import { Redirect } from "expo-router";
+import { useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 
+SplashScreen.preventAutoHideAsync();
+
 const HomeIndex = () => {
+    const router = useRouter();
     const [lang, setLang] = useState<string | null>(null);
     const [langLoaded, setLangLoaded] = useState(false);
 
@@ -33,21 +36,24 @@ const HomeIndex = () => {
                 setLangLoaded(true);
             }
         };
-
         checkLanguage();
     }, []);
 
     useEffect(() => {
-        if (loaded && isLoaded && langLoaded) {
-            SplashScreen.hideAsync();
+        if (!loaded || !isLoaded || !langLoaded) return;
+
+        SplashScreen.hideAsync();
+
+        if (isSignedIn) {
+            router.replace("/(tabs)/home");
+        } else if (!lang) {
+            router.replace("/(preauth)/lang");
+        } else {
+            router.replace("/(auth)/sign-in");
         }
-    }, [loaded, isLoaded, langLoaded]);
+    }, [loaded, isLoaded, langLoaded, isSignedIn, lang]);
 
-    if (!loaded || !isLoaded || !langLoaded) return null;
-
-    if (isSignedIn) return <Redirect href="/(tabs)/home" />;
-    if (!lang) return <Redirect href="/(preauth)/lang" />;
-    return <Redirect href="/(auth)/sign-in" />;
+    return null;
 };
 
 export default HomeIndex;
