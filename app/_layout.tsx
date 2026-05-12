@@ -56,6 +56,7 @@ const Layout = () => {
         <Stack.Protected guard={!!isSignedIn}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         </Stack.Protected>
+        <Stack.Screen name="(preauth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(sponsorship)" options={{ headerShown: false }} />
         <Stack.Screen name="infos/[id]" options={{ headerShown: false }} />

@@ -46,7 +46,7 @@ const HomeIndex = () => {
     if (!loaded || !isLoaded || !langLoaded) return null;
 
     if (isSignedIn) return <Redirect href="/(tabs)/home" />;
-    if (!lang) return <Redirect href="/(auth)/lang" />;
+    if (!lang) return <Redirect href="/(preauth)/lang" />;
     return <Redirect href="/(auth)/sign-in" />;
 };
 

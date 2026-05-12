@@ -1,6 +1,11 @@
+import SunButton from "@/components/SunButton";
+import { THEME_COLORS } from "@/constants/utilities";
+import { translationStorage } from "@/interfaces/translationStorage";
 import { useTranslations } from "@/services/useTranslation";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Dimensions, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
@@ -237,20 +242,27 @@ const Profile = () => {
                                 activeOpacity={0.8}
                             >
                                 <View className="w-10 h-10 items-center justify-center rounded-2xl bg-primary/20">
-                                    <Feather name={item.icon as any} size={18} color="#141414" />
+                                    <Feather name={item.icon as any} size={18} color={THEME_COLORS.dark} />
                                 </View>
                                 <Text className="text-lg font-elms-bold italic text-dark ml-4 tracking-tight">{item.label}</Text>
-                                <Feather name="arrow-right" size={18} color="#141414" className="-rotate-45" style={{ marginLeft: 'auto' }} />
+                                <Feather name="arrow-right" size={18} color={THEME_COLORS.dark} className="-rotate-45" style={{ marginLeft: 'auto' }} />
                             </TouchableOpacity>
                         </View>
                     ))}
 
                     <TouchableOpacity
                         onPress={() => signOut()}
-                        className="flex-row items-center justify-center py-6 border-4 border-dark rounded-[32px] mt-10 active:bg-dark group"
+                        className="flex-row items-center mb-4 justify-center py-6 border-4 border-dark rounded-[32px] mt-10 active:bg-dark group"
                     >
-                        <Text className="text-xl font-elms-bold italic text-dark uppercase tracking-widest">{t.profile.settings.terminateSession}</Text>
+                        <Text className="text-xl font-elms-bold italic text-dark uppercase tracking-widest">Sign out{t.profile.settings.terminateSession}</Text>
                     </TouchableOpacity>
+
+                    <SunButton text="Clear Lang" onPress={async () => {
+                        await AsyncStorage.removeItem("language");
+                        await translationStorage.clear("en");
+                        await translationStorage.clear("it");
+                        router.replace("/(preauth)/lang");
+                    }} />
                 </Animated.View>
 
                 <View style={{ height: 150 }} />

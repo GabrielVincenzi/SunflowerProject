@@ -35,25 +35,24 @@ const Onboarding = () => {
                 {/* Visual Archetype Slide */}
                 <View key={0} className="flex-1 px-8 pt-12">
                     <View className="h-[2px] w-12 bg-dark mb-6" />
-                    <Text className="text-dark text-7xl font-elms-bold italic tracking-tighter">{t.welcome.slides[0].title}</Text>
+                    <Text className="text-white text-7xl font-elms-bold italic tracking-tighter">{t.welcome.slides[0].title}</Text>
                     <Text className="text-xl font-elms-bold italic mt-8 text-dark/60">{t.welcome.slides[0].description}</Text>
                     <Image source={images.sunflower} className="w-[120%] h-full absolute right-[-100] bottom-[-200] opacity-20" resizeMode="contain" />
                 </View>
 
                 {/* Data Network Slide */}
-                <View key={1} className="flex-1">
-                    <ImageBackground source={images.europe} style={{ flex: 1 }} className="px-8 items-center justify-center opacity-80">
-                        <View className="bg-dark p-10 rounded-[50px] border-4 border-primary">
-                            <Text className="text-white text-5xl font-elms-bold italic text-center">{t.welcome.slides[1].title}</Text>
-                        </View>
+                <View key={1} className="flex-1 px-8 pt-12">
+                    <ImageBackground source={images.europe} style={{ flex: 1 }} className="px-8opacity-80">
+                        <View className="h-[2px] w-12 bg-dark mb-6" />
+                        <Text className="text-white text-6xl font-elms-bold italic tracking-tighter">{t.welcome.slides[1].title}</Text>
                     </ImageBackground>
                 </View>
 
                 {/* Creative Node Slide */}
                 <View key={2} className="flex-1 px-8 pt-12 items-center">
-                    <Text className="text-dark text-6xl font-elms-bold italic text-center tracking-tighter">{t.welcome.slides[2].title}</Text>
+                    <Text className="text-white text-6xl font-elms-bold italic text-center tracking-tighter">{t.welcome.slides[2].title}</Text>
                     <Text className="text-xl font-elms-bold italic mt-6 text-dark/60 text-center">{t.welcome.slides[2].description}</Text>
-                    <Image source={images.creativity} className="w-full h-1/2 absolute bottom-0" resizeMode="contain" />
+                    <Image source={images.creativity} className="w-full h-1/2 absolute bottom-0 scale-x-[-1]" resizeMode="contain" />
                 </View>
             </Swiper>
 
