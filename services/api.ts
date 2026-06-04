@@ -1,4 +1,4 @@
-const baseUrl = "http://172.20.10.3:5013"; //process.env.EXPO_PUBLIC_AZURE_URL?.replace(/\/$/, "");
+const baseUrl = process.env.EXPO_PUBLIC_AZURE_URL?.replace(/\/$/, "");
 
 export type AuthFetch = (url: string, options?: RequestInit) => Promise<Response>;
 
