@@ -30,7 +30,7 @@ function SunPieChart({ screenWidth, screenHeight, apiData }: ChartProps) {
     const radius = size / 2;
     const innerRadius = radius * 0.6;
     const geos = apiData.activeGeos || [];
-    const safeColors = CHART_COLORS || ["#000"];
+    const palette = apiData?.palette ?? CHART_COLORS;
 
     const variables = useMemo(
         () => Array.from(new Set(Object.keys(apiData.series || {}).map((k) => k.substring(0, k.lastIndexOf("_"))))),
@@ -45,9 +45,9 @@ function SunPieChart({ screenWidth, screenHeight, apiData }: ChartProps) {
         return variables.map((variable, varIdx) => ({
             label: apiData.variableLabels?.[variable] ?? variable,
             value: Math.abs(apiData.series?.[`${variable}_${geo}`]?.[lastPeriodIndex]?.value ?? 0),
-            color: safeColors[varIdx % safeColors.length],
+            color: palette[varIdx % palette.length],
         }));
-    }, [apiData, geos, variables, lastPeriodIndex, safeColors]);
+    }, [apiData, geos, variables, lastPeriodIndex, palette]);
 
     const legendItems = useMemo<LegendItem[]>(
         () => chartData.map(({ label, color }) => ({ label, color })),
@@ -57,7 +57,6 @@ function SunPieChart({ screenWidth, screenHeight, apiData }: ChartProps) {
     const pieGenerator = useMemo(() => pie<typeof chartData[number]>().value((d) => d.value).sort(null), []);
     const arcs = useMemo(() => pieGenerator(chartData), [pieGenerator, chartData]);
     const arcGen = useMemo(() => arc<PieArcDatum<typeof chartData[number]>>().innerRadius(innerRadius).outerRadius(radius), [innerRadius, radius]);
-    const centerLabel = geos[0] ?? "";
 
     return (
         <View className="w-full bg-background items-center py-8">

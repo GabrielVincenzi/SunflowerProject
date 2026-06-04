@@ -34,7 +34,7 @@ function AnimatedBarLeft({ cx, y, fullWidth, bh, color }: { cx: number; y: numbe
 }
 
 function SunPopulationPyramidChart({ screenWidth, screenHeight, apiData }: any) {
-    const safeColors = CHART_COLORS || ["#FCD34D", "#343a40"];
+    const palette = apiData?.palette ?? CHART_COLORS;
     const width = screenWidth;
     const height = screenHeight ? screenHeight * 0.45 : HEIGHT;
     const geos = apiData.activeGeos || [];
@@ -56,22 +56,72 @@ function SunPopulationPyramidChart({ screenWidth, screenHeight, apiData }: any) 
             <View className="flex-row justify-center mb-6" style={{ gap: 20 }}>
                 {geos.slice(0, 2).map((geo: string, i: number) => (
                     <View key={geo + i} className="flex-row items-center">
-                        <View style={{ width: 12, height: 12, backgroundColor: safeColors[i % safeColors.length], borderWidth: 1.5, borderColor: '#141414', marginRight: 8 }} />
-                        <Text className="text-[10px] font-black italic uppercase tracking-widest text-dark">{geo}</Text>
+                        <View
+                            style={{
+                                width: 12,
+                                height: 12,
+                                backgroundColor: palette[i % palette.length],
+                                borderWidth: 1.5,
+                                borderColor: "#141414",
+                                marginRight: 8,
+                            }}
+                        />
+                        <Text className="text-[10px] font-black italic uppercase tracking-widest text-dark">
+                            {geo}
+                        </Text>
                     </View>
                 ))}
             </View>
-            <Svg width={width} height={height}>
-                <SvgLine x1={cx} x2={cx} y1={margin.top - 4} y2={height - margin.bottom + 4} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
-                <SvgLine x1={margin.left} x2={width - margin.right} y1={height - margin.bottom} y2={height - margin.bottom} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
-                {variables.map((v, i) => (
-                    <G key={v}>
-                        <AnimatedBarLeft cx={cx} y={yScale(v) ?? 0} fullWidth={xScale(leftValues[i])} bh={yScale.bandwidth()} color={safeColors[0]} />
-                        <AnimatedBarRight cx={cx} y={yScale(v) ?? 0} fullWidth={xScale(rightValues[i])} bh={yScale.bandwidth()} color={safeColors[1 % safeColors.length]} />
-                        <SvgText x={cx} y={yScale(v)! + yScale.bandwidth() / 2 + 4} textAnchor="middle" fontSize={10} fontWeight="900" fill={THEME_COLORS.dark} opacity={0.2}>{v.toUpperCase()}</SvgText>
-                    </G>
-                ))}
-            </Svg>
+
+            <View style={{ width: "100%", alignItems: "center" }}>
+                <Svg width={width} height={height}>
+                    <SvgLine
+                        x1={cx}
+                        x2={cx}
+                        y1={margin.top - 4}
+                        y2={height - margin.bottom + 4}
+                        stroke={THEME_COLORS.dark}
+                        strokeWidth={2.5}
+                    />
+                    <SvgLine
+                        x1={margin.left}
+                        x2={width - margin.right}
+                        y1={height - margin.bottom}
+                        y2={height - margin.bottom}
+                        stroke={THEME_COLORS.dark}
+                        strokeWidth={2.5}
+                    />
+                    {variables.map((v, i) => (
+                        <G key={v}>
+                            <AnimatedBarLeft
+                                cx={cx}
+                                y={yScale(v) ?? 0}
+                                fullWidth={xScale(leftValues[i])}
+                                bh={yScale.bandwidth()}
+                                color={palette[0]}
+                            />
+                            <AnimatedBarRight
+                                cx={cx}
+                                y={yScale(v) ?? 0}
+                                fullWidth={xScale(rightValues[i])}
+                                bh={yScale.bandwidth()}
+                                color={palette[1 % palette.length]}
+                            />
+                            <SvgText
+                                x={cx}
+                                y={(yScale(v) ?? 0) + yScale.bandwidth() / 2 + 4}
+                                textAnchor="middle"
+                                fontSize={10}
+                                fontWeight="900"
+                                fill={THEME_COLORS.dark}
+                                opacity={0.2}
+                            >
+                                {v.toUpperCase()}
+                            </SvgText>
+                        </G>
+                    ))}
+                </Svg>
+            </View>
         </View>
     );
 }

@@ -10,7 +10,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInDown, FadeOut } from "react-native-reanimated";
 import ViewShot from "react-native-view-shot";
 
 import { buildPeriodOptions, normalizePeriod } from '@/functions/dateHandlers';
@@ -30,6 +30,105 @@ import SunStackedAreaChart from "@/components/charts/SunStackedAreaChart";
 import SunTreemapChart from "@/components/charts/SunTreemapChart";
 import { SearchableSelect } from "@/components/SearchableSelect";
 import { useTranslations } from "@/services/useTranslation";
+
+// Import original app theme colors
+
+// ── COLOR ACCESSIBILITY PALETTES ─────────────────────────────────────────────
+export const CHART_PALETTES = {
+    default: { name: "Sunburst", colors: ["#EE9B00", "#CA6702", "#0A9396", "#BB3E03", "#005F73", "#001219", "#AE2012"], colorblindSafe: false },
+    nordic: { name: "Nordic", colors: ["#5B8DB8", "#E07B54", "#6BAA75", "#B5838D", "#7B9E87", "#C9A96E", "#8B7FB8"], colorblindSafe: false },
+    ink: { name: "Ink & Dust", colors: ["#141414", "#3D3D3D", "#6B6B6B", "#9E9E9E", "#C5C5C5", "#E0E0E0", "#F7CE46"], colorblindSafe: false },
+    terracotta: { name: "Terracotta", colors: ["#C0392B", "#E67E22", "#F39C12", "#D4AC0D", "#7D6608", "#A04000", "#641E16"], colorblindSafe: false },
+    ocean: { name: "Deep Ocean", colors: ["#1A237E", "#1565C0", "#0288D1", "#00838F", "#00695C", "#2E7D32", "#558B2F"], colorblindSafe: false },
+    tableau10: { name: "Tableau 10", colors: ["#4E79A7", "#F28E2B", "#E15759", "#76B7B2", "#59A14F", "#EDC948", "#B07AA1"], colorblindSafe: false },
+    wong: { name: "Wong 8", colors: ["#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00"], colorblindSafe: true },
+    ibm: { name: "IBM Carbon", colors: ["#648FFF", "#785EF0", "#DC267F", "#FE6100", "#FFB000", "#001141", "#0043CE"], colorblindSafe: true },
+    okabe: { name: "Okabe-Ito", colors: ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"], colorblindSafe: true },
+} as const;
+
+export type PaletteKey = keyof typeof CHART_PALETTES;
+
+interface Props {
+    value: PaletteKey;
+    onChange: (key: PaletteKey) => void;
+}
+
+export const PaletteSelect = ({ value, onChange }: Props) => {
+    const [open, setOpen] = useState(false);
+    const active = CHART_PALETTES[value];
+
+    return (
+        <View>
+            {/* Trigger — same rounded-[32px] style as variable toggles */}
+            <View className="relative">
+                <View className="absolute inset-0 bg-dark rounded-[32px] translate-x-0.5 translate-y-0.5" />
+                <TouchableOpacity
+                    onPress={() => setOpen(o => !o)}
+                    className={`flex-row items-center justify-between px-6 py-[18px] rounded-[32px] border-2 border-dark ${open ? "bg-primary" : "bg-white"}`}
+                    activeOpacity={0.85}
+                >
+                    <View className="flex-row items-center gap-3 flex-1 mr-2">
+                        <Text className="text-lg font-elms-bold italic text-dark tracking-tight">{active.name}</Text>
+                        {/* Continuous gradient-style swatch indicator */}
+                        <View className="flex-1 flex-row h-3 rounded-full overflow-hidden border border-dark/10">
+                            {active.colors.map((c, i) => (
+                                <View key={i} className="flex-1 h-full" style={{ backgroundColor: c }} />
+                            ))}
+                        </View>
+                    </View>
+                    <Feather
+                        name="chevron-down"
+                        size={18}
+                        color="#141414"
+                        style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}
+                    />
+                </TouchableOpacity>
+            </View>
+
+            {/* Dropdown list */}
+            {open && (
+                <Animated.View
+                    entering={FadeIn.duration(120)}
+                    exiting={FadeOut.duration(80)}
+                    className="mt-2 rounded-[28px] border-2 border-dark overflow-hidden bg-white"
+                >
+                    {(Object.entries(CHART_PALETTES) as [PaletteKey, typeof CHART_PALETTES[PaletteKey]][]).map(
+                        ([key, palette], i, arr) => {
+                            const isSelected = value === key;
+                            return (
+                                <TouchableOpacity
+                                    key={key}
+                                    onPress={() => { onChange(key); setOpen(false); }}
+                                    className={`flex-row items-center justify-between gap-3 px-5 py-[14px] ${isSelected ? "bg-primary" : "bg-white"} ${i < arr.length - 1 ? "border-b border-dark/[0.07]" : ""}`}
+                                    activeOpacity={0.7}
+                                >
+                                    <View className="w-[100px]">
+                                        <Text className="text-[15px] font-elms-bold italic text-dark" numberOfLines={1}>{palette.name}</Text>
+                                    </View>
+
+                                    <View className="flex-1 flex-row h-[18px] rounded-md overflow-hidden border border-dark/10">
+                                        {palette.colors.map((c, ci) => (
+                                            <View key={ci} className="flex-1 h-full" style={{ backgroundColor: c }} />
+                                        ))}
+                                    </View>
+
+                                    <View className="flex-row items-center gap-2">
+                                        {palette.colorblindSafe && (
+                                            <View className="bg-dark/5 px-2 py-0.5 rounded-full">
+                                                <Text className="text-[8px] font-elms-bold text-dark/50 uppercase tracking-wider">Safe</Text>
+                                            </View>
+                                        )}
+                                        {isSelected && <Feather name="check" size={15} color="#141414" />}
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        }
+                    )}
+                </Animated.View>
+            )}
+        </View>
+    );
+};
 
 const CHART_REGISTRY = {
     line: { component: SunLineChart, label: "Line", icon: "activity", group: "time_series" },
@@ -59,7 +158,7 @@ const ChartPage = () => {
     if (!data) return null;
     const t: any = data.payload;
 
-    const { db, chart_id, title, description, variables, chart_type } = useLocalSearchParams();
+    const { db, chart_id, title, description, variables, variableLabels, chart_type } = useLocalSearchParams();
     const chartDb = String(db);
     const chartId = String(chart_id);
     const initialChartType = String(chart_type) as ChartTypeKey;
@@ -84,6 +183,10 @@ const ChartPage = () => {
     const [overlayOpen, setOverlayOpen] = useState(false);
     const [exportSheetOpen, setExportSheetOpen] = useState(false);
     const [selectedChartType, setSelectedChartType] = useState<ChartTypeKey>(initialChartType);
+
+    // Core applied palette state vs Tentative temporary selections inside the drawer
+    const [selectedPalette, setSelectedPalette] = useState<PaletteKey>("default");
+    const [tempPalette, setTempPalette] = useState<PaletteKey>("default");
 
     const compatibleCharts = useMemo(() => {
         const currentGroup = CHART_REGISTRY[selectedChartType]?.group;
@@ -122,10 +225,30 @@ const ChartPage = () => {
         placeholderData: keepPreviousData,
     });
 
-    const varLabelMap: Record<string, string> = useMemo(
-        () => apiData?.variableLabels ?? {},
-        [apiData]
-    );
+    const varLabelMap: Record<string, string> = useMemo(() => {
+        if (!variableLabels) return {};
+        const raw = Array.isArray(variableLabels) ? variableLabels[0] : variableLabels;
+        try {
+            return JSON.parse(raw) as Record<string, string>;
+        } catch {
+            // Fallback: "gdp:GDP Growth+pop:Population" flat format
+            return Object.fromEntries(
+                raw.split("+")
+                    .map(pair => pair.split(":") as [string, string])
+                    .filter(([k]) => Boolean(k))
+            );
+        }
+    }, [variableLabels]);
+
+    // Enrich apiData with the labels that came from navigation params and current active palette choices
+    const enrichedApiData = useMemo(() => {
+        if (!apiData) return undefined;
+        return {
+            ...apiData,
+            variableLabels: varLabelMap,
+            palette: CHART_PALETTES[selectedPalette].colors,
+        };
+    }, [apiData, varLabelMap, selectedPalette]);
 
     const { data: savedSet, isLoading: isLoadingSavedSet } = useQuery({
         queryKey: ['charts', 'savedIds'],
@@ -186,44 +309,25 @@ const ChartPage = () => {
         description: String(description),
         chartType: selectedChartType,
         dataSource: availableData?.dbSource ?? "",
-        activeGeos: apiData?.activeGeos ?? selectedGeos,
-        apiData,
+        activeGeos: enrichedApiData?.activeGeos ?? selectedGeos,
+        apiData: enrichedApiData,
     });
 
     const handleExport = useCallback(async (format: ExportFormat) => {
-        if (!apiData || !apiData.activeGeos?.length) return;
-        await exportAs(format, apiData);
+        if (!enrichedApiData || !enrichedApiData.activeGeos?.length) return;
+        await exportAs(format, enrichedApiData);
         if (!exportError) setExportSheetOpen(false);
-    }, [exportAs, exportError, apiData]);
-
+    }, [exportAs, exportError, enrichedApiData]);
 
     // ── Chart Rendering ──────────────────────────────────────────────────────
     const ChartComponent = CHART_REGISTRY[selectedChartType]?.component ?? SunLineChart;
     const chartElement = useMemo(
-        () => <ChartComponent screenWidth={WINDOW_WIDTH * 0.9} apiData={apiData} />,
-        [ChartComponent, apiData],
+        () => <ChartComponent screenWidth={WINDOW_WIDTH * 0.9} apiData={enrichedApiData} />,
+        [ChartComponent, enrichedApiData],
     );
 
-    const geoChips = geoOptions.map((opt: { label: string; value: string }) => {
-        const active = selectedGeos.includes(opt.value);
-        return (
-            <View key={opt.value} className="relative">
-                <View className="absolute inset-0 bg-dark rounded-[24px] translate-x-1 translate-y-1" />
-                <TouchableOpacity
-                    onPress={() => setSelectedGeos(prev =>
-                        active ? prev.filter(v => v !== opt.value) : [...prev, opt.value]
-                    )}
-                    className={`px-6 py-4 rounded-[24px] border-2 border-dark ${active ? 'bg-primary' : 'bg-white'}`}
-                >
-                    <Text className="font-elms-bold italic text-dark text-lg">{opt.label}</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    });
-
-
     // ── Early return: loading ────────────────────────────────────────────────
-    if (!apiData || isLoadingSavedSet || isFetchingChart)
+    if (!enrichedApiData || isLoadingSavedSet || isFetchingChart)
         return (
             <View className="flex-1 bg-background justify-center items-center">
                 <Text className="text-dark/40 font-elms-bold italic uppercase tracking-widest">
@@ -253,16 +357,6 @@ const ChartPage = () => {
 
                 {/* 2. Visual Layer (ViewShot for Export) */}
                 <ViewShot ref={chartRef} options={{ format: "png", quality: 1 }} style={{ backgroundColor: "#FDFCF6", paddingBottom: 20 }}>
-                    {/* Editorial Legend */}
-                    <Animated.View entering={FadeInDown.delay(200)} className="px-8 mb-2 flex-row flex-wrap gap-2">
-                        {apiData?.activeGeos?.map((geo: string) => (
-                            <View key={geo} className="flex-row items-center gap-2 bg-white px-4 py-2 rounded-full border-2 border-dark">
-                                <View className="w-2.5 h-2.5 rounded-full bg-primary" />
-                                <Text className="text-[10px] font-elms-bold italic text-dark uppercase tracking-widest">{geo}</Text>
-                            </View>
-                        ))}
-                    </Animated.View>
-
                     {/* Chart Core */}
                     <Animated.View entering={FadeIn.delay(400)} className="px-4 mb-4 items-center justify-center min-h-[320]">
                         {chartElement}
@@ -280,7 +374,14 @@ const ChartPage = () => {
                         {/* Filter Button */}
                         <View className="relative">
                             <View className="absolute inset-0 bg-dark rounded-full translate-x-1 translate-y-1" />
-                            <TouchableOpacity onPress={() => setOverlayOpen(true)} className="w-14 h-14 rounded-full bg-primary border-2 border-dark items-center justify-center">
+                            <TouchableOpacity
+                                onPress={() => {
+                                    // Make sure current applied values are synced to draft states when opening 
+                                    setTempPalette(selectedPalette);
+                                    setOverlayOpen(true);
+                                }}
+                                className="w-14 h-14 rounded-full bg-primary border-2 border-dark items-center justify-center"
+                            >
                                 <Feather name="sliders" size={20} color="#141414" />
                             </TouchableOpacity>
                         </View>
@@ -403,6 +504,14 @@ const ChartPage = () => {
                                 </View>
                             )}
 
+                            {/* ── Colour Palette Selector ──────────────────────────── */}
+                            <View className="mb-12">
+                                <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-6">
+                                    {t.chartPage.filterOverlay.paletteLabel ?? "Colour Palette"}
+                                </Text>
+                                <PaletteSelect value={tempPalette} onChange={setTempPalette} />
+                            </View>
+
                             {/* ── Geography ────────────────────────────────────────── */}
                             <View className="mb-12">
                                 <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-6">
@@ -476,7 +585,7 @@ const ChartPage = () => {
                             )}
                         </ScrollView>
 
-                        {/* Apply */}
+                        {/* Apply Button */}
                         <SunButton
                             text={t.chartPage.filterOverlay.applyButton}
                             onPress={() => {
@@ -486,9 +595,9 @@ const ChartPage = () => {
                                     start: normalizePeriod(periods[0]),
                                     end: normalizePeriod(periods[1]),
                                 });
+                                // Commit the temporary selected palette palette state on apply synthesis click!
+                                setSelectedPalette(tempPalette);
                                 setOverlayOpen(false);
-                                // selectedChartType is already stored in state;
-                                // ChartComponent re-derives from it on next render.
                             }}
                         />
                     </View>

@@ -50,7 +50,7 @@ function AnimatedBubble({ x, y, radius, color }: { x: number; y: number; radius:
 }
 
 function SunCategoricalBubbleChart({ screenWidth, apiData }: any) {
-    const safeColors = CHART_COLORS || ["#FCD34D", "#3B82F6", "#10B981", "#F472B6"];
+    const palette = apiData?.palette ?? CHART_COLORS;
     const chartHeight = 500;
     const padding = 60;
 
@@ -61,7 +61,7 @@ function SunCategoricalBubbleChart({ screenWidth, apiData }: any) {
 
         const colorScale = scaleOrdinal<string>()
             .domain(categories)
-            .range(safeColors);
+            .range(palette);
 
         const nodes: BubbleNode[] = geos.map((geo: string) => {
             const val = apiData.series[`${variable}_${geo}`]?.[0]?.value ?? 0;
@@ -76,7 +76,7 @@ function SunCategoricalBubbleChart({ screenWidth, apiData }: any) {
         });
 
         return { nodes, categories };
-    }, [apiData, safeColors]);
+    }, [apiData, palette]);
 
     const maxVal = max(processedData.nodes.map(n => n.value)) || 0;
     const radiusScale = scaleSqrt()
@@ -110,7 +110,7 @@ function SunCategoricalBubbleChart({ screenWidth, apiData }: any) {
             <ChartLegend
                 items={processedData.categories.map((cat, i) => ({
                     label: cat.toUpperCase(),
-                    color: safeColors[i % safeColors.length]
+                    color: palette[i % palette.length]
                 }))}
                 yUnitLabel={yUnitLabel}
             />

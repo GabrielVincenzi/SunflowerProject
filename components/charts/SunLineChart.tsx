@@ -129,7 +129,7 @@ function SunLineChart({
     yTickCount = 6,
     height = 300, // Slightly taller for high impact
 }: any) {
-    const safeColors = CHART_COLORS || ["#000000"];
+    const palette = apiData?.palette ?? CHART_COLORS;
 
     const hasData =
         apiData &&
@@ -160,7 +160,7 @@ function SunLineChart({
                         const date = apiData.activePeriods?.[i] ? new Date(apiData.activePeriods[i]) : null;
                         return { value: pt?.value ?? 0, label: date ? formatPeriod(date, granularity) : "" };
                     }),
-                    color: safeColors[seriesCounter % safeColors.length],
+                    color: palette[seriesCounter % palette.length],
                 };
                 seriesCounter++;
                 return series;
@@ -177,14 +177,14 @@ function SunLineChart({
                             const date = apiData.activePeriods?.[i] ? new Date(apiData.activePeriods[i]) : null;
                             return { value: pt?.value ?? 0, label: date ? formatPeriod(date, granularity) : "" };
                         }),
-                        color: safeColors[seriesCounter % safeColors.length],
+                        color: palette[seriesCounter % palette.length],
                     };
                     seriesCounter++;
                     return series;
                 })
             );
         }
-    }, [apiData, safeColors, granularity, hasData]);
+    }, [apiData, palette, granularity, hasData]);
 
     const legendItems = useMemo<LegendItem[]>(
         () => chartData.map(({ label, color }: LegendItem) => ({ label, color })),

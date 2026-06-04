@@ -65,7 +65,7 @@ function rightHalfPath(cx: number, cy: number, r: number): string {
 
 // ─── Component ────────────────────────────────────────────────
 function SunProportionalAreaChart({ screenWidth, screenHeight, apiData }: ChartProps) {
-    const safeColors = CHART_COLORS || ["#FCD34D"];
+    const palette = apiData?.palette ?? CHART_COLORS;
     const width = screenWidth;
 
     const periods = useMemo(() => parsePeriods(apiData.activePeriods || []), [apiData.activePeriods]);
@@ -88,14 +88,14 @@ function SunProportionalAreaChart({ screenWidth, screenHeight, apiData }: ChartP
             return {
                 geo,
                 label: geo,
-                color: safeColors[gi % safeColors.length],
+                color: palette[gi % palette.length],
                 v1: Math.abs(series[p1Idx]?.value ?? 0),
                 v2: Math.abs(series[p2Idx]?.value ?? 0),
-                color1: safeColors[gi % safeColors.length] + "88",
-                color2: safeColors[gi % safeColors.length],
+                color1: palette[gi % palette.length] + "88",
+                color2: palette[gi % palette.length],
             };
         }),
-        [geos, firstVariable, apiData, p1Idx, p2Idx, safeColors]
+        [geos, firstVariable, apiData, p1Idx, p2Idx, palette]
     );
 
     const legendItems = useMemo<LegendItem[]>(

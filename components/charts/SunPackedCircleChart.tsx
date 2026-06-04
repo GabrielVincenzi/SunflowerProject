@@ -61,7 +61,7 @@ function AnimatedBubble({
 
 // ─── Component ────────────────────────────────────────────────
 function SunPackedCircleChart({ screenWidth, screenHeight, apiData }: ChartProps) {
-    const safeColors = CHART_COLORS || ["#FCD34D"];
+    const palette = apiData?.palette ?? CHART_COLORS;
     const width = screenWidth;
     const height = screenHeight ? screenHeight * 0.4 : HEIGHT;
 
@@ -82,12 +82,12 @@ function SunPackedCircleChart({ screenWidth, screenHeight, apiData }: ChartProps
                     id: key,
                     label: activeGeos.length > 1 ? `${apiData.variableLabels?.[v] ?? v} (${geo})` : (apiData.variableLabels?.[v] ?? v),
                     value: Math.abs(val),
-                    color: safeColors[ci++ % safeColors.length],
+                    color: palette[ci++ % palette.length],
                 });
             });
         });
         return result.filter((d) => d.value > 0);
-    }, [apiData, safeColors]);
+    }, [apiData, palette]);
 
     const legendItems = useMemo<LegendItem[]>(
         () => leaves.map(({ label, color }) => ({ label, color })),

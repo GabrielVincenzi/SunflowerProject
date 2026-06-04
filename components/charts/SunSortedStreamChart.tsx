@@ -84,7 +84,7 @@ function ribbonPath(lx: number, ly0: number, ly1: number, rx: number, ry0: numbe
 
 // ─── Component ─────────────────────────────────────────────────
 function SunSortedStreamChart({ screenWidth, screenHeight, apiData }: ChartProps) {
-    const safeColors = CHART_COLORS || ["#FCD34D"];
+    const palette = apiData?.palette ?? CHART_COLORS;
     const width = screenWidth;
     const height = screenHeight ? screenHeight * 0.4 : HEIGHT;
     const xTickCount = 6;
@@ -108,10 +108,10 @@ function SunSortedStreamChart({ screenWidth, screenHeight, apiData }: ChartProps
                 if (!apiData.series[key]) return [];
                 const label = geos.length > 1 ? `${v} (${geo})` : v;
                 const vals = (apiData.series[key] || []).map((pt) => Math.abs(pt?.value ?? 0));
-                return [{ key, label, color: safeColors[idx++ % safeColors.length], values: vals }];
+                return [{ key, label, color: palette[idx++ % palette.length], values: vals }];
             })
         );
-    }, [apiData, geos, variables, safeColors]);
+    }, [apiData, geos, variables, palette]);
 
     const legendItems = useMemo<LegendItem[]>(
         () => chartData.map(({ label, color }) => ({ label, color })),

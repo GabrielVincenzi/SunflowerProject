@@ -1,4 +1,4 @@
-const baseUrl = process.env.EXPO_PUBLIC_AZURE_URL?.replace(/\/$/, "");
+const baseUrl = "http://172.20.10.3:5013"; //process.env.EXPO_PUBLIC_AZURE_URL?.replace(/\/$/, "");
 
 export type AuthFetch = (url: string, options?: RequestInit) => Promise<Response>;
 
@@ -21,6 +21,7 @@ export const fetchAllChartDetails = async ({
     signal?: AbortSignal;
     authFetch: AuthFetch;
 }): Promise<ApiAllChartResponse> => {
+
     const params = new URLSearchParams();
     if (query?.trim()) params.set("search", query.trim());
     if (category?.trim()) params.set("category", category.trim());
@@ -40,6 +41,8 @@ export const fetchAllChartDetails = async ({
         ...row,
         id: Number(row.id),
     })) as CardProps[];
+
+    console.log(data)
 
     return {
         data,

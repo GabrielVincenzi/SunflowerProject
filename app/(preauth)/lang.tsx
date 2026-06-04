@@ -1,6 +1,7 @@
 import { useLanguage } from "@/components/LanguageContext";
 import LanguageRotatingTitle from "@/components/RotatingTitle";
 import SunButton from "@/components/SunButton";
+import { THEME_COLORS } from "@/constants/utilities";
 import { translationStorage } from "@/interfaces/translationStorage";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -55,7 +56,7 @@ const LanguageSelection = () => {
                     <LanguageNode title="English" onPress={() => selectLanguage('en')} />
                     <LanguageNode title="Italiano" onPress={() => selectLanguage('it')} />
                 </View>
-                {loading && <ActivityIndicator color="#141414" className="mt-8" />}
+                {loading && <ActivityIndicator color={THEME_COLORS.dark} className="mt-8" />}
             </View>
         </ScrollView>
     );

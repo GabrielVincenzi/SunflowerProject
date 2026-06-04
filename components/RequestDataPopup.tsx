@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, Keyboard, Modal, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import SunButton from "./SunButton";
 
 const { height } = Dimensions.get("window");
 
@@ -97,17 +98,11 @@ export default function RequestDataPopup({ visible, onClose, prefillQuery = "" }
 
                         {/* Submit Button with Shadow Layer */}
                         <View className="relative w-full">
-                            <View className="absolute inset-0 bg-dark rounded-[32px] translate-y-2" />
-                            <TouchableOpacity
+                            <SunButton
+                                text={submitted ? "REQUEST SENT ✓" : mutation.isPending ? "SENDING..." : "SUBMIT REQUEST"}
                                 onPress={() => mutation.mutate()}
                                 disabled={!canSubmit}
-                                activeOpacity={0.9}
-                                className={`py-6 rounded-[32px] border-2 border-dark items-center shadow-lg ${submitted ? "bg-primary" : canSubmit ? "bg-primary" : "bg-white"}`}
-                            >
-                                <Text className="font-elms-bold italic text-xl uppercase tracking-widest text-dark">
-                                    {submitted ? "REQUEST SENT ✓" : mutation.isPending ? "SENDING..." : "SUBMIT REQUEST"}
-                                </Text>
-                            </TouchableOpacity>
+                            />
                         </View>
                     </Animated.View>
                 </View>

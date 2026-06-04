@@ -5,12 +5,9 @@ import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import * as SplashScreen from "expo-splash-screen";
 import React from 'react';
 import { AppStateStatus, Platform, StatusBar } from "react-native";
 import './globals.css';
-
-SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,20 +51,19 @@ const Layout = () => {
       <StatusBar hidden={false} barStyle="dark-content" />
       <Stack>
         <Stack.Protected guard={!!isSignedIn}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(sponsorship)" options={{ headerShown: false }} />
+          <Stack.Screen name="infos/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="categories/[cat]" options={{ headerShown: false }} />
+          <Stack.Screen name="categories/recomm" options={{ headerShown: false }} />
+          <Stack.Screen name="categories/random" options={{ headerShown: false }} />
+          <Stack.Screen name="specific/municipality" options={{ headerShown: false }} />
         </Stack.Protected>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(preauth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(sponsorship)" options={{ headerShown: false }} />
-        <Stack.Screen name="infos/[id]" options={{ headerShown: false }} />
-        <Stack.Screen name="categories/[cat]" options={{ headerShown: false }} />
-        <Stack.Screen name="categories/recomm" options={{ headerShown: false }} />
-        <Stack.Screen name="categories/random" options={{ headerShown: false }} />
-        <Stack.Screen name="specific/municipality" options={{ headerShown: false }} />
       </Stack>
     </>
   )
-
 }
 
 export default function RootLayout() {

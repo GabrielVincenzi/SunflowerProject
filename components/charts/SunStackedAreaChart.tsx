@@ -65,7 +65,7 @@ function AnimatedStackedArea({ d, color, startDelay = 0 }: { d: string; color: s
 }
 
 function SunStackedAreaChart({ screenWidth, screenHeight, apiData }: ChartProps) {
-    const safeColors = CHART_COLORS || [THEME_COLORS.primary, THEME_COLORS.dark, "#E5E5E5"];
+    const palette = apiData?.palette ?? CHART_COLORS;
     const width = screenWidth;
     const height = screenHeight ? screenHeight * 0.35 : HEIGHT;
     const xTickCount = 6;
@@ -90,10 +90,10 @@ function SunStackedAreaChart({ screenWidth, screenHeight, apiData }: ChartProps)
                 if (!apiData.series[key]) return [];
                 const label = geos.length > 1 ? `${v} (${geo})` : v;
                 const vals = (apiData.series[key] || []).map((pt: any) => pt?.value ?? 0);
-                return [{ key, label, color: safeColors[idx++ % safeColors.length], values: vals }];
+                return [{ key, label, color: palette[idx++ % palette.length], values: vals }];
             })
         );
-    }, [apiData, geos, variables, safeColors]);
+    }, [apiData, geos, variables, palette]);
 
     const xLabels = useMemo(
         () => (apiData.activePeriods || []).map((p: any) => formatPeriod(new Date(p), granularity)),

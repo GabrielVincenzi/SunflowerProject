@@ -46,10 +46,11 @@ interface CardProps {
   description: string;
   db_name: string;
   vars: string;
+  variableLabels: Record<string, string>;
   chart_type: string;
 }
 
-type QuestionProps = {
+interface QuestionProps {
   title: string;
   description?: string;
   image?: string | null;
@@ -57,7 +58,7 @@ type QuestionProps = {
   popupContent?: React.ReactNode;
 };
 
-type QuestionPopupProps<T = any> = {
+interface QuestionPopupProps<T = any> {
   visible: boolean; // parent controls mounting
   info?: T; // arbitrary info object passed from parent
   onClose: () => void; // called after exit animation completes
@@ -65,10 +66,10 @@ type QuestionPopupProps<T = any> = {
   popupContent?: React.ReactNode; // optional custom content; if present, used instead of info rendering
 };
 
-type PopupChoice = {
+interface PopupChoice {
   id: number;
   text: string;
-};
+}
 
 type PopupQuestion = {
   questionId: number;
@@ -214,8 +215,9 @@ type ApiRandomChartParams = {
 type ApiResponse = {
   activeGeos: string[];
   activePeriods: string[];
-  variableLabels: Record<string, string>;
+  variableLabels?: Record<string, string>;
   series: Record<string, { value: number }[]>;
+  palette?: dict;
 }
 
 type ApiDbResponse = {
@@ -315,4 +317,52 @@ interface ExportOption {
   label: string;
   sublabel: string;
   icon: React.ComponentProps<typeof Feather>["name"];
+}
+
+type ChartType =
+  | 'bar'
+  | 'line'
+  | 'treemap'
+  | 'sortedStream'
+  | 'populationPyramid'
+  | 'pie'
+  | 'radar';
+
+type SlideTheme = 'primary' | 'dark' | 'white';
+
+
+interface ChartApiData {
+  activeGeos: string[];
+  activePeriods: string[];
+  series: Record<string, { value: number }[]>;
+}
+
+// ─── StatCard config ──────────────────────────────────────────────────────────
+interface StatCardConfig {
+  id: string;
+  category: string;
+  emoji: string;
+  chartType: ChartType;
+  data: ChartApiData;
+  headline: string;
+  headlineUnit?: string;
+  interpretiveLine: string;
+  source: string;
+  year: string;
+  bgTheme: SlideTheme;
+  tooltipText: string;
+  expandRows?: Array<{ label: string; value: string }>;
+}
+
+// ─── Slider ───────────────────────────────────────────────────────────────────
+interface MunicipalitySliderProps {
+  municipalityName: string;
+  provinceCode: string;
+  population: number;
+  year: string;
+  cards: StatCardConfig[];
+  onBack?: () => void;
+  viewMode?: 'absolute' | 'perCapita';
+  onViewModeChange?: (v: 'absolute' | 'perCapita') => void;
+  onShareStat?: (card: StatCardConfig) => void;
 }

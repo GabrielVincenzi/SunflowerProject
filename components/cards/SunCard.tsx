@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-const SunCard = ({ id, chart_id, title, description, db_name, vars, chart_type }: any) => {
+const SunCard = ({ id, chart_id, title, description, db_name, vars, variableLabels, chart_type }: any) => {
     return (
         <View className="relative w-full mb-8">
             {/* Shadow Layer: Large 8px offset for primary signal cards */}
@@ -16,7 +16,16 @@ const SunCard = ({ id, chart_id, title, description, db_name, vars, chart_type }
                 onPress={() =>
                     router.push({
                         pathname: "/infos/[id]",
-                        params: { id, chart_id, title, description, db: db_name, chart_type, variables: vars }
+                        params: {
+                            id,
+                            chart_id,
+                            title,
+                            description,
+                            db: db_name,
+                            chart_type,
+                            variables: vars,
+                            variableLabels: JSON.stringify(variableLabels ?? {})
+                        }
                     })
                 }
                 className="w-full bg-white rounded-[40px] border-2 border-dark overflow-hidden p-8"
