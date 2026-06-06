@@ -5,18 +5,16 @@
     "requireCommit": true
   },
   "build": {
-    "base": {
-      "env": {
-        "APP_ENV": "staging"
-      }
-    },
+    "base": {},
     "development": {
       "extends": "base",
+      "environment": "development",
       "developmentClient": true,
       "distribution": "internal"
     },
     "preview": {
       "extends": "base",
+      "environment": "preview",
       "distribution": "internal",
       "android": {
         "gradleCommand": ":app:assembleRelease"
@@ -25,6 +23,7 @@
     "production": {
       "autoIncrement": true,
       "extends": "base",
+      "environment": "production",
       "android": {
         "gradleCommand": ":app:bundleRelease"
       }
