@@ -13,8 +13,8 @@ const Onboarding = () => {
     const [activeIndex, setActiveIndex] = useState(0);
 
     if (isPending) return <ActivityIndicator />;        // loading
-    if (!data) return <Text>Error loading translations</Text>; // actual failure
     if (isError) return <Text>{JSON.stringify(error)}</Text>;
+    if (!data) return <Text>Error loading translations</Text>; // actual failure
 
     const t: any = data.payload;
     const isLastSlide = activeIndex === 2;
