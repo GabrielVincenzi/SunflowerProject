@@ -8,12 +8,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Swiper from "react-native-swiper";
 
 const Onboarding = () => {
-    const { data, isPending, isError } = useTranslations();
+    const { data, isPending, isError, error } = useTranslations();
     const swiperRef = useRef<Swiper>(null);
     const [activeIndex, setActiveIndex] = useState(0);
 
     if (isPending) return <ActivityIndicator />;        // loading
-    if (isError || !data) return <Text>Error loading translations</Text>; // actual failure
+    if (!data) return <Text>Error loading translations</Text>; // actual failure
+    if (isError) return <Text>{JSON.stringify(error)}</Text>;
 
     const t: any = data.payload;
     const isLastSlide = activeIndex === 2;
