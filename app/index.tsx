@@ -1,7 +1,6 @@
 import { useAuth } from "@clerk/clerk-expo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 
 const HomeIndex = () => {
@@ -26,8 +25,6 @@ const HomeIndex = () => {
 
     useEffect(() => {
         if (!isLoaded || !langLoaded) return;
-
-        SplashScreen.hideAsync();
 
         if (isSignedIn) {
             router.replace("/(tabs)/home");
