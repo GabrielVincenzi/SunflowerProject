@@ -85,7 +85,7 @@ function SunBarChart({ screenWidth, screenHeight, apiData }: ChartProps) {
                     variable,
                     label: readable,
                     value: apiData.series[`${variable}_${geo}`]?.[0]?.value ?? 0,
-                    color: palette.colors[varIdx % palette.colors.length],
+                    color: palette[varIdx % palette.length],
                 };
             }),
         }));
@@ -95,7 +95,7 @@ function SunBarChart({ screenWidth, screenHeight, apiData }: ChartProps) {
     const sortedGeos = chartData.map(d => d.geo);
     const legendItems = useMemo(() => variables.map((v, i) => ({
         label: apiData.variableLabels?.[v] ?? v,
-        color: palette.colors[i % palette.colors.length],
+        color: palette[i % palette.length],
         variable: v,
     })), [variables, apiData, palette]);
 

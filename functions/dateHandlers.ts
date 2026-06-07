@@ -95,17 +95,34 @@ export function buildPeriodOptions(periodRange?: string): PeriodOption[] {
 }
 
 // Date helpers for quarterly and monthly data
-export function formatPeriod(date: Date, granularity: "year" | "quarter") {
-    if (granularity === "year") {
-        return date.getFullYear().toString()
+export function detectGranularity(periods: Date[]): "year" | "quarter" | "month" {
+    if (!periods.length) return "year";
+    const months = periods.map(d => d.getFullYear() * 12 + d.getMonth());
+    if (new Set(months).size === periods.length && periods.length > 1) {
+        const years = periods.map(d => d.getFullYear());
+        // if all same year or months increment by 1 → monthly
+        const diffs = months.slice(1).map((m, i) => m - months[i]);
+        if (diffs.every(d => d === 1)) return "month";
+        return new Set(years).size < periods.length ? "quarter" : "year";
     }
-
-    const year = date.getFullYear()
-    const quarter = Math.floor(date.getMonth() / 3) + 1
-    return `${year}Q${quarter}`
+    const years = periods.map(d => d.getFullYear());
+    return new Set(years).size < periods.length ? "quarter" : "year";
 }
 
-export function detectGranularity(periods: Date[]) {
-    const years = periods.map(d => d.getFullYear())
-    return new Set(years).size < periods.length ? "quarter" : "year"
+export function formatPeriod(date: Date, granularity: "year" | "quarter" | "month"): string {
+    if (granularity === "year") return date.getFullYear().toString();
+    if (granularity === "month") {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, "0");
+        return `${y}M${m}`;
+    }
+    const year = date.getFullYear();
+    const quarter = Math.floor(date.getMonth() / 3) + 1;
+    return `${year}Q${quarter}`;
+}
+
+export function parsePeriod(s: string): Date {
+    const datePart = s.split("T")[0]; // strip time component
+    const [year, month = "1", day = "1"] = datePart.split("-");
+    return new Date(Number(year), Number(month) - 1, Number(day));
 }

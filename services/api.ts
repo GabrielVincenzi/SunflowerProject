@@ -42,7 +42,7 @@ export const fetchAllChartDetails = async ({
         id: Number(row.id),
     })) as CardProps[];
 
-    console.log(data)
+    //console.log(data)
 
     return {
         data,

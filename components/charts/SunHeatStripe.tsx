@@ -1,4 +1,5 @@
-import { margin, THEME_COLORS } from "@/constants/utilities";
+import { CHART_COLORS, margin, THEME_COLORS } from "@/constants/utilities";
+import { parsePeriod } from "@/functions/dateHandlers";
 import { max, min } from "d3-array";
 import { scaleBand, scaleLinear } from "d3-scale";
 import React, { useMemo } from "react";
@@ -90,7 +91,7 @@ function SunHeatStripe({
     // Align with activePeriods -> x labels
     const periods = apiData.activePeriods || [];
     const xLabels = periods.map((p) => {
-        const date = p ? new Date(p) : null;
+        const date = p ? parsePeriod(p) : null;
         return date && !isNaN(date.getTime()) ? date.getFullYear().toString() : String(p ?? "");
     });
 
@@ -109,8 +110,9 @@ function SunHeatStripe({
     const vMax = (max(allNumeric) ?? 0) as number;
 
     // sequential color scale strictly from vMin -> vMax
-    const lowColor = colorRange?.[0] ?? THEME_COLORS.primary;
-    const highColor = colorRange?.[1] ?? THEME_COLORS.dark;
+    const palette = apiData?.palette ?? CHART_COLORS;
+    const lowColor = colorRange?.[0] ?? palette[0];
+    const highColor = colorRange?.[1] ?? palette[palette.length - 1];
 
     // If domain is degenerate (vMin === vMax), use a constant color function to avoid scale issues
     const colorScaleFn = useMemo(() => {

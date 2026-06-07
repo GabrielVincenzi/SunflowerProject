@@ -1,5 +1,5 @@
 import { animationDuration, CHART_COLORS, margin, THEME_COLORS } from "@/constants/utilities";
-import { detectGranularity, formatPeriod } from "@/functions/dateHandlers";
+import { detectGranularity, formatPeriod, parsePeriod } from "@/functions/dateHandlers";
 import { detectScale } from "@/functions/formatHandlers";
 import { max, min } from "d3-array";
 import { scaleLinear, scalePoint } from "d3-scale";
@@ -139,7 +139,7 @@ function SunLineChart({
         Object.keys(apiData.series).length > 0;
 
     const granularity = useMemo(
-        () => detectGranularity(apiData?.activePeriods?.map((p: any) => new Date(p)) ?? []),
+        () => detectGranularity(apiData?.activePeriods?.map((p: any) => parsePeriod(p)) ?? []),
         [apiData?.activePeriods]
     );
 
@@ -157,7 +157,7 @@ function SunLineChart({
                     geo,
                     label: geo,
                     data: (apiData.series[key] ?? []).map((pt: any, i: number) => {
-                        const date = apiData.activePeriods?.[i] ? new Date(apiData.activePeriods[i]) : null;
+                        const date = apiData.activePeriods?.[i] ? parsePeriod(apiData.activePeriods[i]) : null;
                         return { value: pt?.value ?? 0, label: date ? formatPeriod(date, granularity) : "" };
                     }),
                     color: palette[seriesCounter % palette.length],
@@ -174,7 +174,7 @@ function SunLineChart({
                         geo,
                         label: multipleGeos ? `${readable} (${geo})` : readable,
                         data: (apiData.series[key] ?? []).map((pt: any, i: number) => {
-                            const date = apiData.activePeriods?.[i] ? new Date(apiData.activePeriods[i]) : null;
+                            const date = apiData.activePeriods?.[i] ? parsePeriod(apiData.activePeriods[i]) : null;
                             return { value: pt?.value ?? 0, label: date ? formatPeriod(date, granularity) : "" };
                         }),
                         color: palette[seriesCounter % palette.length],
@@ -197,12 +197,23 @@ function SunLineChart({
     const xLabels: string[] = Array.from(
         new Set<string>(allDataPoints.map((d: any) => d.label))
     ).sort((a, b) => {
-        const parse = (s: string) => {
-            const [y, q] = s.split("Q")
-            return Number(y) * 10 + (q ? Number(q) : 0)
-        }
-        return parse(a) - parse(b)
-    })
+        const parse = (s: string): number => {
+            // Quarterly: "2023Q1", "2023-Q1"
+            const qMatch = s.match(/(\d{4})[- ]?Q(\d)/i);
+            if (qMatch) return Number(qMatch[1]) * 100 + Number(qMatch[2]);
+
+            // Monthly: "2023M01", "2023-01", "Jan 2023", "2023-01-01"
+            const mMatch = s.match(/(\d{4})[- ]?M?(\d{1,2})/i);
+            if (mMatch) return Number(mMatch[1]) * 100 + Number(mMatch[2]);
+
+            // Annual: "2023"
+            const yMatch = s.match(/(\d{4})/);
+            if (yMatch) return Number(yMatch[1]) * 100;
+
+            return 0;
+        };
+        return parse(a) - parse(b);
+    });
     const yValues = allDataPoints.map((d: any) => d.value);
 
     const maxAbs = yValues.length ? Math.max(...yValues.map((v: any) => Math.abs(v))) : 0;

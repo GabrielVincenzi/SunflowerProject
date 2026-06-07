@@ -1,5 +1,5 @@
 import { animationDuration, CHART_COLORS, HEIGHT, margin, THEME_COLORS } from "@/constants/utilities";
-import { detectGranularity, formatPeriod } from "@/functions/dateHandlers";
+import { detectGranularity, formatPeriod, parsePeriod } from "@/functions/dateHandlers";
 import { max } from "d3-array";
 import { scaleLinear, scalePoint } from "d3-scale";
 import { area, curveCatmullRom } from "d3-shape";
@@ -78,7 +78,7 @@ function SunStackedAreaChart({ screenWidth, screenHeight, apiData }: ChartProps)
     );
 
     const granularity = useMemo(
-        () => detectGranularity((apiData.activePeriods || []).map((p: any) => new Date(p))),
+        () => detectGranularity((apiData.activePeriods || []).map((p: any) => parsePeriod(p))),
         [apiData.activePeriods]
     );
 
@@ -96,7 +96,7 @@ function SunStackedAreaChart({ screenWidth, screenHeight, apiData }: ChartProps)
     }, [apiData, geos, variables, palette]);
 
     const xLabels = useMemo(
-        () => (apiData.activePeriods || []).map((p: any) => formatPeriod(new Date(p), granularity)),
+        () => (apiData.activePeriods || []).map((p: any) => formatPeriod(parsePeriod(p), granularity)),
         [apiData.activePeriods, granularity]
     );
 

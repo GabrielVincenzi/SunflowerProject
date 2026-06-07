@@ -1,5 +1,5 @@
 import { animationDuration, CHART_COLORS, HEIGHT, margin, THEME_COLORS } from "@/constants/utilities";
-import { detectGranularity, formatPeriod } from "@/functions/dateHandlers";
+import { detectGranularity, formatPeriod, parsePeriod } from "@/functions/dateHandlers";
 import React, { useEffect, useMemo, useRef } from "react";
 import { View } from "react-native";
 import Animated, { useAnimatedProps, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
@@ -96,7 +96,7 @@ function SunSortedStreamChart({ screenWidth, screenHeight, apiData }: ChartProps
     );
 
     const granularity = useMemo(
-        () => detectGranularity((apiData.activePeriods || []).map((p) => new Date(p))),
+        () => detectGranularity((apiData.activePeriods || []).map((p) => parsePeriod(p))),
         [apiData.activePeriods]
     );
 
@@ -119,7 +119,7 @@ function SunSortedStreamChart({ screenWidth, screenHeight, apiData }: ChartProps
     );
 
     const xLabels = useMemo(
-        () => (apiData.activePeriods || []).map((p) => formatPeriod(new Date(p), granularity)),
+        () => (apiData.activePeriods || []).map((p) => formatPeriod(parsePeriod(p), granularity)),
         [apiData.activePeriods, granularity]
     );
 

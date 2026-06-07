@@ -1,4 +1,5 @@
 import { animationDuration, CHART_COLORS, CHART_TEXT_FONT, THEME_COLORS } from "@/constants/utilities";
+import { parsePeriod } from "@/functions/dateHandlers";
 import { scaleSqrt } from "d3-scale";
 import React, { useEffect, useMemo } from "react";
 import { View } from "react-native";
@@ -18,7 +19,7 @@ function parsePeriods(activePeriods: string[]): string[] {
 }
 
 function periodYear(p: string): string {
-    const d = new Date(p);
+    const d = parsePeriod(p);
     if (!isNaN(d.getTime())) return d.getFullYear().toString();
     return p;
 }

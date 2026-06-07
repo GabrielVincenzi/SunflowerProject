@@ -3,11 +3,14 @@ import { useAppState } from '@/services/useAppState';
 import { useOnlineManager } from '@/services/useOnlineManager';
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import { focusManager, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack } from "expo-router";
+import { useFonts } from 'expo-font';
+import { SplashScreen, Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppStateStatus, Platform, StatusBar } from "react-native";
 import './globals.css';
+
+SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,6 +72,23 @@ const Layout = () => {
 export default function RootLayout() {
   useOnlineManager();
   useAppState(onAppStateChange);
+
+  const [fontsLoaded] = useFonts({
+    "Geist-Regular": require("../assets/fonts/Geist-Regular.ttf"),
+    "Geist-ExtraBold": require("../assets/fonts/Geist-ExtraBold.ttf"),
+    "Geist-ExtraLight": require("../assets/fonts/Geist-ExtraLight.ttf"),
+    "Elms-Regular": require("../assets/fonts/ElmsSans-Regular.ttf"),
+    "Elms-ExtraBold": require("../assets/fonts/ElmsSans-ExtraBold.ttf"),
+    "Elms-Bold": require("../assets/fonts/ElmsSans-Bold.ttf"),
+    "Elms-ExtraLight": require("../assets/fonts/ElmsSans-ExtraLight.ttf"),
+    "Elms-Thin": require("../assets/fonts/ElmsSans-Thin.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
 
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}>
