@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 
+
 const HomeIndex = () => {
     const router = useRouter();
     const [lang, setLang] = useState<string | null>(null);
