@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, Keyboard, Modal, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import SunButton from "./SunButton";
+import SunButton from "../SunButton";
 
 const { height } = Dimensions.get("window");
 

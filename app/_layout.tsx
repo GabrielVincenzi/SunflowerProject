@@ -1,4 +1,4 @@
-import { LanguageProvider } from '@/components/LanguageContext';
+import { LanguageProvider } from '@/components/layoutcomp/LanguageContext';
 import { useAppState } from '@/services/useAppState';
 import { useOnlineManager } from '@/services/useOnlineManager';
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';

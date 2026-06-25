@@ -5,7 +5,7 @@ import React, { useEffect, useMemo } from "react";
 import { View } from "react-native";
 import Animated, { useAnimatedProps, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
 import Svg, { G, GProps, Path, Line as SvgLine, Text as SvgText } from "react-native-svg";
-import ChartLegend from "../ChartLegend";
+import ChartLegend from "../chartscomp/ChartLegend";
 
 const AnimatedG = Animated.createAnimatedComponent(G);
 

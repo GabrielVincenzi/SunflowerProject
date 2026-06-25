@@ -1,4 +1,4 @@
-import ChartList from '@/components/ChartList';
+import ChartList from '@/components/chartscomp/ChartList';
 import SunButton from '@/components/SunButton';
 import { useTranslations } from '@/services/useTranslation';
 import { router } from 'expo-router';

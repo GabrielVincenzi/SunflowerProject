@@ -11,7 +11,7 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import Svg, { G, Line, Rect, Text as SvgText } from "react-native-svg";
-import ChartLegend from "../ChartLegend";
+import ChartLegend from "../chartscomp/ChartLegend";
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
 

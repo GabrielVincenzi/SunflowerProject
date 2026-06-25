@@ -4,7 +4,7 @@ import React, { useEffect, useMemo } from "react";
 import { View } from "react-native";
 import Animated, { Easing, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
 import Svg, { Circle, CircleProps, G, Text as SvgText } from "react-native-svg";
-import ChartLegend from "../ChartLegend";
+import ChartLegend from "../chartscomp/ChartLegend";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedG = Animated.createAnimatedComponent(G);

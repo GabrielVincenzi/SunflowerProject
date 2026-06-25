@@ -4,6 +4,179 @@ export type AuthFetch = (url: string, options?: RequestInit) => Promise<Response
 
 // ── Chart GET requests ────────────────────────────────────────────────────────
 
+//export const fetchAllChartDetails = async ({
+//    query,
+//    category,
+//    lang,
+//    limit,
+//    afterCursor,
+//    signal,
+//    authFetch,
+//}: {
+//    query?: string;
+//    category?: string;
+//    lang?: string;
+//    limit?: number;
+//    afterCursor?: number | null;
+//    signal?: AbortSignal;
+//    authFetch: AuthFetch;
+//}): Promise<ApiAllChartResponse> => {
+//
+//    const params = new URLSearchParams();
+//    if (query?.trim()) params.set("search", query.trim());
+//    if (category?.trim()) params.set("category", category.trim());
+//    if (lang?.trim()) params.set("lang", lang.trim());
+//    if (limit != null) params.set("limit", String(limit));
+//    if (afterCursor != null) params.set("afterId", String(afterCursor));
+//
+//    const apiUrl = params.toString().length > 0
+//        ? `${baseUrl}/chart/allCharts?${params.toString()}`
+//        : `${baseUrl}/chart/allCharts`;
+//
+//    const response = await authFetch(apiUrl, { signal });
+//    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+//
+//    const json = await response.json();
+//    const data = (json?.data ?? []).map((row: any) => ({
+//        ...row,
+//        id: Number(row.id),
+//    })) as CardProps[];
+//
+//    //console.log(data)
+//
+//    return {
+//        data,
+//        nextCursor: json?.nextCursor == null ? null : Number(json.nextCursor),
+//        hasMore: Boolean(json?.hasMore),
+//        limit: json?.limit ?? data.length,
+//    };
+//};
+//
+//export const fetchRecommendedCharts = async ({
+//    limit,
+//    lang,
+//    afterCursor,
+//    excludeSeenDays,
+//    signal,
+//    authFetch,
+//}: Omit<ApiRecommChartParams, 'userId'>): Promise<ApiAllChartResponse & { nextCursor?: AfterCursor | null }> => {
+//    const params = new URLSearchParams();
+//    // userId no longer sent — backend reads it from the JWT
+//    if (limit != null) params.set("limit", String(limit));
+//    if (lang?.trim()) params.set("lang", lang.trim());
+//    if (excludeSeenDays != null) params.set("excludeSeenDays", String(excludeSeenDays));
+//    if (afterCursor) {
+//        if (afterCursor.lastSimilarity != null) params.set("lastSimilarity", String(afterCursor.lastSimilarity));
+//        if (afterCursor.lastId != null) params.set("afterId", String(afterCursor.lastId));
+//    }
+//
+//    const res = await authFetch(`${baseUrl}/chart/recommended?${params.toString()}`, { signal });
+//    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+//    const json = await res.json();
+//
+//    const data = (json?.data ?? []).map((row: any) => ({
+//        ...row,
+//        id: Number(row.id),
+//    })) as CardProps[];
+//
+//    return {
+//        data,
+//        nextCursor: json?.nextCursor ?? null,
+//        hasMore: Boolean(json?.hasMore),
+//        limit: json?.limit ?? data.length,
+//    };
+//};
+//
+//export const fetchRandomCharts = async ({
+//    limit,
+//    lang,
+//    categories,
+//    afterCursor,
+//    signal,
+//    authFetch,
+//}: ApiRandomChartParams): Promise<ApiAllChartResponse & { nextCursor?: AfterCursorRandom | null }> => {
+//    if (!limit) throw new Error("Limit is required");
+//
+//    const params = new URLSearchParams();
+//    if (limit != null) params.set("limit", String(limit));
+//    if (categories != null) params.set("categories", String(categories));
+//    if (lang?.trim()) params.set("lang", lang.trim());
+//    if (afterCursor) {
+//        if (afterCursor.seed != null) params.set("seed", String(afterCursor.seed));
+//        if (afterCursor.lastSortKey != null) params.set("lastSortKey", String(afterCursor.lastSortKey));
+//        if (afterCursor.lastId != null) params.set("afterId", String(afterCursor.lastId));
+//    }
+//
+//    const res = await authFetch(`${baseUrl}/chart/random?${params.toString()}`, { signal });
+//
+//    if (!res.ok) {
+//        let text: string | undefined;
+//        try { text = await res.text(); } catch { /* ignore */ }
+//        throw new Error(`HTTP ${res.status}${text ? ` - ${text}` : ""}`);
+//    }
+//
+//    const json = await res.json();
+//    const data = (json?.data ?? []).map((row: any) => ({
+//        ...row,
+//        id: Number(row.id),
+//    })) as CardProps[];
+//
+//    return {
+//        data,
+//        nextCursor: json?.nextCursor ?? null,
+//        hasMore: Boolean(json?.hasMore),
+//        limit: json?.limit ?? data.length,
+//    };
+//};
+
+// TEMP FETCHES 
+const DUMMY_CHARTS: any = [
+    { id: 1, chart_id: "1", title: "How free is the press, country by country?", description: "Compares scores across political, economic, social and legal freedoms.", db_name: "Reporters Without Borders", chart_type: "barHoriz", category: "press_media" },
+    { id: 2, chart_id: "2", title: "Gross earnings for singles and couples", description: "Purchasing power adjusted, with and without children.", db_name: "Eurostat", chart_type: "line", category: "income_work" },
+    { id: 3, chart_id: "3", title: "Gender violence, by victim nationality", description: "EU, non-EU and reporting-country breakdowns.", db_name: "Eurostat", chart_type: "hist", category: "gender_safety" },
+    { id: 4, chart_id: "4", title: "CO2 emissions from transport over time", description: "Share of global emissions by transport mode, 1990–2023.", db_name: "Our World in Data", chart_type: "areaStacked", category: "climate_energy" },
+    { id: 5, chart_id: "5", title: "Life expectancy vs healthcare spending", description: "Country-level comparison across 40 nations.", db_name: "World Bank", chart_type: "circles", category: "health" },
+    { id: 6, chart_id: "6", title: "Migration flows into the EU, 2015–2024", description: "Net migration by origin region.", db_name: "Eurostat", chart_type: "sortedStream", category: "migration" },
+    { id: 7, chart_id: "7", title: "Unemployment rate by education level", description: "Breakdown across OECD countries.", db_name: "OECD", chart_type: "barStacked", category: "income_work" },
+    { id: 8, chart_id: "8", title: "Renewable energy share by country", description: "Percentage of total energy from renewables.", db_name: "Our World in Data", chart_type: "pie", category: "climate_energy" },
+];
+
+/** Simulates server-side pagination over the dummy dataset. */
+function paginateDummy({
+    query,
+    category,
+    limit = 5,
+    afterCursor,
+}: {
+    query?: string;
+    category?: string;
+    limit?: number;
+    afterCursor?: number | null;
+}): ApiAllChartResponse {
+    let filtered = DUMMY_CHARTS;
+
+    if (query?.trim()) {
+        const q = query.trim().toLowerCase();
+        filtered = filtered.filter(
+            (c: any) => c.title.toLowerCase().includes(q) || c.description?.toLowerCase().includes(q)
+        );
+    }
+    if (category?.trim()) {
+        filtered = filtered.filter((c: any) => c.category === category.trim());
+    }
+
+    const startIndex = afterCursor != null ? filtered.findIndex((c: any) => Number(c.id) === afterCursor) + 1 : 0;
+    const page = filtered.slice(startIndex, startIndex + limit);
+    const hasMore = startIndex + limit < filtered.length;
+
+    return {
+        data: page,
+        nextCursor: hasMore ? Number(page[page.length - 1]?.id) : null,
+        hasMore,
+        limit,
+    };
+}
+
 export const fetchAllChartDetails = async ({
     query,
     category,
@@ -21,111 +194,46 @@ export const fetchAllChartDetails = async ({
     signal?: AbortSignal;
     authFetch: AuthFetch;
 }): Promise<ApiAllChartResponse> => {
-
-    const params = new URLSearchParams();
-    if (query?.trim()) params.set("search", query.trim());
-    if (category?.trim()) params.set("category", category.trim());
-    if (lang?.trim()) params.set("lang", lang.trim());
-    if (limit != null) params.set("limit", String(limit));
-    if (afterCursor != null) params.set("afterId", String(afterCursor));
-
-    const apiUrl = params.toString().length > 0
-        ? `${baseUrl}/chart/allCharts?${params.toString()}`
-        : `${baseUrl}/chart/allCharts`;
-
-    const response = await authFetch(apiUrl, { signal });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const json = await response.json();
-    const data = (json?.data ?? []).map((row: any) => ({
-        ...row,
-        id: Number(row.id),
-    })) as CardProps[];
-
-    //console.log(data)
-
-    return {
-        data,
-        nextCursor: json?.nextCursor == null ? null : Number(json.nextCursor),
-        hasMore: Boolean(json?.hasMore),
-        limit: json?.limit ?? data.length,
-    };
+    // TEMP: dummy data instead of real fetch
+    return paginateDummy({ query, category, limit, afterCursor });
 };
 
 export const fetchRecommendedCharts = async ({
     limit,
-    lang,
     afterCursor,
-    excludeSeenDays,
-    signal,
-    authFetch,
 }: Omit<ApiRecommChartParams, 'userId'>): Promise<ApiAllChartResponse & { nextCursor?: AfterCursor | null }> => {
-    const params = new URLSearchParams();
-    // userId no longer sent — backend reads it from the JWT
-    if (limit != null) params.set("limit", String(limit));
-    if (lang?.trim()) params.set("lang", lang.trim());
-    if (excludeSeenDays != null) params.set("excludeSeenDays", String(excludeSeenDays));
-    if (afterCursor) {
-        if (afterCursor.lastSimilarity != null) params.set("lastSimilarity", String(afterCursor.lastSimilarity));
-        if (afterCursor.lastId != null) params.set("afterId", String(afterCursor.lastId));
+    // TEMP: dummy data instead of real fetch
+    const result = paginateDummy({ limit, afterCursor: afterCursor?.lastId ?? null });
+
+    let nextCursor: AfterCursor | null = null;
+    if (result.nextCursor != null) {
+        nextCursor = Object.assign(result.nextCursor, {
+            lastId: result.nextCursor,
+            lastSimilarity: null,
+        }) as unknown as AfterCursor;
     }
 
-    const res = await authFetch(`${baseUrl}/chart/recommended?${params.toString()}`, { signal });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-
-    const data = (json?.data ?? []).map((row: any) => ({
-        ...row,
-        id: Number(row.id),
-    })) as CardProps[];
-
-    return {
-        data,
-        nextCursor: json?.nextCursor ?? null,
-        hasMore: Boolean(json?.hasMore),
-        limit: json?.limit ?? data.length,
-    };
+    return { ...result, nextCursor };
 };
 
 export const fetchRandomCharts = async ({
     limit,
-    lang,
-    categories,
     afterCursor,
-    signal,
-    authFetch,
 }: ApiRandomChartParams): Promise<ApiAllChartResponse & { nextCursor?: AfterCursorRandom | null }> => {
     if (!limit) throw new Error("Limit is required");
-
-    const params = new URLSearchParams();
-    if (limit != null) params.set("limit", String(limit));
-    if (categories != null) params.set("categories", String(categories));
-    if (lang?.trim()) params.set("lang", lang.trim());
-    if (afterCursor) {
-        if (afterCursor.seed != null) params.set("seed", String(afterCursor.seed));
-        if (afterCursor.lastSortKey != null) params.set("lastSortKey", String(afterCursor.lastSortKey));
-        if (afterCursor.lastId != null) params.set("afterId", String(afterCursor.lastId));
-    }
-
-    const res = await authFetch(`${baseUrl}/chart/random?${params.toString()}`, { signal });
-
-    if (!res.ok) {
-        let text: string | undefined;
-        try { text = await res.text(); } catch { /* ignore */ }
-        throw new Error(`HTTP ${res.status}${text ? ` - ${text}` : ""}`);
-    }
-
-    const json = await res.json();
-    const data = (json?.data ?? []).map((row: any) => ({
-        ...row,
-        id: Number(row.id),
-    })) as CardProps[];
+    // TEMP: dummy data, shuffled, instead of real fetch
+    const shuffled = [...DUMMY_CHARTS].sort(() => Math.random() - 0.5);
+    const startIndex = afterCursor?.lastId != null
+        ? shuffled.findIndex((c) => Number(c.id) === afterCursor.lastId) + 1
+        : 0;
+    const page = shuffled.slice(startIndex, startIndex + limit);
+    const hasMore = startIndex + limit < shuffled.length;
 
     return {
-        data,
-        nextCursor: json?.nextCursor ?? null,
-        hasMore: Boolean(json?.hasMore),
-        limit: json?.limit ?? data.length,
+        data: page,
+        nextCursor: hasMore ? { lastId: Number(page[page.length - 1]?.id), lastSortKey: null, seed: null } : null,
+        hasMore,
+        limit,
     };
 };
 

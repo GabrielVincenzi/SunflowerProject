@@ -1,5 +1,5 @@
-import ChartList from "@/components/ChartList";
-import RequestDataPopup from "@/components/RequestDataPopup";
+import ChartList from "@/components/chartscomp/ChartList";
+import RequestDataPopup from "@/components/popup/RequestDataPopup";
 import SearchBar from "@/components/SearchBar";
 import { images } from "@/constants/images";
 import { useTranslations } from "@/services/useTranslation";

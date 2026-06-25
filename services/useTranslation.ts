@@ -1,4 +1,4 @@
-import { useLanguage } from '@/components/LanguageContext';
+import { useLanguage } from '@/components/layoutcomp/LanguageContext';
 import { translationStorage } from '@/interfaces/translationStorage';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTranslations } from './api';

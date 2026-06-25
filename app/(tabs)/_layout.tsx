@@ -1,4 +1,4 @@
-import SunTabBar from '@/components/SunTabBar';
+import SunTabBar from '@/components/layoutcomp/SunTabBar';
 import { Tabs } from 'expo-router';
 import React from 'react';
 
@@ -21,8 +21,16 @@ const _Layout = () => {
                 options={{ title: "Search" }}
             />
             <Tabs.Screen
+                name="search2"
+                options={{ title: "Search2" }}
+            />
+            <Tabs.Screen
                 name="saved"
-                options={{ title: "Events" }}
+                options={{ title: "Saved" }}
+            />
+            <Tabs.Screen
+                name="greenhouse"
+                options={{ title: "Greenhouse" }}
             />
             <Tabs.Screen
                 name="profile"

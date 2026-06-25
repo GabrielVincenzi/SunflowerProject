@@ -5,7 +5,7 @@ import { ActivityIndicator, FlatList, ListRenderItemInfo, ScrollView, Text, View
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import SunSavedCard from '@/components/cards/SunSavedCard';
-import AnimatedItemWrapper from '@/components/WrapperEntranceList';
+import AnimatedItemWrapper from '@/components/chartscomp/WrapperEntranceList';
 import { defaultLang } from '@/constants/utilities';
 import { fetchSavedEvents } from '@/services/api';
 import { useAuthFetch } from '@/services/useAuthFetch';

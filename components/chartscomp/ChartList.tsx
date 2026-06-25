@@ -5,8 +5,8 @@ import { useUser } from "@clerk/clerk-expo";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useCallback, useMemo } from "react";
 import { ActivityIndicator, FlatList, ListRenderItemInfo, Text, View } from "react-native";
+import SunCard from "../cards/SunCard";
 import AnimatedItemWrapper from "./WrapperEntranceList";
-import SunCard from "./cards/SunCard";
 
 export default function ChartList({
     searchQuery = "",

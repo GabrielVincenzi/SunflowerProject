@@ -8,7 +8,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import Animated, { Easing, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated";
 import Svg, { G, Path, PathProps, Line as SvgLine, Text as SvgText } from "react-native-svg";
-import ChartLegend from "../ChartLegend";
+import ChartLegend from "../chartscomp/ChartLegend";
 
 // Wrap Path in Animated
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -90,28 +90,39 @@ function pickXTicks(labels: string[], count: number) {
     return Array.from(new Set(result));
 }
 
-// Create starting scales (Logic strictly preserved)
+// Create starting scales
 function createLineChart({
     width,
     height,
     margin,
     xLabels,
     yValues,
+    yDomainOverride,
 }: {
     width: number;
     height: number;
     margin: { top: number; right: number; bottom: number; left: number };
     xLabels: string[];
     yValues: number[];
+    yDomainOverride?: { yMin?: number; yMax?: number };
 }) {
     const xScale = scalePoint<string>()
         .domain(xLabels)
         .range([margin.left, width - margin.right]);
 
+    const domainMin = yDomainOverride?.yMin ?? (min(yValues) ?? 0);
+    const domainMax = yDomainOverride?.yMax ?? (max(yValues) ?? 0);
+
     const yScale = scaleLinear()
-        .domain([min(yValues) ?? 0, max(yValues) ?? 0])
-        .nice()
+        .domain([domainMin, domainMax])
         .range([height - margin.bottom, margin.top]);
+
+    // .nice() rounds the domain to clean tick values — skipped when an
+    // explicit override is given, since "nice" rounding would undo a
+    // deliberately precise axis truncation.
+    if (!yDomainOverride) {
+        yScale.nice();
+    }
 
     const lineGenerator = line<{ value: number; label: string }>()
         .x((d) => xScale(d.label)!)
@@ -122,12 +133,17 @@ function createLineChart({
 }
 
 // SunLineChart
+// ── CHANGE: accepts an optional `yDomainOverride` prop, shape
+// { yMin?: number; yMax?: number }. Unused by every existing call site
+// (ChartPage etc.) since it's optional — auto-scale behavior is
+// unchanged when omitted.
 function SunLineChart({
     screenWidth,
     apiData,
     xTickCount = 6,
     yTickCount = 6,
     height = 300, // Slightly taller for high impact
+    yDomainOverride,
 }: any) {
     const palette = apiData?.palette ?? CHART_COLORS;
 
@@ -191,7 +207,6 @@ function SunLineChart({
         [chartData]
     );
 
-
     const width = screenWidth;
     const allDataPoints = chartData.flatMap((s: any) => s.data);
     const xLabels: string[] = Array.from(
@@ -227,8 +242,9 @@ function SunLineChart({
                 margin,
                 xLabels,
                 yValues,
+                yDomainOverride,
             }),
-        [width, height, margin, xLabels.join(","), yValues.join(",")]
+        [width, height, margin, xLabels.join(","), yValues.join(","), yDomainOverride?.yMin, yDomainOverride?.yMax]
     );
 
     const rawYTicks = yScale.ticks(yTickCount);

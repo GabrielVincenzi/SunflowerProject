@@ -1,17 +1,33 @@
-import { useLanguage } from "@/components/LanguageContext";
-import LanguageRotatingTitle from "@/components/RotatingTitle";
+import { useLanguage } from "@/components/layoutcomp/LanguageContext";
 import SunButton from "@/components/SunButton";
-import { THEME_COLORS } from "@/constants/utilities";
+import { LANGUAGE_TITLES, THEME_COLORS } from "@/constants/utilities";
 import { translationStorage } from "@/interfaces/translationStorage";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 const LanguageSelection = () => {
     const { setLang } = useLanguage();
     const [loading, setLoading] = useState(false);
+    const [index, setIndex] = useState(0);
     const queryClient = useQueryClient();
+    const opacity = useSharedValue(1);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            opacity.value = withTiming(0, { duration: 250 });
+            setIndex((prev) => (prev + 1) % LANGUAGE_TITLES.length);
+            opacity.value = withTiming(1, { duration: 250 });
+        }, 1500);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: opacity.value,
+    }));
 
     const selectLanguage = async (newLang: string) => {
         setLoading(true);
@@ -51,7 +67,12 @@ const LanguageSelection = () => {
                 <View className="w-24 h-24 bg-dark rounded-[32px] items-center justify-center shadow-xl mb-12">
                     <Text className="text-primary font-elms-bold text-4xl italic">S</Text>
                 </View>
-                <LanguageRotatingTitle classname="mb-16" />
+                <Animated.Text
+                    style={animatedStyle}
+                    className="text-dark text-2xl font-elms-bold text-center mb-16"
+                >
+                    {LANGUAGE_TITLES[index]}
+                </Animated.Text>
                 <View className="w-full space-y-1">
                     <LanguageNode title="English" onPress={() => selectLanguage('en')} />
                     <LanguageNode title="Italiano" onPress={() => selectLanguage('it')} />

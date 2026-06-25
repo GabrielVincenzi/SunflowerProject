@@ -48,6 +48,13 @@ interface CardProps {
   vars: string;
   variableLabels: Record<string, string>;
   chart_type: string;
+  category?: string;
+  featured?: boolean;
+}
+
+interface SavedCardProps {
+  savedAt: string;
+  data: CardProps;
 }
 
 interface QuestionProps {
@@ -365,4 +372,51 @@ interface MunicipalitySliderProps {
   viewMode?: 'absolute' | 'perCapita';
   onViewModeChange?: (v: 'absolute' | 'perCapita') => void;
   onShareStat?: (card: StatCardConfig) => void;
+}
+
+// ─── Education Tools ───────────────────────────────────────────────────────────────────
+type ManipulationTechniqueId =
+  | 'truncateAxis'
+  | 'cherryPickRange'
+  | 'absoluteVsPercent'
+  | 'missingDenominator'
+  | 'smoothing';
+
+interface TechniqueDef {
+  id: ManipulationTechniqueId;
+  label: string;
+  shortHint: string;
+  credibilityCostPerNotch: number;
+}
+
+
+// ─── Real chart data contract (matches fetchChartData / ApiResponse) ───────
+interface ChartApiData {
+  activeGeos: string[];
+  activePeriods: string[];
+  variableLabels?: Record<string, string>;
+  series: Record<string, { value: number }[]>; // keyed e.g. "value_IT"
+  palette?: string[];
+}
+
+interface ManipulatorScenario {
+  id: string;
+  sourceChartId?: string | number;
+  title: string;
+  targetClaim: string;
+  unit: string;
+  apiData: ChartApiData;
+  seriesKey: string;
+  realStory: string;
+  sourceName: string;
+  sourceUrl?: string;
+}
+
+// ─── Manipulation state ─────────────────────────────────────────────────────
+interface ManipulationState {
+  truncateAxis: number;
+  cherryPickRange: number;
+  absoluteVsPercent: 'absolute' | 'percent';
+  missingDenominator: boolean;
+  smoothing: number;
 }

@@ -8,6 +8,7 @@ export const THEME_COLORS = {
     dark: '#343a40',
     grey: '#495057',
     light: '#f8f9fa',
+    error: '#ef4444'
 } as const;
 //  new colors: #FCD34D yellow, #3B82F6 blue, #84CC16 green
 //  old colors: #F2BB16 yellow, #118C8C blue, #7C8C2E green
