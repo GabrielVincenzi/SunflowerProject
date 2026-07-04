@@ -23,25 +23,20 @@ type ChartDisplayItem =
 
 interface ChartListProps {
     searchQuery?: string;
+    searchVector?: number[] | null;
     searchCategory?: string;
     renderHeader?: React.ReactElement | (() => React.ReactElement) | null;
     pageLimit?: number;
     recommended?: boolean;
     excludeSeenDays?: number;
     random?: boolean;
-    /**
-     * If provided, renders this element as its own row after the Nth chart
-     * card (1-indexed position counted among chart cards only — the
-     * interrupt itself doesn't count toward the position). Pass `null`/
-     * omit to disable. Re-renders fresh each time charts changes length
-     * across the threshold, but only mounts once since key is stable.
-     */
     interruptComponent?: React.ReactElement;
     interruptAfterIndex?: number; // default 3
 }
 
 export default function ChartList({
     searchQuery = "",
+    searchVector,
     searchCategory,
     renderHeader,
     pageLimit = 5,
@@ -111,6 +106,7 @@ export default function ChartList({
 
             return fetchAllChartDetails({
                 query: searchQuery,
+                vector: searchVector,
                 category: searchCategory,
                 lang: defaultLang,
                 limit: pageLimit,

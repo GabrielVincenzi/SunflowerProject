@@ -1,10 +1,18 @@
-import { CHART_COLORS, margin, THEME_COLORS } from "@/constants/utilities";
+import { animationDuration, CHART_COLORS, margin, THEME_COLORS } from "@/constants/utilities";
 import { parsePeriod } from "@/functions/dateHandlers";
 import { max, min } from "d3-array";
 import { scaleBand, scaleLinear } from "d3-scale";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Text, View } from "react-native";
+import Animated, {
+    Easing,
+    useAnimatedProps,
+    useSharedValue,
+    withDelay,
+    withTiming,
+} from "react-native-reanimated";
 import Svg, {
+    ClipPath,
     Defs,
     G,
     LinearGradient,
@@ -13,6 +21,8 @@ import Svg, {
     Line as SvgLine,
     Text as SvgText,
 } from "react-native-svg";
+
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
 function pickXTicks(labels: string[] = [], count = 6) {
     if (!labels || labels.length === 0) return [];
@@ -25,6 +35,50 @@ function pickXTicks(labels: string[] = [], count = 6) {
         result.push(labels[idx]);
     }
     return Array.from(new Set(result));
+}
+
+// ─── Row reveal ─────────────────────────────────────────────────
+// Each stripe row sweeps in left-to-right behind a clip mask, the
+// same "signal drawing itself" idea as the line chart's path draw —
+// just expressed as a wipe instead of a stroke. Rows cascade in with
+// an 80ms stagger, matching the marker-stagger convention used on
+// SunLineChart's end-of-line dots.
+function RowReveal({
+    rowIndex,
+    width,
+    height,
+    children,
+}: {
+    rowIndex: number;
+    width: number;
+    height: number;
+    children: React.ReactNode;
+}) {
+    const progress = useSharedValue(0);
+
+    useEffect(() => {
+        progress.value = withDelay(
+            rowIndex * 80,
+            withTiming(1, { duration: animationDuration, easing: Easing.bezier(0.16, 1, 0.3, 1) })
+        );
+    }, []);
+
+    const animatedProps = useAnimatedProps(() => ({
+        width: Math.max(0, width * progress.value),
+    }));
+
+    const clipId = `heat-clip-${rowIndex}`;
+
+    return (
+        <>
+            <Defs>
+                <ClipPath id={clipId}>
+                    <AnimatedRect x={0} y={0} height={height} animatedProps={animatedProps} />
+                </ClipPath>
+            </Defs>
+            <G clipPath={`url(#${clipId})`}>{children}</G>
+        </>
+    );
 }
 
 function SunHeatStripe({
@@ -54,7 +108,7 @@ function SunHeatStripe({
     if (!hasData) {
         return (
             <View style={{ padding: 12 }}>
-                <Text style={{ color: "grey" }}>No data available</Text>
+                <Text style={{ color: THEME_COLORS.grey, fontStyle: "italic", fontSize: 11 }}>No data available</Text>
             </View>
         );
     }
@@ -114,18 +168,17 @@ function SunHeatStripe({
     const lowColor = colorRange?.[0] ?? palette[0];
     const highColor = colorRange?.[1] ?? palette[palette.length - 1];
 
-    // If domain is degenerate (vMin === vMax), use a constant color function to avoid scale issues
+    // If domain is degenerate (vMin === vMax), fall back to a neutral
+    // constant fill rather than a hardcoded hex.
     const colorScaleFn = useMemo(() => {
         if (vMin === vMax) {
-            // if there is no numeric data at all (both 0), still show same neutral color
-            const constColor = "#efefef";
-            return (v: number | null) => (v === null || v === undefined ? "#efefef" : constColor);
+            return (v: number | null) => (v === null || v === undefined ? THEME_COLORS.light : THEME_COLORS.subtle);
         }
         const s = scaleLinear<string>().domain([vMin, vMax]).range([lowColor, highColor]).clamp(true);
-        return (v: number | null) => (v === null || v === undefined ? "#efefef" : s(v as number));
+        return (v: number | null) => (v === null || v === undefined ? THEME_COLORS.light : s(v as number));
     }, [vMin, vMax, lowColor, highColor]);
 
-    // layout
+    // layout — unchanged from original, positions must stay put
     const width = screenWidth;
     const rowsCount = normalizedchartData.length;
     const totalGaps = Math.max(0, rowsCount - 1) * rowGap;
@@ -141,7 +194,9 @@ function SunHeatStripe({
         .paddingOuter(0);
 
     const barWidth = xScale.bandwidth() || Math.max(1, (width - margin.left - margin.right) / Math.max(1, xLabels.length));
+    const tileWidth = Math.max(barWidth - 1, barWidth * 0.85); // hairline gutter between tiles
     const displayedXLabels = pickXTicks(xLabels, xTickCount);
+    const stripesWidth = width - margin.right - margin.left;
 
     // helper: small number formatting
     const formatSmall = (n: number) => {
@@ -153,7 +208,7 @@ function SunHeatStripe({
     };
 
     return (
-        <View>
+        <View className="w-full">
             <Svg width={width} height={chartHeight}>
                 {/* gradient for colorbar (decorative) */}
                 <Defs>
@@ -165,70 +220,96 @@ function SunHeatStripe({
 
                 {/* Rows */}
                 {normalizedchartData.map((row, rIdx) => {
-                    // compute y offset for this row (account for previous rows + gaps)
-                    const yOffset =
-                        margin.top +
-                        rIdx * heightPerRow +
-                        Math.max(0, rIdx) * rowGap; // each row after first adds rowGap
-
-                    const stripeHeight = heightPerRow; // keep stripe height = heightPerRow
-                    const labelX = 8; // left label x pos
+                    const yOffset = margin.top + rIdx * heightPerRow + Math.max(0, rIdx) * rowGap;
+                    const stripeHeight = heightPerRow;
+                    const labelX = 8;
                     const stripesXOffset = margin.left / 8;
 
                     return (
                         <G key={`row-${row.key}-${rIdx}`} transform={`translate(0, ${yOffset})`}>
-                            {/* geo label (left) */}
-                            <SvgText x={labelX} y={stripeHeight / 2} dy="0.35em" fontSize={12} fill={THEME_COLORS.dark} fontWeight="800">
+                            {/* geo label — muted supporting text, same voice as every other in-chart label */}
+                            <SvgText
+                                x={labelX}
+                                y={stripeHeight / 2}
+                                dy="0.35em"
+                                fontSize={11}
+                                fill={THEME_COLORS.grey}
+                                fontStyle="italic"
+                            >
                                 {row.geo}
                             </SvgText>
 
-                            {/* stripe tiles */}
+                            {/* stripe tiles — sweep in left-to-right behind a clip mask */}
                             <G transform={`translate(${stripesXOffset}, 0)`}>
-                                {row.values.map((val, i) => {
-                                    const x = xScale(xLabels[i]) ?? i * barWidth;
-                                    const fill = colorScaleFn(val);
-                                    return <Rect key={`rect-${rIdx}-${i}`} x={x} y={0} width={barWidth} height={stripeHeight} fill={fill} />;
-                                })}
+                                <RowReveal rowIndex={rIdx} width={stripesWidth} height={stripeHeight}>
+                                    {row.values.map((val, i) => {
+                                        const x = xScale(xLabels[i]) ?? i * barWidth;
+                                        const fill = colorScaleFn(val);
+                                        return (
+                                            <Rect
+                                                key={`rect-${rIdx}-${i}`}
+                                                x={x}
+                                                y={0}
+                                                width={tileWidth}
+                                                height={stripeHeight}
+                                                fill={fill}
+                                            />
+                                        );
+                                    })}
+                                </RowReveal>
                             </G>
                         </G>
                     );
                 })}
 
-                {/* X axis ticks beneath rows */}
+                {/* x-axis: single hairline, no tick marks, italic muted labels */}
                 <G transform={`translate(0, ${margin.top + stripesAreaHeight + 4})`}>
+                    <SvgLine
+                        x1={margin.left}
+                        x2={width - margin.right}
+                        y1={0}
+                        y2={0}
+                        stroke={`${THEME_COLORS.dark}24`}
+                        strokeWidth={1}
+                    />
                     {displayedXLabels.map((lbl, i) => {
                         const xCenter = (xScale(lbl) ?? margin.left) + barWidth / 2;
                         return (
-                            <G key={`xt-${i}`} transform={`translate(${xCenter}, 0)`}>
-                                <SvgLine y2={10} stroke={THEME_COLORS.dark} strokeWidth={2} />
-                                <SvgText y={30} fontSize={10} fill={THEME_COLORS.dark} textAnchor="middle" fontWeight="800">
-                                    {lbl}
-                                </SvgText>
-                            </G>
+                            <SvgText
+                                key={`xt-${i}`}
+                                x={xCenter}
+                                y={22}
+                                fontSize={11}
+                                fill={THEME_COLORS.grey}
+                                textAnchor="middle"
+                                fontStyle="italic"
+                            >
+                                {lbl}
+                            </SvgText>
                         );
                     })}
-                    <SvgLine x1={margin.left} x2={width - margin.right} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
                 </G>
 
-                {/* small gradient colorbar */}
+                {/* color scale — thin gradient bar with min/max readout */}
                 <G transform={`translate(${margin.left}, ${margin.top + stripesAreaHeight + 60})`}>
                     <Rect
                         x={0}
                         y={0}
                         width={Math.max(120, Math.min(240, width - margin.left - margin.right - 40))}
-                        height={8}
+                        height={6}
+                        rx={3}
                         fill="url(#grad)"
                     />
-                    <SvgText x={0} y={20} fontSize={10} fill={THEME_COLORS.dark} textAnchor="start" fontWeight="800">
+                    <SvgText x={0} y={22} fontSize={11} fill={THEME_COLORS.grey} textAnchor="start" fontStyle="italic">
                         {formatSmall(Math.floor(vMin))}
                     </SvgText>
                     <SvgText
                         x={Math.max(120, Math.min(240, width - margin.left - margin.right - 40))}
-                        y={20}
-                        fontSize={10}
-                        fill={THEME_COLORS.dark}
+                        y={22}
+                        fontSize={11}
+                        fill={THEME_COLORS.grey}
                         textAnchor="end"
-                        fontWeight="800"
+                        fontStyle="italic"
                     >
                         {formatSmall(Math.ceil(vMax))}
                     </SvgText>
@@ -239,4 +320,3 @@ function SunHeatStripe({
 }
 
 export default SunHeatStripe;
-

@@ -2,13 +2,13 @@ import {
     ChipRow,
     FieldLabel,
     FlowHeader,
-    PrimaryButton,
     StepDots,
     StepTitle,
     SuccessScreen,
     TagCloud,
 } from "@/components/SponsorshipComponents";
 import SponsorshipReview from "@/components/SponsorshipReview";
+import SunButton from "@/components/SunButton";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, TextInput, View } from "react-native";
@@ -154,8 +154,8 @@ export default function SignalScreen() {
                 )}
 
                 <View className="mt-2">
-                    <PrimaryButton
-                        label={step === 1 ? "Review →" : "Continue →"}
+                    <SunButton
+                        text={step === 1 ? "Review →" : "Continue →"}
                         onPress={() => setStep((s) => s + 1)}
                         disabled={step === 0 && selectedTopics.length === 0}
                     />

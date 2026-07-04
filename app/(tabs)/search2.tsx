@@ -5,16 +5,21 @@ import FilterSheet, { ChartFilters, countActiveFilters, EMPTY_FILTERS } from '@/
 import RequestDataPopup from '@/components/popup/RequestDataPopup';
 import SearchBarWithFilter from '@/components/SearchBarWithFilter';
 import SearchSkeleton from '@/components/skeletons/SearchSkeleton';
+import { THEME_COLORS } from '@/constants/utilities';
+import { encodeQuery } from '@/services/embeddingService';
+import { useModelStatus } from '@/services/useModelStatus';
 import { useTranslations } from '@/services/useTranslation';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Keyboard, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { ActivityIndicator, Keyboard, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 
 export default function SearchScreen() {
     const { data: translated } = useTranslations();
-    if (!translated) return <SearchSkeleton />;
+    const { isReady, isDownloading, isWarming, progress } = useModelStatus();
 
     const [input, setInput] = useState('');
     const [committedQuery, setCommittedQuery] = useState('');
+    const [committedVector, setCommittedVector] = useState<number[] | null>(null); // ← new
+    const [isEncoding, setIsEncoding] = useState(false);
     const [mode, setMode] = useState<FeedMode>('recommended');
     const [filters, setFilters] = useState<ChartFilters>(EMPTY_FILTERS);
     const [filterSheetVisible, setFilterSheetVisible] = useState(false);
@@ -22,9 +27,24 @@ export default function SearchScreen() {
 
     const inputRef = useRef<TextInput | null>(null);
 
-    const handleSearch = useCallback(() => {
-        setCommittedQuery(input.trim());
-        inputRef.current?.blur();
+    const handleSearch = useCallback(async () => {
+        const trimmed = input.trim();
+        if (!trimmed) {
+            setCommittedQuery('');
+            setCommittedVector(null);
+            return;
+        }
+        setIsEncoding(true);
+        try {
+            const vector = await encodeQuery(trimmed);
+            setCommittedQuery(trimmed);
+            setCommittedVector(vector);
+        } catch (e) {
+            console.error('Encoding failed', e);
+        } finally {
+            setIsEncoding(false);
+            inputRef.current?.blur();
+        }
     }, [input]);
 
     const handleApplyFilters = useCallback((next: ChartFilters) => {
@@ -59,7 +79,33 @@ export default function SearchScreen() {
                 onOpenFilters={() => setFilterSheetVisible(true)}
                 activeFilterCount={activeFilterCount}
                 inputRef={inputRef}
+                isLoading={isEncoding}
+                disabled={!isReady}
             />
+
+            {/* Non-blocking model status indicator */}
+            {isDownloading && (
+                <View className="flex-row items-center gap-2 mt-2">
+                    <View className="flex-1 h-[2px] bg-dark/10 rounded-full">
+                        <View
+                            className="h-[2px] bg-primary rounded-full"
+                            style={{ width: `${Math.round(progress * 100)}%` }}
+                        />
+                    </View>
+                    <Text className="text-[11px] font-elms-regular text-dark/35">
+                        {Math.round(progress * 100)}%
+                    </Text>
+                </View>
+            )}
+
+            {isWarming && (
+                <View className="flex-row items-center gap-2 mt-2">
+                    <ActivityIndicator size="small" color={THEME_COLORS.primary} />
+                    <Text className="text-[11px] font-elms-regular text-dark/35">
+                        Preparing search...
+                    </Text>
+                </View>
+            )}
 
             {/* Search results label */}
             {isSearching && (
@@ -88,6 +134,8 @@ export default function SearchScreen() {
         </View>
     );
 
+    if (!translated) return <SearchSkeleton />;
+
     return (
         <>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -95,6 +143,7 @@ export default function SearchScreen() {
                     <ChartList
                         key={isSearching ? `search-${committedQuery}-${searchCategory}` : mode}
                         searchQuery={isSearching ? committedQuery : ''}
+                        searchVector={isSearching ? committedVector : null}
                         searchCategory={isSearching ? searchCategory : undefined}
                         renderHeader={renderHeader}
                         pageLimit={5}

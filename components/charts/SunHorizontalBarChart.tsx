@@ -1,4 +1,4 @@
-import { animationDuration, CHART_COLORS, HEIGHT, margin, THEME_COLORS } from "@/constants/utilities";
+import { animationDuration, CHART_COLORS, margin, THEME_COLORS } from "@/constants/utilities";
 import { detectScale } from "@/functions/formatHandlers";
 import { max } from "d3-array";
 import { scaleBand, scaleLinear } from "d3-scale";
@@ -10,10 +10,20 @@ import Animated, {
     useSharedValue,
     withTiming
 } from "react-native-reanimated";
-import Svg, { G, Line, Rect, Text as SvgText } from "react-native-svg";
+import Svg, { G, Rect, Line as SvgLine, Text as SvgText } from "react-native-svg";
 import ChartLegend from "../chartscomp/ChartLegend";
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
+
+function formatScaled(value: number, factor: number) {
+    const n = value / factor;
+    const absN = Math.abs(n);
+    const maxFractionDigits = absN < 10 ? 2 : absN < 100 ? 1 : 0;
+    return new Intl.NumberFormat(undefined, {
+        maximumFractionDigits: maxFractionDigits,
+        minimumFractionDigits: 0,
+    }).format(Number(n.toFixed(maxFractionDigits)));
+}
 
 interface HorizontalBarProps {
     y: number;
@@ -24,6 +34,8 @@ interface HorizontalBarProps {
     axisStart: number;
 }
 
+// No border, no heavy stroke — matches AnimatedBar in SunBarChart,
+// just growing rightward instead of upward.
 function AnimatedHorizontalBar({ y, height, color, value, xScale, axisStart }: HorizontalBarProps) {
     const progress = useSharedValue(0);
     const yPos = useSharedValue(y);
@@ -57,19 +69,29 @@ function AnimatedHorizontalBar({ y, height, color, value, xScale, axisStart }: H
             x={axisStart}
             height={height}
             fill={color}
-            stroke={THEME_COLORS.dark}
-            strokeWidth={1.5}
             animatedProps={animatedProps}
         />
     );
 }
 
-function SunHorizontalBarChart({ screenWidth, screenHeight, apiData }: ChartProps) {
+// ─── SunHorizontalBarChart ──────────────────────────────────────
+// Full-width, card-free, same SunChartProps contract as every other
+// chart type. The value axis runs horizontally here, so yDomainOverride
+// (yMin/yMax) maps onto that horizontal value scale — same shape,
+// same .nice()-skip invariant, just rotated 90°.
+function SunHorizontalBarChart({
+    screenWidth,
+    apiData,
+    xTickCount,
+    yTickCount = 5,
+    height = 280,
+    yDomainOverride,
+}: ChartProps) {
     const palette = apiData?.palette ?? CHART_COLORS;
 
-    // Custom margin offsets to accommodate larger uppercase geo labels cleanly on the left
+    // Extra left room for geo labels — analogous to margin.left, just wider
+    // since row labels sit outside the plot rather than under it.
     const leftMargin = 72;
-    const chartHeight = screenHeight ? screenHeight * 0.45 : HEIGHT;
     const geos = apiData.activeGeos || [];
 
     const [activeVariable, setActiveVariable] = useState<string | null>(null);
@@ -111,65 +133,79 @@ function SunHorizontalBarChart({ screenWidth, screenHeight, apiData }: ChartProp
 
     const minRowHeight = 36;
     const totalBarsCount = geos.length * variables.length;
-    const dynamicSvgHeight = Math.max(chartHeight, totalBarsCount * minRowHeight + margin.top + margin.bottom);
+    const dynamicSvgHeight = Math.max(height, totalBarsCount * minRowHeight + margin.top + margin.bottom);
 
     const y0 = scaleBand<string>().domain(sortedGeos).range([margin.top, dynamicSvgHeight - margin.bottom]).paddingInner(0.2);
     const y1 = scaleBand<string>().domain(variables).range([0, y0.bandwidth()]).padding(0.05);
 
-    const xMax = max(chartData.flatMap((d: any) => d.values.map((v: any) => v.value))) || 0;
-    const x = scaleLinear().domain([0, xMax]).nice().range([leftMargin, screenWidth - margin.right]);
+    const rawMax = max(chartData.flatMap((d: any) => d.values.map((v: any) => v.value))) || 0;
+    const domainMin = yDomainOverride?.yMin ?? 0;
+    const domainMax = yDomainOverride?.yMax ?? rawMax;
 
-    const xTicks = x.ticks(5);
-    const { label: xUnitLabel } = detectScale(xMax);
+    const x = scaleLinear().domain([domainMin, domainMax]).range([leftMargin, screenWidth - margin.right]);
+    // Skip .nice() when an explicit override is given — same invariant
+    // as every other chart: rounding would undo a deliberate manipulation.
+    if (!yDomainOverride) x.nice();
+
+    const xTicks = x.ticks(yTickCount);
+    const { factor: xFactor, label: xUnitLabel } = detectScale(rawMax);
 
     return (
-        <View style={{ width: "100%", backgroundColor: THEME_COLORS.background }}>
+        // No card, no border, no radius, no background of its own.
+        <View className="w-full">
             <ChartLegend items={legendItems} yUnitLabel={xUnitLabel} />
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
                 <Svg width={screenWidth} height={dynamicSvgHeight}>
-                    {/* Grid Lines projecting from X coordinate ticks */}
+                    {/* Gridlines — value axis only, recessive, dashed */}
                     {xTicks.map((tick: number) => (
-                        <Line
+                        <SvgLine
                             key={tick}
                             x1={x(tick)}
                             x2={x(tick)}
                             y1={margin.top}
                             y2={dynamicSvgHeight - margin.bottom}
-                            stroke={THEME_COLORS.dark}
-                            strokeOpacity={0.08}
-                            strokeDasharray="4,4"
+                            stroke={THEME_COLORS.subtle}
                             strokeWidth={1}
+                            strokeDasharray="4,5"
                         />
                     ))}
 
-                    {/* Y Axis Baseline containing high-touch labels */}
-                    <G transform={`translate(0, 0)`}>
-                        <Line x1={leftMargin} x2={leftMargin} y1={margin.top} y2={dynamicSvgHeight - margin.bottom} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
-                        {sortedGeos.map((geo: string) => (
-                            <G key={geo} transform={`translate(0, ${(y0(geo) ?? 0) + y0.bandwidth() / 2})`}>
-                                <Line x1={leftMargin - 6} x2={leftMargin} stroke={THEME_COLORS.dark} strokeWidth={2} />
-                                <SvgText x={leftMargin - 12} dy="0.32em" fontSize={10} fill={THEME_COLORS.dark} textAnchor="end" fontWeight="800" letterSpacing={0.5}>
-                                    {geo.toUpperCase()}
-                                </SvgText>
-                            </G>
-                        ))}
-                    </G>
+                    {/* Category axis: labels only, no axis line, no tick marks */}
+                    {sortedGeos.map((geo: string) => (
+                        <SvgText
+                            key={geo}
+                            x={leftMargin - 12}
+                            y={(y0(geo) ?? 0) + y0.bandwidth() / 2}
+                            dy="0.32em"
+                            fontSize={11}
+                            fill={THEME_COLORS.grey}
+                            textAnchor="end"
+                            fontStyle="italic"
+                        >
+                            {geo}
+                        </SvgText>
+                    ))}
 
-                    {/* Bottom X-Axis line */}
+                    {/* Value axis: single hairline, italic muted labels, no tick marks */}
                     <G transform={`translate(0, ${dynamicSvgHeight - margin.bottom})`}>
-                        <Line x1={leftMargin} x2={screenWidth - margin.right} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
+                        <SvgLine x1={leftMargin} x2={screenWidth - margin.right} stroke={`${THEME_COLORS.dark}24`} strokeWidth={1} />
                         {xTicks.map((tick: number) => (
-                            <G key={tick} transform={`translate(${x(tick)}, 0)`}>
-                                <Line y1={0} y2={8} stroke={THEME_COLORS.dark} strokeWidth={2} />
-                                <SvgText y={22} fontSize={10} fill={THEME_COLORS.dark} opacity={0.4} textAnchor="middle" fontWeight="800">
-                                    {tick}
-                                </SvgText>
-                            </G>
+                            <SvgText
+                                key={tick}
+                                x={x(tick)}
+                                y={22}
+                                fontSize={11}
+                                fill={THEME_COLORS.grey}
+                                textAnchor="middle"
+                                fontStyle="italic"
+                            >
+                                {formatScaled(tick, xFactor)}
+                            </SvgText>
                         ))}
                     </G>
 
-                    {/* Rendered Animated Horizontal Bars */}
+                    {/* Bars */}
                     {chartData.map((group: any) => (
                         <G key={group.geo}>
                             {group.values.map((d: any) => (

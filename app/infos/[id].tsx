@@ -21,6 +21,7 @@ import SunLineChart from "@/components/charts/SunLineChart";
 import { SearchableSelect } from "@/components/SearchableSelect";
 import { CHART_PALETTES, CHART_REGISTRY } from "@/constants/charts";
 import { useTranslations } from "@/services/useTranslation";
+import {THEME_COLORS } from "@/constants/utilities";
 
 type PaletteKey = keyof typeof CHART_PALETTES;
 type ChartTypeKey = keyof typeof CHART_REGISTRY;
@@ -398,7 +399,7 @@ const ChartPage = () => {
                     entering={popupEntering}
                     exiting={popupExiting}
                     style={StyleSheet.absoluteFill}
-                    className="bg-[#FDFCF6]"
+                    className="bg-background"
                 >
                     <View className="p-8 flex-1">
                         {/* Overlay Header */}
@@ -410,7 +411,7 @@ const ChartPage = () => {
                                 onPress={() => setOverlayOpen(false)}
                                 className="w-12 h-12 bg-dark rounded-2xl items-center justify-center"
                             >
-                                <Feather name="x" size={24} color="#F7CE46" />
+                                <Feather name="x" size={24} color={THEME_COLORS.primary} />
                             </TouchableOpacity>
                         </View>
 
@@ -527,13 +528,13 @@ const ChartPage = () => {
                                             onValuesChangeFinish={vals =>
                                                 setPeriods([periodOptions[vals[0]].value, periodOptions[vals[1]].value])
                                             }
-                                            selectedStyle={{ backgroundColor: "#141414", height: 4 }}
+                                            selectedStyle={{ backgroundColor: THEME_COLORS.dark, height: 4 }}
                                             markerStyle={{
-                                                backgroundColor: "#F7CE46",
+                                                backgroundColor: THEME_COLORS.primary,
                                                 height: 24, width: 24,
                                                 borderEndWidth: 2, borderStartWidth: 2,
                                                 borderTopWidth: 2, borderBottomWidth: 2,
-                                                borderColor: '#141414',
+                                                borderColor: THEME_COLORS.dark,
                                                 shadowOpacity: 0,
                                             }}
                                         />

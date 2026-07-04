@@ -1,14 +1,19 @@
+import { initModel } from "@/services/embeddingService";
 import { useAuth } from "@clerk/clerk-expo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 
-
 const HomeIndex = () => {
     const router = useRouter();
     const [lang, setLang] = useState<string | null>(null);
-    const [langLoaded, setLangLoaded] = useState(false)
+    const [langLoaded, setLangLoaded] = useState(false);
     const { isLoaded, isSignedIn } = useAuth();
+
+    useEffect(() => {
+        // Fire-and-forget — never blocks routing
+        initModel();
+    }, []);
 
     useEffect(() => {
         const checkLanguage = async () => {

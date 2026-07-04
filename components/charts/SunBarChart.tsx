@@ -1,4 +1,4 @@
-import { animationDuration, CHART_COLORS, HEIGHT, margin, THEME_COLORS } from "@/constants/utilities";
+import { animationDuration, CHART_COLORS, margin, THEME_COLORS } from "@/constants/utilities";
 import { detectScale } from "@/functions/formatHandlers";
 import { max } from "d3-array";
 import { scaleBand, scaleLinear } from "d3-scale";
@@ -10,10 +10,21 @@ import Animated, {
     useSharedValue,
     withTiming
 } from "react-native-reanimated";
-import Svg, { G, Line, Rect, Text as SvgText } from "react-native-svg";
+import Svg, { Rect, Line as SvgLine, Text as SvgText } from "react-native-svg";
 import ChartLegend from "../chartscomp/ChartLegend";
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
+
+// ─── Scale label formatting (matches SunLineChart) ─────────────
+function formatScaled(value: number, factor: number) {
+    const n = value / factor;
+    const absN = Math.abs(n);
+    const maxFractionDigits = absN < 10 ? 2 : absN < 100 ? 1 : 0;
+    return new Intl.NumberFormat(undefined, {
+        maximumFractionDigits: maxFractionDigits,
+        minimumFractionDigits: 0,
+    }).format(Number(n.toFixed(maxFractionDigits)));
+}
 
 // ==================== Animated Bar ====================
 function AnimatedBar({ x, width, color, value, yScale, chartHeight }: AnimatedBarProps) {
@@ -26,10 +37,9 @@ function AnimatedBar({ x, width, color, value, yScale, chartHeight }: AnimatedBa
         const fullLength = chartHeight - yScale(value);
         setBarLength(fullLength);
         progress.value = 0;
-        // Mechanical "Pop" Easing
         progress.value = withTiming(1, {
             duration: animationDuration,
-            easing: Easing.bezier(0.16, 1, 0.3, 1)
+            easing: Easing.bezier(0.16, 1, 0.3, 1),
         });
     }, [value, chartHeight, yScale]);
 
@@ -50,17 +60,21 @@ function AnimatedBar({ x, width, color, value, yScale, chartHeight }: AnimatedBa
         <AnimatedRect
             width={width}
             fill={color}
-            stroke={THEME_COLORS.dark}
-            strokeWidth={1.5}
             animatedProps={animatedProps}
         />
     );
 }
 
-// ==================== Chart ====================
-function SunBarChart({ screenWidth, screenHeight, apiData }: ChartProps) {
+// ─── SunBarChart ────────────────────────────────────────────────
+function SunBarChart({
+    screenWidth,
+    apiData,
+    xTickCount,
+    yTickCount = 5,
+    height = 280,
+    yDomainOverride,
+}: ChartProps) {
     const palette = apiData?.palette ?? CHART_COLORS;
-    const height = screenHeight ? screenHeight * 0.45 : HEIGHT;
     const geos = apiData.activeGeos || [];
 
     const [activeVariable, setActiveVariable] = useState<string | null>(null);
@@ -77,7 +91,7 @@ function SunBarChart({ screenWidth, screenHeight, apiData }: ChartProps) {
     const activeVarIndex = variables.findIndex(v => v === activeVariable);
 
     const chartData = useMemo(() => {
-        const data = geos.map((geo) => ({
+        const data = geos.map((geo: string) => ({
             geo,
             values: variables.map((variable, varIdx) => {
                 const readable = apiData.variableLabels?.[variable] ?? variable;
@@ -106,62 +120,83 @@ function SunBarChart({ screenWidth, screenHeight, apiData }: ChartProps) {
     const x0 = scaleBand<string>().domain(sortedGeos).range([margin.left, svgWidth - margin.right]).paddingInner(0.2);
     const x1 = scaleBand<string>().domain(variables).range([0, x0.bandwidth()]).padding(0.05);
 
-    const yMax = max(chartData.flatMap(d => d.values.map(v => v.value))) || 0;
-    const y = scaleLinear().domain([0, yMax]).nice().range([HEIGHT - margin.bottom, margin.top]);
+    const rawMax = max(chartData.flatMap(d => d.values.map(v => v.value))) || 0;
+    const domainMin = yDomainOverride?.yMin ?? 0;
+    const domainMax = yDomainOverride?.yMax ?? rawMax;
 
-    const yTicks = y.ticks(5);
-    const { label: yUnitLabel } = detectScale(yMax);
+    const y = scaleLinear().domain([domainMin, domainMax]).range([height - margin.bottom, margin.top]);
+    // Skip .nice() when an explicit override is given — rounding would
+    // silently undo a deliberate manipulation (Manipulator's Studio).
+    if (!yDomainOverride) y.nice();
+
+    const yTicks = y.ticks(yTickCount);
+    const { factor: yFactor, label: yUnitLabel } = detectScale(rawMax);
+    const baselineY = height - margin.bottom;
 
     return (
-        <View className="w-full bg-background">
+        // No card, no border, no radius, no background of its own —
+        // bg-background is inherited from whatever screen holds this.
+        <View className="w-full">
             <ChartLegend items={legendItems} yUnitLabel={yUnitLabel} />
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
-                {/* Industrial Grid Lines: Dashed and Rigid */}
                 <Svg width={svgWidth} height={height}>
+                    {/* Horizontal gridlines only — recessive, dashed */}
                     {yTicks.map((tick) => (
-                        <Line
+                        <SvgLine
                             key={tick}
                             x1={margin.left}
                             x2={svgWidth - margin.right}
                             y1={y(tick)}
                             y2={y(tick)}
-                            stroke={THEME_COLORS.dark}
-                            strokeOpacity={0.08}
-                            strokeDasharray="4,4"
+                            stroke={THEME_COLORS.subtle}
                             strokeWidth={1}
+                            strokeDasharray="4,5"
                         />
                     ))}
 
-                    {/* X Axis: Heavy Brutalist Baseline */}
-                    <G transform={`translate(0, ${HEIGHT - margin.bottom})`}>
-                        <Line x1={margin.left} x2={svgWidth - margin.right} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
-                        {sortedGeos.map((geo) => (
-                            <G key={geo} transform={`translate(${(x0(geo) ?? 0) + x0.bandwidth() / 2}, 0)`}>
-                                <Line y2={8} stroke={THEME_COLORS.dark} strokeWidth={2} />
-                                <SvgText y={25} fontSize={10} fill={THEME_COLORS.dark} textAnchor="middle" fontWeight="800" letterSpacing={0.5}>
-                                    {geo.toUpperCase()}
-                                </SvgText>
-                            </G>
-                        ))}
-                    </G>
+                    {/* x-axis: single hairline, no tick marks */}
+                    <SvgLine
+                        x1={margin.left}
+                        x2={svgWidth - margin.right}
+                        y1={baselineY}
+                        y2={baselineY}
+                        stroke={`${THEME_COLORS.dark}24`}
+                        strokeWidth={1}
+                    />
+                    {sortedGeos.map((geo) => (
+                        <SvgText
+                            key={geo}
+                            x={(x0(geo) ?? 0) + x0.bandwidth() / 2}
+                            y={baselineY + 22}
+                            fontSize={11}
+                            fill={THEME_COLORS.grey}
+                            textAnchor="middle"
+                            fontStyle="italic"
+                        >
+                            {geo}
+                        </SvgText>
+                    ))}
 
-                    {/* Y Axis: Technical Readout Labels */}
-                    <G transform={`translate(${margin.left}, 0)`}>
-                        <Line y1={margin.top} y2={HEIGHT - margin.bottom} stroke={THEME_COLORS.dark} strokeWidth={2.5} />
-                        {yTicks.map((tick) => (
-                            <G key={tick} transform={`translate(0, ${y(tick)})`}>
-                                <Line x2={-8} stroke={THEME_COLORS.dark} strokeWidth={2} />
-                                <SvgText x={-12} dy="0.32em" fontSize={10} fill={THEME_COLORS.dark} opacity={0.4} textAnchor="end" fontWeight="800">
-                                    {tick}
-                                </SvgText>
-                            </G>
-                        ))}
-                    </G>
+                    {/* y-axis: labels only, no rule, no tick marks */}
+                    {yTicks.map((tick) => (
+                        <SvgText
+                            key={tick}
+                            x={margin.left - 10}
+                            y={y(tick)}
+                            dy="0.35em"
+                            fontSize={11}
+                            fill={THEME_COLORS.grey}
+                            textAnchor="end"
+                            fontStyle="italic"
+                        >
+                            {formatScaled(tick, yFactor)}
+                        </SvgText>
+                    ))}
 
-                    {/* Bars Content */}
+                    {/* Bars */}
                     {chartData.map((group) => (
-                        <G key={group.geo}>
+                        <React.Fragment key={group.geo}>
                             {group.values.map((d) => (
                                 <AnimatedBar
                                     key={`${group.geo}-${d.variable}`}
@@ -170,10 +205,10 @@ function SunBarChart({ screenWidth, screenHeight, apiData }: ChartProps) {
                                     color={d.color}
                                     value={d.value}
                                     yScale={y}
-                                    chartHeight={HEIGHT - margin.bottom}
+                                    chartHeight={baselineY}
                                 />
                             ))}
-                        </G>
+                        </React.Fragment>
                     ))}
                 </Svg>
             </ScrollView>

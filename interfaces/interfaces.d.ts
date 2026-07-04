@@ -112,6 +112,13 @@ type ChartProps = {
   screenWidth: number;
   screenHeight?: number;
   apiData: ApiResponse;
+  xTickCount?: number;
+  yTickCount?: number;
+  height?: number;
+  yDomainOverride?: {
+    yMin?: number;
+    yMax?: number;
+  };
 };
 
 type HighlightProps = {
