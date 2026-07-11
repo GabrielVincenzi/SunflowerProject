@@ -1,10 +1,14 @@
+import { resetLanguageState } from "@/components/layoutcomp/LanguageContext";
+import SunButton from "@/components/SunButton2";
+import { THEME_COLORS } from "@/constants/utilities";
 import { translationStorage } from "@/interfaces/translationStorage";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
     Easing,
     FadeIn,
@@ -253,6 +257,7 @@ export default function ProfileScreen({
     const { signOut } = useAuth();
     const { user } = useUser();
     const [statsRevealed, setStatsRevealed] = useState(false);
+    const queryclient = useQueryClient();
 
     const displayName =
         user?.firstName ?? user?.username ?? user?.emailAddresses?.[0]?.emailAddress ?? "Friend";
@@ -397,7 +402,7 @@ export default function ProfileScreen({
                                     activeOpacity={0.85}
                                 >
                                     <View className="w-9 h-9 items-center justify-center rounded-2xl bg-[#F0ECE0]">
-                                        <Feather name={item.icon} size={16} color="#5F5E5A" />
+                                        <Feather name={item.icon} size={16} color={THEME_COLORS.grey} />
                                     </View>
                                     <Text className="text-[14px] font-elms-bold italic text-dark ml-3.5 tracking-tight flex-1">
                                         {item.label}
@@ -419,6 +424,17 @@ export default function ProfileScreen({
                             </Text>
                         </TouchableOpacity>
 
+                        <TouchableOpacity
+                            onPress={() => router.navigate("/(auth)/welcome")}
+                            activeOpacity={0.85}
+                            className="flex-row items-center justify-center py-4 border-[1.5px] border-dark/15 rounded-[24px] mt-8"
+                        >
+                            <Feather name="repeat" size={15} color="#5F5E5A" style={{ marginRight: 8 }} />
+                            <Text className="text-[13px] font-elms-bold text-dark/60 uppercase tracking-[0.1em]">
+                                Welcome
+                            </Text>
+                        </TouchableOpacity>
+
                         {/* Language change — preserved functionally, rethemed visually */}
                         <TouchableOpacity
                             onPress={handleClearLanguage}
@@ -430,6 +446,21 @@ export default function ProfileScreen({
                                 Change language
                             </Text>
                         </TouchableOpacity>
+
+                        <SunButton
+                            label="🧹 Reset language (dev)"
+                            onPress={async () => {
+                                await resetLanguageState();
+                                queryclient.clear();
+                                // force a full reload so LanguageProvider re-runs its detection logic
+                                if (Platform.OS === 'web') {
+                                    window.location.reload();
+                                } else {
+                                    // Updates.reloadAsync() if using expo-updates, or just manually
+                                    // background/foreground the app, or shake -> Reload
+                                }
+                            }}
+                        />
                     </Animated.View>
                 </View>
             </ScrollView>

@@ -1,6 +1,6 @@
 import ChartList from "@/components/chartscomp/ChartList";
+import SearchBar from "@/components/filters/SearchBar";
 import RequestDataPopup from "@/components/popup/RequestDataPopup";
-import SearchBar from "@/components/SearchBar";
 import { images } from "@/constants/images";
 import { useTranslations } from "@/services/useTranslation";
 import React, { useCallback, useRef, useState } from "react";

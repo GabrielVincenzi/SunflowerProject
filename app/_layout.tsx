@@ -1,3 +1,4 @@
+import { AppReadyGate } from '@/components/layoutcomp/AppReadyGate';
 import { LanguageProvider } from '@/components/layoutcomp/LanguageContext';
 import { useAppState } from '@/services/useAppState';
 import { useOnlineManager } from '@/services/useOnlineManager';
@@ -7,7 +8,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from 'react';
+import React from 'react';
 import { AppStateStatus, Platform, StatusBar } from "react-native";
 import './globals.css';
 
@@ -85,17 +86,15 @@ export default function RootLayout() {
     "Elms-Thin": require("../assets/fonts/ElmsSans-Thin.ttf"),
   });
 
-  useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
-  }, [fontsLoaded]);
-
   if (!fontsLoaded) return null;
 
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <LanguageProvider>
         <QueryClientProvider client={queryClient}>
-          <Layout />
+          <AppReadyGate>
+            <Layout />
+          </AppReadyGate>
         </QueryClientProvider>
       </LanguageProvider>
     </ClerkProvider>

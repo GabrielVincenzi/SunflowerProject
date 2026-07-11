@@ -1,9 +1,9 @@
 import CategoryGrid from '@/components/CategoryGrid';
 import ChartList from '@/components/chartscomp/ChartList2';
-import ModeSwitch, { FeedMode } from '@/components/ModeSwitch';
+import ModeSwitch, { FeedMode } from '@/components/filters/ModeSwitch';
+import SearchBarWithFilter from '@/components/filters/SearchBarWithFilter';
 import FilterSheet, { ChartFilters, countActiveFilters, EMPTY_FILTERS } from '@/components/popup/FilterSheet';
 import RequestDataPopup from '@/components/popup/RequestDataPopup';
-import SearchBarWithFilter from '@/components/SearchBarWithFilter';
 import SearchSkeleton from '@/components/skeletons/SearchSkeleton';
 import { THEME_COLORS } from '@/constants/utilities';
 import { encodeQuery } from '@/services/embeddingService';

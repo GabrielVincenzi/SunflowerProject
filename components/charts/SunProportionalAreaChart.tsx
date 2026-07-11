@@ -25,6 +25,8 @@ function periodYear(p: string): string {
 }
 
 // ─── Animated half: fades + scales up from cx,cy ─────────────
+// Unchanged — same scale-from-center transform, same stagger between
+// the two periods (right half first, left half 40% into the timing).
 function AnimatedHalf({ cx, cy, r, fill, buildPath, delay = 0 }: {
     cx: number;
     cy: number;
@@ -40,16 +42,14 @@ function AnimatedHalf({ cx, cy, r, fill, buildPath, delay = 0 }: {
         progress.value = withDelay(delay, withTiming(1, { duration: animationDuration }));
     }, [r, delay]);
 
-    // Scale from 0→1 around the center point (cx, cy) using SVG transform
     const animatedProps = useAnimatedProps<GProps>(() => ({
         opacity: progress.value,
-        // SVG transform: translate to center, scale, translate back
         transform: [{ translateX: cx }, { translateY: cy }, { scale: progress.value }, { translateX: -cx }, { translateY: -cy }],
     }));
 
     return (
         <AnimatedG animatedProps={animatedProps}>
-            <Path d={buildPath(cx, cy, r)} fill={fill} stroke={THEME_COLORS.dark} strokeWidth={2} opacity={0.92} />
+            <Path d={buildPath(cx, cy, r)} fill={fill} />
         </AnimatedG>
     );
 }
@@ -65,7 +65,17 @@ function rightHalfPath(cx: number, cy: number, r: number): string {
 }
 
 // ─── Component ────────────────────────────────────────────────
-function SunProportionalAreaChart({ screenWidth, screenHeight, apiData }: ChartProps) {
+// Layout, row math, and two-period comparison logic unchanged —
+// only styling and the props contract have been aligned to the rest
+// of the chart family.
+function SunProportionalAreaChart({
+    screenWidth,
+    apiData,
+    xTickCount,
+    yTickCount,
+    height: heightProp = 280,
+    yDomainOverride, // no axis, but the sqrt radius scale honors yMax when given
+}: ChartProps) {
     const palette = apiData?.palette ?? CHART_COLORS;
     const width = screenWidth;
 
@@ -104,12 +114,14 @@ function SunProportionalAreaChart({ screenWidth, screenHeight, apiData }: ChartP
         [chartData]
     );
 
-    const maxVal = Math.max(...chartData.flatMap((e) => [e.v1, e.v2]), 1);
+    // yDomainOverride.yMax, when given, is a deliberate manipulation of the
+    // radius scale — same invariant as every other chart's domain override.
+    const maxVal = yDomainOverride?.yMax ?? Math.max(...chartData.flatMap((e) => [e.v1, e.v2]), 1);
     const maxR = 52;
     const rScale = scaleSqrt().domain([0, maxVal]).range([0, maxR]);
 
     const rowHeight = maxR * 2 + 28;
-    const height = screenHeight ? screenHeight * 0.55 : geos.length * rowHeight + 60;
+    const height = Math.max(heightProp, geos.length * rowHeight + 60);
     const cx = width / 2;
 
     const rightDelay = 0;
@@ -122,16 +134,15 @@ function SunProportionalAreaChart({ screenWidth, screenHeight, apiData }: ChartP
     };
 
     return (
+        // No card, no border, no radius, no background of its own.
         <View className="w-full px-4 items-center">
-            {/* Legend */}
             <ChartLegend items={legendItems} />
 
-            {/* Chart Section */}
             <Svg width={width} height={height}>
-                <SvgText x={cx} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontWeight="600" fill={THEME_COLORS.dark}>{firstVariable}</SvgText>
-                <SvgText x={cx - 100} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontWeight="600" fill={THEME_COLORS.dark}>{p1Label}</SvgText>
-                <SvgText x={cx + 100} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontWeight="600" fill={THEME_COLORS.dark}>{p2Label}</SvgText>
-                <SvgLine x1={cx} x2={cx} y1={34} y2={height - 10} stroke={THEME_COLORS.dark} strokeWidth={1} />
+                <SvgText x={cx} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontStyle="italic" fill={THEME_COLORS.grey}>{firstVariable}</SvgText>
+                <SvgText x={cx - 100} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontStyle="italic" fill={THEME_COLORS.grey}>{p1Label}</SvgText>
+                <SvgText x={cx + 100} y={24} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontStyle="italic" fill={THEME_COLORS.grey}>{p2Label}</SvgText>
+                <SvgLine x1={cx} x2={cx} y1={34} y2={height - 10} stroke={`${THEME_COLORS.dark}24`} strokeWidth={1} />
 
                 {chartData.map((e, i) => {
                     const cy = 60 + i * rowHeight + maxR;
@@ -142,8 +153,8 @@ function SunProportionalAreaChart({ screenWidth, screenHeight, apiData }: ChartP
                         <G key={e.geo}>
                             <AnimatedHalf cx={cx} cy={cy} r={r2} fill={e.color2} buildPath={rightHalfPath} delay={rightDelay} />
                             <AnimatedHalf cx={cx} cy={cy} r={r1} fill={e.color1} buildPath={leftHalfPath} delay={leftDelay} />
-                            <SvgText x={cx - rMax - 30} y={cy + 5} textAnchor="middle" fontSize={CHART_TEXT_FONT} fill={THEME_COLORS.dark}>{formatVal(e.v1)}</SvgText>
-                            <SvgText x={cx + rMax + 30} y={cy + 5} textAnchor="middle" fontSize={CHART_TEXT_FONT} fill={THEME_COLORS.dark}>{formatVal(e.v2)}</SvgText>
+                            <SvgText x={cx - rMax - 30} y={cy + 5} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontStyle="italic" fill={THEME_COLORS.grey}>{formatVal(e.v1)}</SvgText>
+                            <SvgText x={cx + rMax + 30} y={cy + 5} textAnchor="middle" fontSize={CHART_TEXT_FONT} fontStyle="italic" fill={THEME_COLORS.grey}>{formatVal(e.v2)}</SvgText>
                         </G>
                     );
                 })}

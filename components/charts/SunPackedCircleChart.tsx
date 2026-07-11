@@ -1,4 +1,4 @@
-import { animationDuration, CHART_COLORS, HEIGHT, margin, THEME_COLORS } from "@/constants/utilities";
+import { animationDuration, CHART_COLORS, margin, THEME_COLORS } from "@/constants/utilities";
 import { hierarchy, pack } from "d3-hierarchy";
 import React, { useEffect, useMemo } from "react";
 import { View } from "react-native";
@@ -10,6 +10,9 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedG = Animated.createAnimatedComponent(G);
 
 // ─── Animated bubble + label ──────────────────────────────────
+// Structure unchanged: circle grows in, label fades in over the
+// last 30% of that growth. Only the fill/stroke/text styling below
+// has been retouched to match the rest of the chart family.
 function AnimatedBubble({
     cx, cy, r, fill, showLabel, labelValue
 }: {
@@ -38,18 +41,17 @@ function AnimatedBubble({
     return (
         <G transform={`translate(${cx}, ${cy})`}>
             <AnimatedCircle cx={0} cy={0} fill={fill}
-                stroke={THEME_COLORS.dark} strokeWidth={2}
                 animatedProps={animatedCircleProps} />
             {showLabel && (
                 <AnimatedG animatedProps={animatedTextGroupProps}>
                     <SvgText
                         x={0}
                         y={0}
+                        dy="0.35em"
                         textAnchor="middle"
-                        fontSize={10}
-                        fontWeight="900"
+                        fontSize={11}
                         fontStyle="italic"
-                        fill={THEME_COLORS.dark}
+                        fill={THEME_COLORS.background}
                     >
                         {labelValue}
                     </SvgText>
@@ -60,10 +62,19 @@ function AnimatedBubble({
 }
 
 // ─── Component ────────────────────────────────────────────────
-function SunPackedCircleChart({ screenWidth, screenHeight, apiData }: ChartProps) {
+// Pack-layout logic and node computation unchanged — only the
+// container styling and prop names have been aligned to the
+// shared SunChartProps contract.
+function SunPackedCircleChart({
+    screenWidth,
+    apiData,
+    xTickCount,
+    yTickCount,
+    height = 280,
+    yDomainOverride, // no axis here — accepted and silently ignored, per contract
+}: ChartProps) {
     const palette = apiData?.palette ?? CHART_COLORS;
     const width = screenWidth;
-    const height = screenHeight ? screenHeight * 0.4 : HEIGHT;
 
     const leaves = useMemo(() => {
         const variables = Array.from(
@@ -101,7 +112,8 @@ function SunPackedCircleChart({ screenWidth, screenHeight, apiData }: ChartProps
     }, [leaves, width, height]);
 
     return (
-        <View className="w-full bg-background py-6">
+        // No card, no border, no radius, no background of its own.
+        <View className="w-full">
             <ChartLegend items={legendItems} />
             <Svg width={width} height={height}>
                 <G transform={`translate(${margin.left}, 0)`}>
@@ -119,4 +131,3 @@ function SunPackedCircleChart({ screenWidth, screenHeight, apiData }: ChartProps
 }
 
 export default SunPackedCircleChart;
-

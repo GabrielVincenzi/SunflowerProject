@@ -1,7 +1,21 @@
-import { CHART_COLORS, THEME_COLORS } from '@/constants/utilities';
-import React, { useMemo } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
-import Svg, { Circle, G, Line, Polygon, Rect, Text as SvgText } from 'react-native-svg';
+import { animationDuration, CHART_COLORS, THEME_COLORS } from '@/constants/utilities';
+import { detectScale } from '@/functions/formatHandlers';
+import { scaleLinear } from 'd3-scale';
+import React, { useEffect, useMemo } from 'react';
+import { Dimensions, View } from 'react-native';
+import Animated, {
+    Easing,
+    useAnimatedProps,
+    useSharedValue,
+    withDelay,
+    withTiming,
+} from 'react-native-reanimated';
+import Svg, { Circle, G, Polygon, Rect, Line as SvgLine, Text as SvgText } from 'react-native-svg';
+import ChartLegend from '../chartscomp/ChartLegend';
+
+const AnimatedLine = Animated.createAnimatedComponent(SvgLine);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const AnimatedG = Animated.createAnimatedComponent(G);
 
 // Shape type decider for multi-dimensional indicators (matched to Eurostat reference)
 const getShapeType = (index: number) => {
@@ -9,13 +23,104 @@ const getShapeType = (index: number) => {
     return shapes[index % shapes.length];
 };
 
+// Static shape renderer — no heavy stroke. Each mark sits on a cream
+// punch-out halo, the same "pop against the surface" motif used for
+// SunLineChart's end-of-line dots and the range chart's end points.
+function renderRNShape(cx: number, cy: number, color: string, type: string, size = 6) {
+    switch (type) {
+        case 'diamond':
+            return (
+                <Polygon
+                    points={`${cx},${cy - size - 2} ${cx + size + 2},${cy} ${cx},${cy + size + 2} ${cx - size - 2},${cy}`}
+                    fill={color}
+                />
+            );
+        case 'square':
+            return <Rect x={cx - size} y={cy - size} width={2 * size} height={2 * size} fill={color} />;
+        case 'triangle':
+            return (
+                <Polygon
+                    points={`${cx},${cy - size - 1} ${cx + size + 1},${cy + size + 1} ${cx - size - 1},${cy + size + 1}`}
+                    fill={color}
+                />
+            );
+        case 'circle':
+        default:
+            return <Circle cx={cx} cy={cy} r={size + 1} fill={color} />;
+    }
+}
+
+// ─── Connector — the lane's range, grown upward from its low point
+// to its high point. Same line-draw idea as every other chart's
+// data-reveal animation, just vertical here.
+function AnimatedConnector({
+    x, yLow, yHigh, delay,
+}: { x: number; yLow: number; yHigh: number; delay: number }) {
+    const progress = useSharedValue(0);
+
+    useEffect(() => {
+        progress.value = withDelay(
+            delay,
+            withTiming(1, { duration: animationDuration, easing: Easing.bezier(0.16, 1, 0.3, 1) })
+        );
+    }, []);
+
+    const animatedProps = useAnimatedProps(() => ({
+        y2: yLow + (yHigh - yLow) * progress.value,
+    }));
+
+    return (
+        <AnimatedLine
+            x1={x} x2={x}
+            y1={yLow}
+            stroke={THEME_COLORS.grey}
+            strokeWidth={1.5}
+            animatedProps={animatedProps}
+        />
+    );
+}
+
+// ─── Indicator mark — pops in with a spring overshoot once the
+// connector has drawn past its position, so multi-level markers
+// appear to "settle onto" the lane in sequence.
+function AnimatedMark({
+    x, y, color, shape, delay,
+}: { x: number; y: number; color: string; shape: string; delay: number }) {
+    const opacity = useSharedValue(0);
+    const scale = useSharedValue(0.5);
+
+    useEffect(() => {
+        opacity.value = withDelay(delay, withTiming(1, { duration: 260, easing: Easing.out(Easing.quad) }));
+        scale.value = withDelay(delay, withTiming(1, { duration: 340, easing: Easing.out(Easing.back(1.6)) }));
+    }, []);
+
+    const haloProps = useAnimatedProps(() => ({ opacity: opacity.value, r: 10 * scale.value }));
+    const markProps = useAnimatedProps(() => ({ opacity: opacity.value }));
+
+    return (
+        <G>
+            <AnimatedCircle cx={x} cy={y} fill={THEME_COLORS.background} animatedProps={haloProps} />
+            <AnimatedG animatedProps={markProps}>
+                {renderRNShape(x, y, color, shape, 5.5)}
+            </AnimatedG>
+        </G>
+    );
+}
+
+// ─── SunMultiVerticalChart ──────────────────────────────────────
+// Full-width, card-free — matches the shared SunChartProps contract.
+// yDomainOverride skips .nice() exactly like every other chart, since
+// an explicit override is a deliberate manipulation and shouldn't be
+// silently rounded.
 export default function SunMultiVerticalChart({
     apiData,
     screenWidth: customWidth,
-    screenHeight: customHeight,
+    height = 280,
+    xTickCount,
+    yTickCount = 5,
+    yDomainOverride,
 }: ChartProps) {
     const screenWidth = customWidth ?? (Dimensions.get('window').width - 32);
-    const height = customHeight ?? 420;
 
     const paddingLeft = 50;
     const paddingRight = 20;
@@ -25,7 +130,6 @@ export default function SunMultiVerticalChart({
     const chartWidth = screenWidth - paddingLeft - paddingRight;
     const chartHeight = height - paddingTop - paddingBottom;
 
-    // Extract variables dynamically (e.g., Indicators or Years)
     const variables = useMemo(() => {
         if (!apiData || !apiData.series) return [];
         return Array.from(
@@ -35,7 +139,6 @@ export default function SunMultiVerticalChart({
 
     const activeGeos = apiData?.activeGeos ?? [];
 
-    // Parse structured data dynamically representing multi-dimensional dots stacked on lanes
     const parsedChartData = useMemo(() => {
         if (!apiData || !apiData.series) return [];
 
@@ -43,179 +146,124 @@ export default function SunMultiVerticalChart({
             const values = variables.map((v) => {
                 const key = `${v}_${geo}`;
                 const dataPoints = apiData.series[key] || [];
-                // Robust fallback: Always extract the first period value configuration
                 const val = dataPoints[0]?.value ?? 0;
                 return {
                     name: apiData.variableLabels?.[v] ?? v,
                     value: val
                 };
             });
-            return {
-                label: geo,
-                values
-            };
+            return { label: geo, values };
         });
     }, [apiData, variables, activeGeos]);
 
-    // Compute Scales and Limits
     const allValues = useMemo(() => {
         return parsedChartData.flatMap((d) => d.values.map((v) => v.value));
     }, [parsedChartData]);
 
-    const minY = useMemo(() => {
-        if (allValues.length === 0) return 0;
-        return Math.max(0, Math.min(...allValues) - 5);
-    }, [allValues]);
+    const domainMin = useMemo(() => {
+        if (yDomainOverride?.yMin !== undefined) return yDomainOverride.yMin;
+        return allValues.length ? Math.max(0, Math.min(...allValues) - 5) : 0;
+    }, [allValues, yDomainOverride]);
 
-    const maxY = useMemo(() => {
-        if (allValues.length === 0) return 40;
-        return Math.max(20, Math.max(...allValues) + 5);
-    }, [allValues]);
+    const domainMax = useMemo(() => {
+        if (yDomainOverride?.yMax !== undefined) return yDomainOverride.yMax;
+        return allValues.length ? Math.max(20, Math.max(...allValues) + 5) : 40;
+    }, [allValues, yDomainOverride]);
+
+    const yScale = useMemo(() => {
+        const s = scaleLinear().domain([domainMin, domainMax]).range([paddingTop + chartHeight, paddingTop]);
+        if (!yDomainOverride) s.nice();
+        return s;
+    }, [domainMin, domainMax, paddingTop, chartHeight, yDomainOverride]);
+
+    const yTicks = yScale.ticks(yTickCount);
+    const maxAbs = allValues.length ? Math.max(...allValues.map(v => Math.abs(v))) : 0;
+    const { factor: yFactor } = detectScale(maxAbs);
 
     const getX = (index: number) => {
         const totalItems = parsedChartData.length;
         return paddingLeft + (index / Math.max(totalItems - 1, 1)) * chartWidth;
     };
 
-    const getY = (val: number) => {
-        return paddingTop + chartHeight - ((val - minY) / Math.max(maxY - minY, 1)) * chartHeight;
-    };
-
-    // Uses selected palette parameter, API palette, or fallback to the brand utility colors
     const palette = apiData?.palette ?? CHART_COLORS;
 
+    const legendItems = useMemo(() => variables.map((v, i) => ({
+        label: apiData.variableLabels?.[v] ?? v,
+        color: palette[i % palette.length],
+    })), [variables, apiData, palette]);
+
     if (parsedChartData.length === 0) {
-        return <View style={styles.emptyContainer} />;
+        return <View className="h-[150px] items-center justify-center" />;
     }
 
-    // Render shapes helper matching high-contrast vector symbols
-    const renderRNShape = (cx: number, cy: number, color: string, type: string, size = 6) => {
-        const strokeProps = {
-            stroke: THEME_COLORS.dark,
-            strokeWidth: 1.5,
-        };
-
-        switch (type) {
-            case 'diamond':
-                return (
-                    <Polygon
-                        points={`${cx},${cy - size - 2} ${cx + size + 2},${cy} ${cx},${cy + size + 2} ${cx - size - 2},${cy}`}
-                        fill={color}
-                        {...strokeProps}
-                    />
-                );
-            case 'square':
-                return (
-                    <Rect
-                        x={cx - size}
-                        y={cy - size}
-                        width={2 * size}
-                        height={2 * size}
-                        fill={color}
-                        {...strokeProps}
-                    />
-                );
-            case 'triangle':
-                return (
-                    <Polygon
-                        points={`${cx},${cy - size - 1} ${cx + size + 1},${cy + size + 1} ${cx - size - 1},${cy + size + 1}`}
-                        fill={color}
-                        {...strokeProps}
-                    />
-                );
-            case 'circle':
-            default:
-                return (
-                    <Circle
-                        cx={cx}
-                        cy={cy}
-                        r={size + 1}
-                        fill={color}
-                        {...strokeProps}
-                    />
-                );
-        }
-    };
-
     return (
-        <View style={styles.container}>
+        // No card, no border, no radius, no background of its own.
+        <View className="w-full">
+            <ChartLegend items={legendItems} />
+
             <Svg width={screenWidth} height={height}>
-                {/* Horizontal grid guide lines */}
-                {[0, 10, 20, 30, 40].map((baseline) => {
-                    if (baseline < minY || baseline > maxY) return null;
-                    const y = getY(baseline);
+                {/* Horizontal gridlines — recessive, dashed; zero line as a hairline */}
+                {yTicks.map((tick) => {
+                    const y = yScale(tick);
+                    const isBaseline = tick === 0;
                     return (
-                        <G key={baseline}>
-                            <Line
+                        <G key={tick}>
+                            <SvgLine
                                 x1={paddingLeft - 5}
                                 x2={paddingLeft + chartWidth + 5}
                                 y1={y}
                                 y2={y}
-                                stroke={THEME_COLORS.dark}
-                                strokeWidth={baseline === 0 ? 1.5 : 0.8}
-                                strokeDasharray={baseline === 0 ? undefined : "3 3"}
-                                opacity={0.08}
+                                stroke={isBaseline ? `${THEME_COLORS.dark}24` : THEME_COLORS.subtle}
+                                strokeWidth={1}
+                                strokeDasharray={isBaseline ? undefined : "4,5"}
                             />
                             <SvgText
                                 x={paddingLeft - 10}
                                 y={y + 3}
-                                fontSize={8}
-                                fontWeight="bold"
+                                fontSize={11}
+                                fontStyle="italic"
                                 textAnchor="end"
-                                fill={THEME_COLORS.dark}
-                                opacity={0.4}
+                                fill={THEME_COLORS.grey}
                             >
-                                {`${baseline}`}
+                                {tick === 0 ? "0" : `${(tick / yFactor).toFixed(0)}`}
                             </SvgText>
                         </G>
                     );
                 })}
 
-                {/* Lanes & Stacked Nodes */}
+                {/* Lanes & stacked indicators */}
                 {parsedChartData.map((row, index) => {
                     const x = getX(index);
                     const values = row.values.map(v => v.value);
                     if (values.length === 0) return null;
 
-                    const minVal = Math.min(...values);
-                    const maxVal = Math.max(...values);
-
-                    const yMin = getY(minVal);
-                    const yMax = getY(maxVal);
+                    const yLow = yScale(Math.min(...values));
+                    const yHigh = yScale(Math.max(...values));
+                    const laneDelay = index * 80;
 
                     return (
                         <G key={index}>
-                            {/* Vertical connector Lane */}
-                            <Line
-                                x1={x}
-                                x2={x}
-                                y1={yMin}
-                                y2={yMax}
-                                stroke={THEME_COLORS.grey}
-                                strokeWidth={1.5}
-                            />
+                            <AnimatedConnector x={x} yLow={yLow} yHigh={yHigh} delay={laneDelay} />
 
-                            {/* Multi-level Indicators */}
-                            {row.values.map((v, valIdx) => {
-                                const y = getY(v.value);
-                                const color = palette[valIdx % palette.length];
-                                const shape = getShapeType(valIdx);
+                            {row.values.map((v, valIdx) => (
+                                <AnimatedMark
+                                    key={valIdx}
+                                    x={x}
+                                    y={yScale(v.value)}
+                                    color={palette[valIdx % palette.length]}
+                                    shape={getShapeType(valIdx)}
+                                    delay={laneDelay + animationDuration + valIdx * 80}
+                                />
+                            ))}
 
-                                return (
-                                    <G key={valIdx}>
-                                        {renderRNShape(x, y, color, shape, 5.5)}
-                                    </G>
-                                );
-                            })}
-
-                            {/* Category labels rotated dynamically */}
+                            {/* Category label — muted supporting text, sentence case */}
                             <SvgText
                                 x={x}
                                 y={paddingTop + chartHeight + 15}
-                                fontSize={8}
-                                fontWeight="bold"
+                                fontSize={11}
+                                fontStyle="italic"
                                 textAnchor="middle"
-                                fill={THEME_COLORS.dark}
+                                fill={THEME_COLORS.grey}
                                 transform={`rotate(-25 ${x} ${paddingTop + chartHeight + 15})`}
                             >
                                 {row.label.length > 10 ? `${row.label.slice(0, 10)}..` : row.label}
@@ -227,19 +275,3 @@ export default function SunMultiVerticalChart({
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: THEME_COLORS.background,
-        borderWidth: 2,
-        borderColor: THEME_COLORS.dark,
-        borderRadius: 24,
-        padding: 8,
-        alignSelf: 'stretch',
-    },
-    emptyContainer: {
-        height: 150,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-});

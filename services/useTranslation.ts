@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchTranslations } from './api';
 
 export function useTranslations() {
-    const { lang } = useLanguage();
+    const { lang, isReady } = useLanguage();
     return useQuery<Translations>({
         queryKey: ['translations', lang],
         queryFn: async () => {
@@ -19,6 +19,7 @@ export function useTranslations() {
                 throw e;
             }
         },
+        enabled: isReady,
         staleTime: Infinity,
         gcTime: Infinity,
     });

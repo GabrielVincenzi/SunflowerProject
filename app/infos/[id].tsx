@@ -18,10 +18,10 @@ import { deleteSavedEvent, fetchChartData, fetchDbAvailabilities, fetchSavedIdsE
 
 // Chart Components Mapping
 import SunLineChart from "@/components/charts/SunLineChart";
-import { SearchableSelect } from "@/components/SearchableSelect";
+import { SearchableSelect } from "@/components/filters/SearchableSelect";
 import { CHART_PALETTES, CHART_REGISTRY } from "@/constants/charts";
+import { THEME_COLORS } from "@/constants/utilities";
 import { useTranslations } from "@/services/useTranslation";
-import {THEME_COLORS } from "@/constants/utilities";
 
 type PaletteKey = keyof typeof CHART_PALETTES;
 type ChartTypeKey = keyof typeof CHART_REGISTRY;
@@ -295,6 +295,7 @@ const ChartPage = () => {
                 <Text className="text-dark/40 font-elms-bold italic uppercase tracking-widest">
                     {t.chartPage.header.signalAnalysisLabel}
                 </Text>
+                <SunButton text="Go back" onPress={() => router.back()} className="mt-6" />
             </View>
         );
 

@@ -3,7 +3,6 @@ const baseUrl = process.env.EXPO_PUBLIC_AZURE_URL?.replace(/\/$/, "");
 export type AuthFetch = (url: string, options?: RequestInit) => Promise<Response>;
 
 // ── Chart GET requests ────────────────────────────────────────────────────────
-
 export const fetchAllChartDetails = async ({
     query,
     vector,

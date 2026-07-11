@@ -1,3 +1,4 @@
+import { THEME_COLORS } from "@/constants/utilities";
 import { useTranslations } from "@/services/useTranslation";
 import { useAuth, useSignIn, useSSO } from "@clerk/clerk-expo";
 import { OAuthStrategy } from "@clerk/types";
@@ -28,6 +29,7 @@ const SignIn = () => {
 
     const [email, setEmail] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isEmailFocused, setIsEmailFocused] = useState(false);
 
     if (!isLoaded || !data) return null;
     const t: any = data.payload;
@@ -63,82 +65,142 @@ const SignIn = () => {
         }
     };
 
+    // Same offset "pop" card used for pills and option rows elsewhere in the
+    // app — just toned down a notch. The backing layer is a muted secondary
+    // color rather than full primary yellow, so these two read as secondary
+    // actions and don't compete with the one dominant CTA below.
     const SocialCard = ({ icon, label, provider }: any) => (
-        <View className="relative w-full mb-4">
-            <View className="absolute inset-0 bg-dark rounded-[24px] translate-y-1.5" />
+        <View className="relative w-full mb-3.5">
+            <View
+                className="absolute inset-0 rounded-[22px] translate-y-[5px] translate-x-[5px]"
+                style={{ backgroundColor: THEME_COLORS.secondary, opacity: 0.5 }}
+            />
             <TouchableOpacity
-                activeOpacity={0.9}
+                activeOpacity={0.85}
                 onPress={() => handleSocialSignIn(provider)}
-                className="bg-white border-2 border-dark py-5 px-6 rounded-[24px] flex-row items-center justify-center gap-4"
+                className="py-4 px-6 rounded-[22px] border-[1.5px] flex-row items-center justify-center gap-3"
+                style={{ backgroundColor: THEME_COLORS.background, borderColor: THEME_COLORS.dark }}
             >
-                <AntDesign name={icon} size={24} color="#141414" />
-                <Text className="text-xl font-elms-bold italic tracking-tight text-dark">{label}</Text>
+                <AntDesign name={icon} size={20} color={THEME_COLORS.dark} />
+                <Text className="text-base font-elms-bold" style={{ color: THEME_COLORS.dark }}>{label}</Text>
             </TouchableOpacity>
         </View>
     );
 
+    const emailReady = email.trim().length > 0;
+
     return (
         <KeyboardAvoidingView
-            className="flex-1 bg-primary"
+            className="flex-1"
+            style={{ backgroundColor: THEME_COLORS.background }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={keyboardVerticalOffset}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }} scrollEnabled={false}>
-                    <SafeAreaView className="flex-1 px-8 pt-10">
-                        <View className="items-center mb-12">
-                            <View className="w-24 h-24 bg-dark rounded-[32px] items-center justify-center shadow-xl mb-6">
-                                <Image
-                                    className="w-16 h-16"
-                                    source={require('@/assets/images/logoMain.png')}
-                                    resizeMode="contain"
+                    <SafeAreaView className="flex-1 px-7 pt-8">
+                        {/* Brand mark — same offset-pop treatment as the buttons below,
+                            so it reads as part of the same system rather than a
+                            leftover from an older screen. */}
+                        <View className="items-center mb-10">
+                            <View className="relative mb-6">
+                                <View
+                                    className="absolute rounded-[28px] top-[6px] left-[6px] right-[-6px] bottom-[-6px]"
+                                    style={{ backgroundColor: THEME_COLORS.primary }}
                                 />
+                                <View
+                                    className="w-20 h-20 rounded-[28px] items-center justify-center"
+                                    style={{ backgroundColor: THEME_COLORS.dark }}
+                                >
+                                    <Image
+                                        className="w-11 h-11"
+                                        source={require('@/assets/images/logoMain.png')}
+                                        resizeMode="contain"
+                                    />
+                                </View>
                             </View>
-                            <Text className="text-4xl font-elms-bold italic tracking-tighter text-dark text-center leading-none">
+                            <Text
+                                className="font-elms-bold italic text-[32px] text-center"
+                                style={{ color: THEME_COLORS.dark, lineHeight: 34 }}
+                            >
                                 {t.signIn.title}
                             </Text>
                         </View>
 
-                        <View className="gap-2">
+                        <View>
                             <SocialCard icon="apple" label={t.signIn.socialButtons.apple} provider="oauth_apple" />
                             <SocialCard icon="google" label={t.signIn.socialButtons.google} provider="oauth_google" />
                         </View>
 
-                        <View className="flex-row items-center my-10 gap-4">
-                            <View className="flex-1 h-[2px] bg-dark opacity-10" />
-                            <Text className="text-[10px] font-elms-bold uppercase tracking-[0.3em] text-dark/30">
+                        <View className="flex-row items-center my-8 gap-3">
+                            <View className="flex-1 h-[1.5px]" style={{ backgroundColor: "rgba(52,58,64,0.12)" }} />
+                            <Text
+                                className="font-elms-bold text-[10px] uppercase tracking-[0.25em]"
+                                style={{ color: "rgba(52,58,64,0.35)" }}
+                            >
                                 {t.signIn.orSeparator}
                             </Text>
-                            <View className="flex-1 h-[2px] bg-dark opacity-10" />
+                            <View className="flex-1 h-[1.5px]" style={{ backgroundColor: "rgba(52,58,64,0.12)" }} />
                         </View>
 
-                        <View className="space-y-4">
-                            <View className="relative w-full mb-2">
-                                <View className="absolute inset-0 bg-dark/5 rounded-[24px] translate-y-1" />
-                                <TextInput
-                                    className="border-2 border-dark rounded-[24px] p-5 font-elms-bold italic text-lg bg-white/50"
-                                    placeholder="Access ID (Email)"
-                                    placeholderTextColor="rgba(20,20,20,0.2)"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    autoCapitalize="none"
-                                    keyboardType="email-address"
-                                />
-                            </View>
+                        <View className="gap-3">
+                            {/* Text field is deliberately flat — no offset "pop" shadow.
+                                That affordance is reserved for tappable buttons; giving
+                                an input the same treatment tells the eye it's pushable
+                                like a button, which it isn't. Focus state just darkens
+                                the border, which is the correct signal for a field. */}
+                            <TextInput
+                                className="py-4 px-5 rounded-[20px] font-elms-regular text-base border-[1.5px]"
+                                style={{
+                                    backgroundColor: THEME_COLORS.background,
+                                    borderColor: isEmailFocused ? THEME_COLORS.dark : "rgba(52,58,64,0.16)",
+                                    color: THEME_COLORS.dark,
+                                }}
+                                placeholder="Access ID (Email)"
+                                placeholderTextColor="rgba(52,58,64,0.35)"
+                                value={email}
+                                onChangeText={setEmail}
+                                onFocus={() => setIsEmailFocused(true)}
+                                onBlur={() => setIsEmailFocused(false)}
+                                autoCapitalize="none"
+                                keyboardType="email-address"
+                                autoComplete="email"
+                                returnKeyType="go"
+                                onSubmitEditing={handleEmailSignIn}
+                            />
 
-                            <TouchableOpacity
-                                onPress={handleEmailSignIn}
-                                disabled={isSubmitting}
-                                className="bg-dark py-6 rounded-[24px] items-center justify-center active:scale-[0.98]"
-                            >
-                                <Text className="text-primary font-elms-bold italic text-xl tracking-widest">
-                                    {isSubmitting ? "..." : t.signIn.nextButton.toUpperCase()}
-                                </Text>
-                            </TouchableOpacity>
+                            {/* Primary CTA — the one button on this screen that gets the
+                                full-strength offset-pop treatment, dimming when the
+                                field is empty so the disabled state is visible before
+                                the user even taps it (handleEmailSignIn already no-ops
+                                on empty email; this just surfaces that state). */}
+                            <View className="relative">
+                                <View
+                                    className="absolute inset-0 rounded-[22px] translate-y-[5px] translate-x-[5px]"
+                                    style={{ backgroundColor: THEME_COLORS.primary, opacity: emailReady ? 1 : 0.4 }}
+                                />
+                                <TouchableOpacity
+                                    onPress={handleEmailSignIn}
+                                    disabled={isSubmitting || !emailReady}
+                                    activeOpacity={0.9}
+                                    className="py-4.5 rounded-[22px] items-center justify-center"
+                                    style={{ backgroundColor: THEME_COLORS.dark, opacity: emailReady ? 1 : 0.5 }}
+                                >
+                                    <Text
+                                        className="font-elms-bold italic text-lg tracking-wide"
+                                        style={{ color: THEME_COLORS.background }}
+                                    >
+                                        {isSubmitting ? "..." : t.signIn.nextButton}
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
 
                             <Link href={"/(tabs)/home"} replace asChild>
                                 <TouchableOpacity className="py-4 items-center">
-                                    <Text className="text-dark/40 font-elms-bold italic uppercase tracking-widest text-xs">
+                                    <Text
+                                        className="font-elms-regular text-[13px] underline"
+                                        style={{ color: "rgba(52,58,64,0.5)" }}
+                                    >
                                         {t.signIn.skip}
                                     </Text>
                                 </TouchableOpacity>

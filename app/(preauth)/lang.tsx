@@ -1,15 +1,24 @@
+import OptionCard from "@/components/cards/OptionCard";
+import OutlineFlower from "@/components/design/OutlineSunFlower";
 import { useLanguage } from "@/components/layoutcomp/LanguageContext";
-import SunButton from "@/components/SunButton";
+import SunButton from "@/components/SunButton2";
 import { LANGUAGE_TITLES, THEME_COLORS } from "@/constants/utilities";
 import { translationStorage } from "@/interfaces/translationStorage";
+import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+
+const LANGUAGES = [
+    { code: "en", label: "English", description: "Use the app in English" },
+    { code: "it", label: "Italiano", description: "Usa l'app in italiano" },
+];
 
 const LanguageSelection = () => {
     const { setLang } = useLanguage();
+    const [selected, setSelected] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [index, setIndex] = useState(0);
     const queryClient = useQueryClient();
@@ -29,55 +38,77 @@ const LanguageSelection = () => {
         opacity: opacity.value,
     }));
 
-    const selectLanguage = async (newLang: string) => {
+    const confirmLanguage = async () => {
+        if (!selected) return;
         setLoading(true);
 
-        // 1. Clear AsyncStorage for this lang — so queryFn doesn't short-circuit
-        await translationStorage.clear(newLang);
+        try {
+            // 1. Clear AsyncStorage for this lang — so queryFn doesn't short-circuit
+            await translationStorage.clear(selected);
 
-        // 2. Remove RQ cache entry entirely — invalidateQueries isn't enough
-        //    because staleTime: Infinity would still return the in-memory value
-        queryClient.removeQueries({ queryKey: ['translations', newLang] });
+            // 2. Remove RQ cache entry entirely — invalidateQueries isn't enough
+            //    because staleTime: Infinity would still return the in-memory value
+            queryClient.removeQueries({ queryKey: ["translations", selected] });
 
-        // 3. Update context — triggers useQuery to run queryFn fresh
-        await setLang(newLang);
+            // 3. Update context — triggers useQuery to run queryFn fresh
+            await setLang(selected);
 
-        requestAnimationFrame(() => {
-            router.replace('/(auth)/welcome');
-        });
-
-        setLoading(false);
+            requestAnimationFrame(() => {
+                router.replace("/(auth)/welcome");
+            });
+        } finally {
+            setLoading(false);
+        }
     };
-
-    const LanguageNode = ({ title, onPress }: any) => (
-        <View className="relative w-full mb-6">
-            <View className="absolute mx-4 inset-0 bg-background rounded-[32px] translate-x-1.5 translate-y-1.5" />
-            <SunButton text={title} onPress={onPress}
-            />
-        </View>
-    );
 
     return (
         <ScrollView
             contentContainerStyle={{ paddingBottom: 100 }}
             showsVerticalScrollIndicator={false}
-            className="flex-1 bg-primary px-8"
+            className="flex-1 bg-background px-8"
         >
             <View className="pt-24 pb-6 items-center">
-                <View className="w-24 h-24 bg-dark rounded-[32px] items-center justify-center shadow-xl mb-12">
-                    <Text className="text-primary font-elms-bold text-4xl italic">S</Text>
-                </View>
+                <OutlineFlower size={140} />
+
                 <Animated.Text
                     style={animatedStyle}
-                    className="text-dark text-2xl font-elms-bold text-center mb-16"
+                    className="text-dark text-2xl font-elms-bold text-center mb-2 mt-4"
                 >
                     {LANGUAGE_TITLES[index]}
                 </Animated.Text>
-                <View className="w-full space-y-1">
-                    <LanguageNode title="English" onPress={() => selectLanguage('en')} />
-                    <LanguageNode title="Italiano" onPress={() => selectLanguage('it')} />
+
+                <Text
+                    className="font-elms-regular text-[13px] text-center mb-10"
+                    style={{ color: "rgba(52,58,64,0.5)" }}
+                >
+                    Choose your language to continue
+                </Text>
+
+                <View className="w-full gap-4 mb-10">
+                    {LANGUAGES.map((l, i) => (
+                        <OptionCard
+                            key={l.code}
+                            icon="globe"
+                            label={l.label}
+                            description={l.description}
+                            selected={selected === l.code}
+                            onPress={() => setSelected(l.code)}
+                            delay={100 + i * 70}
+                            active={true}
+                        />
+                    ))}
                 </View>
-                {loading && <ActivityIndicator color={THEME_COLORS.dark} className="mt-8" />}
+
+                <SunButton
+                    label={loading ? "Loading..." : "Continue"}
+                    icon={
+                        !loading && (
+                            <Feather name="arrow-right" size={15} color={THEME_COLORS.background} />
+                        )
+                    }
+                    onPress={confirmLanguage}
+                    disabled={!selected || loading}
+                />
             </View>
         </ScrollView>
     );

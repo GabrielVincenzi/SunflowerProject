@@ -49,6 +49,7 @@ interface CardProps {
   variableLabels: Record<string, string>;
   chart_type: string;
   category?: string;
+  source?: string | null;
   featured?: boolean;
 }
 

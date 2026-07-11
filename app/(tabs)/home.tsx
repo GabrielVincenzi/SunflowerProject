@@ -7,7 +7,7 @@ import { MiniCard } from "@/components/cards/MiniCard";
 import QuestionCard from "@/components/cards/QuestionCard";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import ManipulatorsStudio from "@/components/eductools/ManipulationStudio";
-import HomeHeader from "@/components/HomeHeader";
+import HomeHeader from "@/components/layoutcomp/HomeHeader";
 import QuestionPopup from "@/components/popup/QuestionPopUp";
 import HomeSkeleton from "@/components/skeletons/HomeSkeleton";
 import { images } from "@/constants/images";
@@ -150,6 +150,7 @@ export default function Index() {
                         <CategoryCarousel />
                     </Animated.View>
                 </View>
+
             </ScrollView>
 
             {/* Question popup */}
