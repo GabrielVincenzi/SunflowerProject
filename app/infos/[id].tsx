@@ -46,7 +46,7 @@ export const PaletteSelect = ({ value, onChange }: Props) => {
                     activeOpacity={0.85}
                 >
                     <View className="flex-row items-center gap-3 flex-1 mr-2">
-                        <Text className="text-lg font-elms-bold italic text-dark tracking-tight">{active.name}</Text>
+                        <Text className="text-lg font-sf-bold italic text-dark tracking-tight">{active.name}</Text>
                         {/* Continuous gradient-style swatch indicator */}
                         <View className="flex-1 flex-row h-3 rounded-full overflow-hidden border border-dark/10">
                             {active.colors.map((c, i) => (
@@ -81,7 +81,7 @@ export const PaletteSelect = ({ value, onChange }: Props) => {
                                     activeOpacity={0.7}
                                 >
                                     <View className="w-[100px]">
-                                        <Text className="text-[15px] font-elms-bold italic text-dark" numberOfLines={1}>{palette.name}</Text>
+                                        <Text className="text-[15px] font-sf-bold italic text-dark" numberOfLines={1}>{palette.name}</Text>
                                     </View>
 
                                     <View className="flex-1 flex-row h-[18px] rounded-md overflow-hidden border border-dark/10">
@@ -93,7 +93,7 @@ export const PaletteSelect = ({ value, onChange }: Props) => {
                                     <View className="flex-row items-center gap-2">
                                         {palette.colorblindSafe && (
                                             <View className="bg-dark/5 px-2 py-0.5 rounded-full">
-                                                <Text className="text-[8px] font-elms-bold text-dark/50 uppercase tracking-wider">Safe</Text>
+                                                <Text className="text-[8px] font-sf-bold text-dark/50 uppercase tracking-wider">Safe</Text>
                                             </View>
                                         )}
                                         {isSelected && <Feather name="check" size={15} color="#141414" />}
@@ -292,7 +292,7 @@ const ChartPage = () => {
     if (!enrichedApiData || isLoadingSavedSet || isFetchingChart)
         return (
             <View className="flex-1 bg-background justify-center items-center">
-                <Text className="text-dark/40 font-elms-bold italic uppercase tracking-widest">
+                <Text className="text-dark/40 font-sf-bold italic uppercase tracking-widest">
                     {t.chartPage.header.signalAnalysisLabel}
                 </Text>
                 <SunButton text="Go back" onPress={() => router.back()} className="mt-6" />
@@ -309,11 +309,11 @@ const ChartPage = () => {
                 <Animated.View entering={FadeInDown.delay(100)} className="px-8 mt-14 mb-8">
                     <View className="flex-row items-center gap-3 mb-4">
                         <View className="h-[2px] w-10 bg-dark" />
-                        <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
+                        <Text className="text-[10px] uppercase font-sf-bold tracking-[0.4em] text-dark/40">
                             {t.chartPage.header.signalAnalysis} // {String(selectedChartType).toUpperCase()}
                         </Text>
                     </View>
-                    <Text className="text-3xl font-elms-bold italic text-dark tracking-tighter leading-none">
+                    <Text className="text-3xl font-sf-bold italic text-dark tracking-tighter leading-none">
                         {title}
                     </Text>
                 </Animated.View>
@@ -329,8 +329,8 @@ const ChartPage = () => {
                 {/* 3. Action Logic Bar */}
                 <View className="px-8 flex-row items-center justify-between">
                     <View className="flex-1 mr-4">
-                        <Text className="text-[9px] uppercase font-elms-bold text-dark/40 tracking-[0.2em] mb-1">{t.chartPage.actionBar.dataSourceLabel}</Text>
-                        <Text className="text-xs font-elms-bold italic text-dark uppercase leading-none">{availableData?.dbSource || t.chartPage.actionBar.dataSourceFallback}</Text>
+                        <Text className="text-[9px] uppercase font-sf-bold text-dark/40 tracking-[0.2em] mb-1">{t.chartPage.actionBar.dataSourceLabel}</Text>
+                        <Text className="text-xs font-sf-bold italic text-dark uppercase leading-none">{availableData?.dbSource || t.chartPage.actionBar.dataSourceFallback}</Text>
                     </View>
 
                     <View className="flex-row gap-4">
@@ -371,9 +371,9 @@ const ChartPage = () => {
                 <Animated.View entering={FadeInDown.delay(600)} className="px-8 mt-4 pt-8 border-t border-dark/5">
                     <View className="flex-row items-center gap-2 mb-4">
                         <View className="w-2 h-2 rounded-full bg-primary" />
-                        <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.4em]">{t.chartPage.synthesis.label}</Text>
+                        <Text className="text-[10px] uppercase font-sf-bold text-dark/40 tracking-[0.4em]">{t.chartPage.synthesis.label}</Text>
                     </View>
-                    <Text className="text-xl font-elms-regular italic text-dark/70 leading-relaxed">
+                    <Text className="text-xl font-sf-regular italic text-dark/70 leading-relaxed">
                         {description}
                     </Text>
                 </Animated.View>
@@ -405,7 +405,7 @@ const ChartPage = () => {
                     <View className="p-8 flex-1">
                         {/* Overlay Header */}
                         <View className="flex-row justify-between items-center mt-8 mb-12">
-                            <Text className="text-5xl font-elms-bold italic text-dark tracking-tighter">
+                            <Text className="text-5xl font-sf-bold italic text-dark tracking-tighter">
                                 {t.chartPage.filterOverlay.title}
                             </Text>
                             <TouchableOpacity
@@ -423,12 +423,12 @@ const ChartPage = () => {
                                 <View className="mb-12">
                                     {/* Section header */}
                                     <View className="flex-row items-center gap-3 mb-6">
-                                        <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em]">
+                                        <Text className="text-[10px] uppercase font-sf-bold text-dark/30 tracking-[0.4em]">
                                             {t.chartPage.filterOverlay.chartTypeLabel ?? "Chart Type"}
                                         </Text>
                                         {/* Group badge */}
                                         <View className="flex-row items-center gap-1.5 bg-dark/5 px-3 py-1 rounded-full">
-                                            <Text className="text-[9px] font-elms-bold text-dark/40 uppercase tracking-widest">
+                                            <Text className="text-[9px] font-sf-bold text-dark/40 uppercase tracking-widest">
                                                 {CHART_REGISTRY[selectedChartType]?.group.replace("_", " ")}
                                             </Text>
                                         </View>
@@ -446,7 +446,7 @@ const ChartPage = () => {
                                                         className={`flex-row items-center gap-2 px-5 py-3.5 rounded-[20px] border-2 border-dark ${active ? 'bg-primary' : 'bg-white'}`}
                                                     >
                                                         <Feather name={icon as any} size={14} color="#141414" />
-                                                        <Text className="font-elms-bold italic text-dark text-base">{label}</Text>
+                                                        <Text className="font-sf-bold italic text-dark text-base">{label}</Text>
                                                         {active && (
                                                             <View className="w-2 h-2 rounded-full bg-dark ml-1" />
                                                         )}
@@ -459,7 +459,7 @@ const ChartPage = () => {
                                     {/* Compatibility hint */}
                                     <View className="flex-row items-center gap-2 mt-4 opacity-40">
                                         <Feather name="info" size={11} color="#141414" />
-                                        <Text className="text-[9px] font-elms-bold text-dark uppercase tracking-widest">
+                                        <Text className="text-[9px] font-sf-bold text-dark uppercase tracking-widest">
                                             {t.chartPage.filterOverlay.chartTypeHint
                                                 ?? "Showing compatible chart types only"}
                                         </Text>
@@ -469,7 +469,7 @@ const ChartPage = () => {
 
                             {/* ── Colour Palette Selector ──────────────────────────── */}
                             <View className="mb-12">
-                                <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-6">
+                                <Text className="text-[10px] uppercase font-sf-bold text-dark/30 tracking-[0.4em] mb-6">
                                     {t.chartPage.filterOverlay.paletteLabel ?? "Colour Palette"}
                                 </Text>
                                 <PaletteSelect value={tempPalette} onChange={setTempPalette} />
@@ -477,7 +477,7 @@ const ChartPage = () => {
 
                             {/* ── Geography ────────────────────────────────────────── */}
                             <View className="mb-12">
-                                <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-6">
+                                <Text className="text-[10px] uppercase font-sf-bold text-dark/30 tracking-[0.4em] mb-6">
                                     {t.chartPage.filterOverlay.geoLabel}
                                 </Text>
                                 <SearchableSelect
@@ -490,7 +490,7 @@ const ChartPage = () => {
 
                             {/* ── Variables ─────────────────────────────────────────── */}
                             <View className="mb-12">
-                                <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-6">
+                                <Text className="text-[10px] uppercase font-sf-bold text-dark/30 tracking-[0.4em] mb-6">
                                     {t.chartPage.filterOverlay.varLabel}
                                 </Text>
                                 <View className="gap-y-2">
@@ -506,7 +506,7 @@ const ChartPage = () => {
                                                 }
                                                 className={`p-6 rounded-[32px] border-2 border-dark flex-row items-center justify-between ${active ? 'bg-primary' : 'bg-white'}`}
                                             >
-                                                <Text className="text-lg font-elms-bold italic text-dark flex-1 mr-4 tracking-tight">{varLabelMap[v] ?? v}</Text>
+                                                <Text className="text-lg font-sf-bold italic text-dark flex-1 mr-4 tracking-tight">{varLabelMap[v] ?? v}</Text>
                                                 {active && <Feather name="check-circle" size={20} color="#141414" />}
                                             </TouchableOpacity>
                                         );
@@ -517,7 +517,7 @@ const ChartPage = () => {
                             {/* ── Time Slider ───────────────────────────────────────── */}
                             {periodOptions.length > 1 && (
                                 <View className="mb-12">
-                                    <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.4em] mb-10">
+                                    <Text className="text-[10px] uppercase font-sf-bold text-dark/30 tracking-[0.4em] mb-10">
                                         {t.chartPage.filterOverlay.timeLabel}
                                     </Text>
                                     <View className="items-center px-4">
@@ -540,8 +540,8 @@ const ChartPage = () => {
                                             }}
                                         />
                                         <View className="flex-row justify-between w-full mt-6">
-                                            <Text className="text-[10px] font-elms-bold italic text-dark">{periodOptions[0].label}</Text>
-                                            <Text className="text-[10px] font-elms-bold italic text-dark">{periodOptions[periodOptions.length - 1].label}</Text>
+                                            <Text className="text-[10px] font-sf-bold italic text-dark">{periodOptions[0].label}</Text>
+                                            <Text className="text-[10px] font-sf-bold italic text-dark">{periodOptions[periodOptions.length - 1].label}</Text>
                                         </View>
                                     </View>
                                 </View>

@@ -298,7 +298,7 @@ type Phase = 'commit' | 'reveal' | 'answer' | 'result';
 function SectionLabel({ children }: { children: string }) {
     return (
         <Text style={{
-            fontSize: 10, fontFamily: 'font-elms-bold', letterSpacing: 1.4,
+            fontSize: 10, fontFamily: 'font-sf-bold', letterSpacing: 1.4,
             textTransform: 'uppercase', color: THEME_COLORS.grey, marginBottom: 10,
         }}>
             {children}
@@ -316,8 +316,8 @@ function AggregateBar({
     return (
         <View style={{ marginBottom: 14 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
-                <Text style={{ fontFamily: 'font-elms-bold', fontSize: 14, color: THEME_COLORS.dark }}>{label}</Text>
-                <Text style={{ fontFamily: 'font-elms-bold', fontSize: 14, color: highlight ? THEME_COLORS.dark : THEME_COLORS.grey }}>
+                <Text style={{ fontFamily: 'font-sf-bold', fontSize: 14, color: THEME_COLORS.dark }}>{label}</Text>
+                <Text style={{ fontFamily: 'font-sf-bold', fontSize: 14, color: highlight ? THEME_COLORS.dark : THEME_COLORS.grey }}>
                     {value}{unit.includes('%') ? '%' : ` ${unit}`}
                 </Text>
             </View>
@@ -355,7 +355,7 @@ function DisaggregatedBlock({
                 shadowOpacity: 0.06, shadowRadius: 0,
             }}>
                 <Text style={{
-                    fontFamily: 'font-elms-bold', fontSize: 11, color: THEME_COLORS.grey,
+                    fontFamily: 'font-sf-bold', fontSize: 11, color: THEME_COLORS.grey,
                     letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12,
                 }}>
                     {item.confounderValue}
@@ -382,7 +382,7 @@ function DisaggregatedBlock({
                             backgroundColor: THEME_COLORS.marked, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6,
                         }}>
                             <Feather name="arrow-up" size={12} color={THEME_COLORS.marked} />
-                            <Text style={{ fontFamily: 'font-elms-regular', fontSize: 12, color: THEME_COLORS.marked, marginLeft: 5 }}>
+                            <Text style={{ fontFamily: 'font-sf-regular', fontSize: 12, color: THEME_COLORS.marked, marginLeft: 5 }}>
                                 {winner.groupLabel} leads by {diff}pp here
                             </Text>
                         </View>
@@ -466,7 +466,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                             flexDirection: 'row', alignItems: 'center', gap: 5,
                         }}>
                             <Feather name="git-branch" size={11} color={THEME_COLORS.primary} />
-                            <Text style={{ fontFamily: 'font-elms-bold', fontSize: 11, color: THEME_COLORS.primary, letterSpacing: 0.5 }}>
+                            <Text style={{ fontFamily: 'font-sf-bold', fontSize: 11, color: THEME_COLORS.primary, letterSpacing: 0.5 }}>
                                 The Confounder's Garden
                             </Text>
                         </View>
@@ -474,7 +474,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                             backgroundColor: THEME_COLORS.background, borderRadius: 12,
                             paddingHorizontal: 8, paddingVertical: 3,
                         }}>
-                            <Text style={{ fontFamily: 'font-elms-regular', fontSize: 11, color: THEME_COLORS.grey }}>
+                            <Text style={{ fontFamily: 'font-sf-regular', fontSize: 11, color: THEME_COLORS.grey }}>
                                 Week {scenario.weekNumber}
                             </Text>
                         </View>
@@ -486,7 +486,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
 
                 {/* ── Source tag ── */}
                 <View style={{ paddingHorizontal: 20, marginBottom: 2 }}>
-                    <Text style={{ fontFamily: 'font-elms-regular', fontSize: 11, color: THEME_COLORS.grey }}>
+                    <Text style={{ fontFamily: 'font-sf-regular', fontSize: 11, color: THEME_COLORS.grey }}>
                         {scenario.sourceName}
                     </Text>
                 </View>
@@ -500,7 +500,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
 
                         {/* ── Title ── */}
                         <Text style={{
-                            fontFamily: 'font-elms-bold', fontSize: 22, color: THEME_COLORS.dark,
+                            fontFamily: 'font-sf-bold', fontSize: 22, color: THEME_COLORS.dark,
                             fontStyle: 'italic', marginTop: 16, marginBottom: 20,
                             lineHeight: 28,
                         }}>
@@ -527,7 +527,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                         backgroundColor: THEME_COLORS.primary, opacity: 0.22,
                                     }} />
                                     <Text style={{
-                                        fontFamily: 'font-elms-regular', fontSize: 14, color: 'rgba(251,247,238,0.75)',
+                                        fontFamily: 'font-sf-regular', fontSize: 14, color: 'rgba(251,247,238,0.75)',
                                         fontStyle: 'italic', lineHeight: 21, marginBottom: 4,
                                     }}>
                                         {scenario.prompt}
@@ -558,7 +558,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                 {/* Commit buttons */}
                                 <SectionLabel>Your conclusion</SectionLabel>
                                 <Text style={{
-                                    fontFamily: 'font-elms-regular', fontSize: 13, color: THEME_COLORS.grey,
+                                    fontFamily: 'font-sf-regular', fontSize: 13, color: THEME_COLORS.grey,
                                     fontStyle: 'italic', marginBottom: 14,
                                 }}>
                                     Looking only at this data, which group has the advantage?
@@ -577,7 +577,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                                 shadowOpacity: 0.06, shadowRadius: 0,
                                             }}
                                         >
-                                            <Text style={{ fontFamily: 'font-elms-bold', fontSize: 15, color: THEME_COLORS.dark }}>
+                                            <Text style={{ fontFamily: 'font-sf-bold', fontSize: 15, color: THEME_COLORS.dark }}>
                                                 {s.groupLabel}
                                             </Text>
                                             <Feather name="arrow-right" size={16} color={THEME_COLORS.grey} />
@@ -590,7 +590,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                             padding: 16, alignItems: 'center',
                                         }}
                                     >
-                                        <Text style={{ fontFamily: 'font-elms-regular', fontSize: 14, color: THEME_COLORS.grey, fontStyle: 'italic' }}>
+                                        <Text style={{ fontFamily: 'font-sf-regular', fontSize: 14, color: THEME_COLORS.grey, fontStyle: 'italic' }}>
                                             Neither — the data is inconclusive
                                         </Text>
                                     </TouchableOpacity>
@@ -613,7 +613,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                         color={commitment === scenario.misleadingWinner ? THEME_COLORS.error : THEME_COLORS.marked}
                                     />
                                     <Text style={{
-                                        fontFamily: 'font-elms-regular', fontSize: 13, fontStyle: 'italic',
+                                        fontFamily: 'font-sf-regular', fontSize: 13, fontStyle: 'italic',
                                         color: commitment === scenario.misleadingWinner ? THEME_COLORS.error : THEME_COLORS.marked,
                                     }}>
                                         You chose: {commitment}
@@ -632,7 +632,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                         backgroundColor: THEME_COLORS.primary, borderRadius: 12,
                                         paddingHorizontal: 12, paddingVertical: 5,
                                     }}>
-                                        <Text style={{ fontFamily: 'font-elms-bold', fontSize: 11, color: THEME_COLORS.dark }}>
+                                        <Text style={{ fontFamily: 'font-sf-bold', fontSize: 11, color: THEME_COLORS.dark }}>
                                             Split by: {scenario.confounderLabel}
                                         </Text>
                                     </View>
@@ -658,7 +658,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                         alignItems: 'center', marginTop: 8,
                                     }}
                                 >
-                                    <Text style={{ fontFamily: 'font-elms-bold', fontSize: 15, color: THEME_COLORS.primary }}>
+                                    <Text style={{ fontFamily: 'font-sf-bold', fontSize: 15, color: THEME_COLORS.primary }}>
                                         Now explain it →
                                     </Text>
                                 </TouchableOpacity>
@@ -672,7 +672,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                     backgroundColor: THEME_COLORS.dark, borderRadius: 28, padding: 20, marginBottom: 24,
                                 }}>
                                     <Text style={{
-                                        fontFamily: 'font-elms-regular', fontSize: 14, color: 'rgba(251,247,238,0.75)',
+                                        fontFamily: 'font-sf-regular', fontSize: 14, color: 'rgba(251,247,238,0.75)',
                                         fontStyle: 'italic', lineHeight: 21,
                                     }}>
                                         The result flipped when we split the data. In one sentence: what was the hidden variable that caused the reversal?
@@ -688,7 +688,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                     style={{
                                         backgroundColor: THEME_COLORS.background, borderRadius: 20, borderWidth: 0.5,
                                         borderColor: THEME_COLORS.dark, padding: 18,
-                                        fontFamily: 'font-elms-regular', fontSize: 15, color: THEME_COLORS.dark,
+                                        fontFamily: 'font-sf-regular', fontSize: 15, color: THEME_COLORS.dark,
                                         fontStyle: 'italic', minHeight: 90, marginBottom: 20,
                                         textAlignVertical: 'top',
                                     }}
@@ -703,7 +703,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                     }}
                                 >
                                     <Text style={{
-                                        fontFamily: 'font-elms-bold', fontSize: 15,
+                                        fontFamily: 'font-sf-bold', fontSize: 15,
                                         color: userAnswer.trim().length < 3 ? THEME_COLORS.grey : THEME_COLORS.primary,
                                     }}>
                                         Commit answer
@@ -729,7 +729,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                             color={answerCorrect ? THEME_COLORS.marked : THEME_COLORS.grey}
                                         />
                                         <Text style={{
-                                            fontFamily: 'font-elms-bold', fontSize: 13,
+                                            fontFamily: 'font-sf-bold', fontSize: 13,
                                             color: answerCorrect ? THEME_COLORS.marked : THEME_COLORS.grey,
                                             textTransform: 'uppercase', letterSpacing: 0.8,
                                         }}>
@@ -737,7 +737,7 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                         </Text>
                                     </View>
                                     <Text style={{
-                                        fontFamily: 'font-elms-regular', fontSize: 14, color: THEME_COLORS.dark,
+                                        fontFamily: 'font-sf-regular', fontSize: 14, color: THEME_COLORS.dark,
                                         fontStyle: 'italic', lineHeight: 21,
                                     }}>
                                         {scenario.realStory}
@@ -754,13 +754,13 @@ export function ConfoundersGarden({ scenario, onClose, onComplete }: Confounders
                                         borderRadius: 45, backgroundColor: THEME_COLORS.primary, opacity: 0.14,
                                     }} />
                                     <Text style={{
-                                        fontFamily: 'font-elms-bold', fontSize: 11, color: THEME_COLORS.primary,
+                                        fontFamily: 'font-sf-bold', fontSize: 11, color: THEME_COLORS.primary,
                                         letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8,
                                     }}>
                                         The pattern to carry forward
                                     </Text>
                                     <Text style={{
-                                        fontFamily: 'font-elms-regular', fontSize: 14, color: 'rgba(251,247,238,0.80)',
+                                        fontFamily: 'font-sf-regular', fontSize: 14, color: 'rgba(251,247,238,0.80)',
                                         fontStyle: 'italic', lineHeight: 21,
                                     }}>
                                         Whenever a group comparison surprises you, ask: is there a third variable

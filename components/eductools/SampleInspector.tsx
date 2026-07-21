@@ -426,7 +426,7 @@ function SelectionOverlay({
 function SectionLabel({ children }: { children: string }) {
     return (
         <Text style={{
-            fontSize: 10, fontFamily: 'font-elms-bold', letterSpacing: 1.4,
+            fontSize: 10, fontFamily: 'font-sf-bold', letterSpacing: 1.4,
             textTransform: 'uppercase', color: C.muted, marginBottom: 10,
         }}>
             {children}
@@ -446,7 +446,7 @@ function StratumLegendRow({ stratum, samplePct, truePct, count }: {
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
                     <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: stratum.color }} />
-                    <Text style={{ fontFamily: 'font-elms-bold', fontSize: 13, color: C.dark }}>{stratum.label}</Text>
+                    <Text style={{ fontFamily: 'font-sf-bold', fontSize: 13, color: C.dark }}>{stratum.label}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     {(overRep || underRep) && (
@@ -455,14 +455,14 @@ function StratumLegendRow({ stratum, samplePct, truePct, count }: {
                             borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2,
                         }}>
                             <Text style={{
-                                fontFamily: 'font-elms-bold', fontSize: 10,
+                                fontFamily: 'font-sf-bold', fontSize: 10,
                                 color: overRep ? C.blue : C.red,
                             }}>
                                 {overRep ? '↑ over' : '↓ under'}
                             </Text>
                         </View>
                     )}
-                    <Text style={{ fontFamily: 'font-elms-regular', fontSize: 12, color: C.muted }}>
+                    <Text style={{ fontFamily: 'font-sf-regular', fontSize: 12, color: C.muted }}>
                         {count} ({Math.round(samplePct * 100)}% of sample · true {Math.round(truePct * 100)}%)
                     </Text>
                 </View>
@@ -511,10 +511,10 @@ function BiasOMeter({ score }: { score: number }) {
                 ))}
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={{ fontFamily: 'font-elms-bold', fontSize: 13, color: active.color }}>
+                <Text style={{ fontFamily: 'font-sf-bold', fontSize: 13, color: active.color }}>
                     {active.label}
                 </Text>
-                <Text style={{ fontFamily: 'font-elms-bold', fontSize: 22, color: C.dark }}>
+                <Text style={{ fontFamily: 'font-sf-bold', fontSize: 22, color: C.dark }}>
                     {score}<Text style={{ fontSize: 13, color: C.muted }}>/100 bias</Text>
                 </Text>
             </View>
@@ -667,7 +667,7 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                             flexDirection: 'row', alignItems: 'center', gap: 5,
                         }}>
                             <Feather name="filter" size={11} color={C.yellow} />
-                            <Text style={{ fontFamily: 'font-elms-bold', fontSize: 11, color: C.yellow, letterSpacing: 0.5 }}>
+                            <Text style={{ fontFamily: 'font-sf-bold', fontSize: 11, color: C.yellow, letterSpacing: 0.5 }}>
                                 The Sample Inspector
                             </Text>
                         </View>
@@ -675,7 +675,7 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                             backgroundColor: C.subtle, borderRadius: 12,
                             paddingHorizontal: 8, paddingVertical: 3,
                         }}>
-                            <Text style={{ fontFamily: 'font-elms-regular', fontSize: 11, color: C.muted }}>
+                            <Text style={{ fontFamily: 'font-sf-regular', fontSize: 11, color: C.muted }}>
                                 Week {scenario.weekNumber}
                             </Text>
                         </View>
@@ -694,13 +694,13 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
 
                     {/* ── Title ── */}
                     <Text style={{
-                        fontFamily: 'font-elms-bold', fontSize: 22, color: C.dark,
+                        fontFamily: 'font-sf-bold', fontSize: 22, color: C.dark,
                         fontStyle: 'italic', marginTop: 8, marginBottom: 4, lineHeight: 28,
                     }}>
                         {scenario.title}
                     </Text>
                     <Text style={{
-                        fontFamily: 'font-elms-regular', fontSize: 13, color: C.muted,
+                        fontFamily: 'font-sf-regular', fontSize: 13, color: C.muted,
                         fontStyle: 'italic', marginBottom: 20,
                     }}>
                         {scenario.sourceName}
@@ -723,13 +723,13 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                     borderRadius: 40, backgroundColor: C.yellow, opacity: 0.22,
                                 }} />
                                 <Text style={{
-                                    fontFamily: 'font-elms-regular', fontSize: 14,
+                                    fontFamily: 'font-sf-regular', fontSize: 14,
                                     color: 'rgba(251,247,238,0.75)', fontStyle: 'italic', lineHeight: 22,
                                 }}>
                                     {scenario.context}
                                 </Text>
                                 <Text style={{
-                                    fontFamily: 'font-elms-bold', fontSize: 14,
+                                    fontFamily: 'font-sf-bold', fontSize: 14,
                                     color: C.cream, marginTop: 12, lineHeight: 20,
                                 }}>
                                     {scenario.prompt}
@@ -754,17 +754,17 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                                 width: 12, height: 12, borderRadius: 6,
                                                 backgroundColor: s.color,
                                             }} />
-                                            <Text style={{ fontFamily: 'font-elms-regular', fontSize: 13, color: C.dark }}>
+                                            <Text style={{ fontFamily: 'font-sf-regular', fontSize: 13, color: C.dark }}>
                                                 {s.label}
                                             </Text>
                                         </View>
-                                        <Text style={{ fontFamily: 'font-elms-bold', fontSize: 13, color: C.muted }}>
+                                        <Text style={{ fontFamily: 'font-sf-bold', fontSize: 13, color: C.muted }}>
                                             {Math.round(s.trueShare * 100)}%
                                         </Text>
                                     </View>
                                 ))}
                                 <Text style={{
-                                    fontFamily: 'font-elms-regular', fontSize: 12,
+                                    fontFamily: 'font-sf-regular', fontSize: 12,
                                     color: C.muted, fontStyle: 'italic', marginTop: 4,
                                 }}>
                                     These percentages reflect the true population — you won't see them during sampling.
@@ -784,7 +784,7 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                     shadowOpacity: 0.15, shadowRadius: 0,
                                 }}
                             >
-                                <Text style={{ fontFamily: 'font-elms-bold', fontSize: 15, color: C.yellow }}>
+                                <Text style={{ fontFamily: 'font-sf-bold', fontSize: 15, color: C.yellow }}>
                                     Start sampling →
                                 </Text>
                             </TouchableOpacity>
@@ -795,7 +795,7 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                     {phase === 'sampling' && (
                         <>
                             <Text style={{
-                                fontFamily: 'font-elms-regular', fontSize: 13,
+                                fontFamily: 'font-sf-regular', fontSize: 13,
                                 color: C.muted, fontStyle: 'italic', marginBottom: 14, lineHeight: 18,
                             }}>
                                 Drag a rectangle across the field to select your sample.
@@ -840,7 +840,7 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                 {scenario.strata.map(s => (
                                     <View key={s.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                         <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: s.color }} />
-                                        <Text style={{ fontFamily: 'font-elms-regular', fontSize: 11, color: C.muted }}>
+                                        <Text style={{ fontFamily: 'font-sf-regular', fontSize: 11, color: C.muted }}>
                                             {s.label}
                                         </Text>
                                     </View>
@@ -858,7 +858,7 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                     shadowOpacity: 0.12, shadowRadius: 0,
                                 }}
                             >
-                                <Text style={{ fontFamily: 'font-elms-bold', fontSize: 15, color: C.dark }}>
+                                <Text style={{ fontFamily: 'font-sf-bold', fontSize: 15, color: C.dark }}>
                                     This is my sample — analyse it
                                 </Text>
                             </TouchableOpacity>
@@ -877,11 +877,11 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                     backgroundColor: C.dark, borderRadius: 14,
                                     paddingHorizontal: 12, paddingVertical: 6,
                                 }}>
-                                    <Text style={{ fontFamily: 'font-elms-bold', fontSize: 12, color: C.yellow }}>
+                                    <Text style={{ fontFamily: 'font-sf-bold', fontSize: 12, color: C.yellow }}>
                                         {result.total} {scenario.unit}s selected
                                     </Text>
                                 </View>
-                                <Text style={{ fontFamily: 'font-elms-regular', fontSize: 12, color: C.muted, fontStyle: 'italic' }}>
+                                <Text style={{ fontFamily: 'font-sf-regular', fontSize: 12, color: C.muted, fontStyle: 'italic' }}>
                                     out of {particles.length} in population
                                 </Text>
                             </View>
@@ -906,7 +906,7 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                 shadowOpacity: 0.06, shadowRadius: 0,
                             }}>
                                 <Text style={{
-                                    fontFamily: 'font-elms-regular', fontSize: 12,
+                                    fontFamily: 'font-sf-regular', fontSize: 12,
                                     color: C.muted, fontStyle: 'italic', marginBottom: 14,
                                 }}>
                                     Coloured bar = your sample share · grey band = true population share
@@ -930,20 +930,20 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                 <View style={{
                                     flex: 1, backgroundColor: C.redBg, borderRadius: 20, padding: 14,
                                 }}>
-                                    <Text style={{ fontFamily: 'font-elms-bold', fontSize: 10, color: C.red, letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 5 }}>
+                                    <Text style={{ fontFamily: 'font-sf-bold', fontSize: 10, color: C.red, letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 5 }}>
                                         Most underrepresented
                                     </Text>
-                                    <Text style={{ fontFamily: 'font-elms-regular', fontSize: 13, color: C.red, fontStyle: 'italic' }}>
+                                    <Text style={{ fontFamily: 'font-sf-regular', fontSize: 13, color: C.red, fontStyle: 'italic' }}>
                                         {result.worstStratum}
                                     </Text>
                                 </View>
                                 <View style={{
                                     flex: 1, backgroundColor: C.greenBg, borderRadius: 20, padding: 14,
                                 }}>
-                                    <Text style={{ fontFamily: 'font-elms-bold', fontSize: 10, color: C.green, letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 5 }}>
+                                    <Text style={{ fontFamily: 'font-sf-bold', fontSize: 10, color: C.green, letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 5 }}>
                                         Closest to true share
                                     </Text>
-                                    <Text style={{ fontFamily: 'font-elms-regular', fontSize: 13, color: C.green, fontStyle: 'italic' }}>
+                                    <Text style={{ fontFamily: 'font-sf-regular', fontSize: 13, color: C.green, fontStyle: 'italic' }}>
                                         {result.bestStratum}
                                     </Text>
                                 </View>
@@ -956,7 +956,7 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                     alignItems: 'center',
                                 }}
                             >
-                                <Text style={{ fontFamily: 'font-elms-bold', fontSize: 15, color: C.yellow }}>
+                                <Text style={{ fontFamily: 'font-sf-bold', fontSize: 15, color: C.yellow }}>
                                     What really happened →
                                 </Text>
                             </TouchableOpacity>
@@ -976,13 +976,13 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                     borderRadius: 60, backgroundColor: C.yellow, opacity: 0.14,
                                 }} />
                                 <Text style={{
-                                    fontFamily: 'font-elms-bold', fontSize: 11, color: C.yellow,
+                                    fontFamily: 'font-sf-bold', fontSize: 11, color: C.yellow,
                                     letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10,
                                 }}>
                                     What actually happened
                                 </Text>
                                 <Text style={{
-                                    fontFamily: 'font-elms-regular', fontSize: 14,
+                                    fontFamily: 'font-sf-regular', fontSize: 14,
                                     color: 'rgba(251,247,238,0.82)', fontStyle: 'italic', lineHeight: 22,
                                 }}>
                                     {scenario.realStory}
@@ -1005,13 +1005,13 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                     width: 4, backgroundColor: C.yellow,
                                 }} />
                                 <Text style={{
-                                    fontFamily: 'font-elms-bold', fontSize: 11, color: C.muted,
+                                    fontFamily: 'font-sf-bold', fontSize: 11, color: C.muted,
                                     letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8,
                                 }}>
                                     The pattern to carry forward
                                 </Text>
                                 <Text style={{
-                                    fontFamily: 'font-elms-regular', fontSize: 14,
+                                    fontFamily: 'font-sf-regular', fontSize: 14,
                                     color: C.dark, fontStyle: 'italic', lineHeight: 22,
                                 }}>
                                     {scenario.principle}
@@ -1024,10 +1024,10 @@ export function SampleInspector({ scenario, onClose, onComplete }: SampleInspect
                                     backgroundColor: C.subtle, borderRadius: 20, padding: 16,
                                     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
                                 }}>
-                                    <Text style={{ fontFamily: 'font-elms-regular', fontSize: 13, color: C.muted, fontStyle: 'italic' }}>
+                                    <Text style={{ fontFamily: 'font-sf-regular', fontSize: 13, color: C.muted, fontStyle: 'italic' }}>
                                         Your sample's representativeness
                                     </Text>
-                                    <Text style={{ fontFamily: 'font-elms-bold', fontSize: 20, color: C.dark }}>
+                                    <Text style={{ fontFamily: 'font-sf-bold', fontSize: 20, color: C.dark }}>
                                         {result.representativePct}
                                         <Text style={{ fontSize: 13, color: C.muted }}>%</Text>
                                     </Text>

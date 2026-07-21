@@ -76,9 +76,6 @@ export default function RootLayout() {
   useAppState(onAppStateChange);
 
   const [fontsLoaded] = useFonts({
-    "Geist-Regular": require("../assets/fonts/Geist-Regular.ttf"),
-    "Geist-ExtraBold": require("../assets/fonts/Geist-ExtraBold.ttf"),
-    "Geist-ExtraLight": require("../assets/fonts/Geist-ExtraLight.ttf"),
     "Elms-Regular": require("../assets/fonts/ElmsSans-Regular.ttf"),
     "Elms-ExtraBold": require("../assets/fonts/ElmsSans-ExtraBold.ttf"),
     "Elms-Bold": require("../assets/fonts/ElmsSans-Bold.ttf"),

@@ -15,11 +15,11 @@ const RandomPage = () => {
         <Animated.View entering={FadeInDown.duration(800).delay(100)} className="px-8 mt-12 mb-10">
             <View className="flex-row items-center gap-3 mb-4">
                 <View className="h-[2px] w-10 bg-dark" />
-                <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
+                <Text className="text-[10px] uppercase font-sf-bold tracking-[0.4em] text-dark/40">
                     {t.random.label}
                 </Text>
             </View>
-            <Text className="text-dark text-6xl tracking-tighter font-elms-bold italic leading-none">
+            <Text className="text-dark text-6xl tracking-tighter font-sf-bold italic leading-none">
                 {t.random.title}
             </Text>
         </Animated.View>

@@ -338,12 +338,12 @@ function NotchStepper({
     return (
         <View className="mb-5">
             <View className="flex-row items-center justify-between mb-1">
-                <Text className="text-[13px] font-elms-bold text-dark">{label}</Text>
-                <Text className="text-[11px] font-elms-bold text-dark/35">
+                <Text className="text-[13px] font-sf-bold text-dark">{label}</Text>
+                <Text className="text-[11px] font-sf-bold text-dark/35">
                     {value === 0 ? 'Off' : `Level ${value}`}
                 </Text>
             </View>
-            <Text className="text-[11px] font-elms-regular text-dark/45 mb-2.5 leading-snug">
+            <Text className="text-[11px] font-sf-regular text-dark/45 mb-2.5 leading-snug">
                 {hint}
             </Text>
             <View className="flex-row gap-1.5">
@@ -396,8 +396,8 @@ function ToggleRow({
             className="flex-row items-center justify-between mb-5 bg-white border border-dark/10 rounded-2xl px-4 py-3.5"
         >
             <View className="flex-1 pr-3">
-                <Text className="text-[13px] font-elms-bold text-dark mb-1">{label}</Text>
-                <Text className="text-[11px] font-elms-regular text-dark/45 leading-snug">{hint}</Text>
+                <Text className="text-[13px] font-sf-bold text-dark mb-1">{label}</Text>
+                <Text className="text-[11px] font-sf-regular text-dark/45 leading-snug">{hint}</Text>
             </View>
             <View
                 className="w-11 h-6 rounded-full justify-center px-0.5"
@@ -474,10 +474,10 @@ function MeterBar({
     return (
         <View className="flex-1">
             <View className="flex-row items-center justify-between mb-1.5">
-                <Text className="text-[10px] font-elms-bold uppercase tracking-[0.08em] text-dark/40">
+                <Text className="text-[10px] font-sf-bold uppercase tracking-[0.08em] text-dark/40">
                     {label}
                 </Text>
-                <Text className="text-[12px] font-elms-bold text-dark">{value}</Text>
+                <Text className="text-[12px] font-sf-bold text-dark">{value}</Text>
             </View>
             <View className="h-2 rounded-full bg-dark/5 overflow-hidden">
                 <View
@@ -520,11 +520,11 @@ export function CredibilityMeter({ result }: CredibilityMeterProps) {
                     size={12}
                     color={verdict.tone}
                 />
-                <Text className="text-[11px] font-elms-bold flex-1" style={{ color: verdict.tone }}>
+                <Text className="text-[11px] font-sf-bold flex-1" style={{ color: verdict.tone }}>
                     {verdict.label}
                 </Text>
                 {result.activeTechniqueCount >= 3 && (
-                    <Text className="text-[10px] font-elms-regular text-dark/35">
+                    <Text className="text-[10px] font-sf-regular text-dark/35">
                         {result.activeTechniqueCount} tricks stacked
                     </Text>
                 )}
@@ -567,16 +567,16 @@ export function RevealScreen({
                 <View className="w-7 h-7 rounded-full items-center justify-center bg-dark">
                     <Feather name="eye" size={13} color="#F7CE46" />
                 </View>
-                <Text className="text-[11px] font-elms-bold uppercase tracking-[0.1em] text-dark/40">
+                <Text className="text-[11px] font-sf-bold uppercase tracking-[0.1em] text-dark/40">
                     Here's what the full data shows
                 </Text>
             </View>
-            <Text className="text-xl font-elms-bold italic text-dark mb-5 leading-snug">
+            <Text className="text-xl font-sf-bold italic text-dark mb-5 leading-snug">
                 {scenario.realStory}
             </Text>
 
             {/* Your version */}
-            <Text className="text-[11px] font-elms-bold uppercase tracking-[0.1em] text-dark/40 mb-2">
+            <Text className="text-[11px] font-sf-bold uppercase tracking-[0.1em] text-dark/40 mb-2">
                 What you built
             </Text>
             <View className="bg-white border border-dark/10 rounded-2xl p-4 mb-3 items-center">
@@ -588,17 +588,17 @@ export function RevealScreen({
                 />
             </View>
             <View className="flex-row gap-4 mb-6 px-1">
-                <Text className="text-[11px] font-elms-bold text-dark/45">
+                <Text className="text-[11px] font-sf-bold text-dark/45">
                     Persuasiveness <Text className="text-dark">{result.persuasiveness}</Text>
                 </Text>
-                <Text className="text-[11px] font-elms-bold text-dark/45">
+                <Text className="text-[11px] font-sf-bold text-dark/45">
                     Credibility <Text className="text-dark">{result.credibility}</Text>
                 </Text>
             </View>
 
             {/* The real chart — same component, untouched apiData, no
                 axis override */}
-            <Text className="text-[11px] font-elms-bold uppercase tracking-[0.1em] text-dark/40 mb-2">
+            <Text className="text-[11px] font-sf-bold uppercase tracking-[0.1em] text-dark/40 mb-2">
                 The real data, untouched
             </Text>
             <View className="relative mb-6">
@@ -626,17 +626,17 @@ export function RevealScreen({
             {/* Source */}
             <View className="flex-row items-center gap-1.5 mb-7">
                 <Feather name="bookmark" size={11} color="#A6A398" />
-                <Text className="text-[11px] font-elms-regular text-dark/40">
+                <Text className="text-[11px] font-sf-regular text-dark/40">
                     Source: {scenario.sourceName}
                 </Text>
             </View>
 
             {/* Reflection prompt */}
             <View className="bg-[#FCEFC4] rounded-2xl p-4 mb-7">
-                <Text className="text-[13px] font-elms-bold text-[#6B5A12] mb-1">
+                <Text className="text-[13px] font-sf-bold text-[#6B5A12] mb-1">
                     Worth remembering
                 </Text>
-                <Text className="text-[12.5px] font-elms-regular text-[#6B5A12] leading-relaxed">
+                <Text className="text-[12.5px] font-sf-regular text-[#6B5A12] leading-relaxed">
                     {result.activeTechniqueCount === 0
                         ? "You showed the data straight — that's the version most likely to hold up to scrutiny."
                         : result.verdict === 'subtle'
@@ -650,7 +650,7 @@ export function RevealScreen({
                 onPress={onContinue}
                 className="bg-dark rounded-[24px] py-4 items-center"
             >
-                <Text className="text-primary font-elms-bold text-[13px] tracking-[0.03em]">
+                <Text className="text-primary font-sf-bold text-[13px] tracking-[0.03em]">
                     Continue
                 </Text>
             </TouchableOpacity>

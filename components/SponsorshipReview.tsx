@@ -40,14 +40,14 @@ export default function SponsorshipReview({ pathLabel, rows, onBack, onSubmit }:
                     ))}
                 </View>
 
-                <Text className="text-center text-[10px] text-grey/30 font-elms-regular leading-relaxed mb-8">
+                <Text className="text-center text-[10px] text-grey/30 font-sf-regular leading-relaxed mb-8">
                     {"By submitting you agree to Sunflower's\nSponsorship Guidelines."}
                 </Text>
 
                 <SunButton text="Submit Sponsorship" onPress={onSubmit} />
 
                 <TouchableOpacity onPress={onBack} className="mt-4 py-3 items-center">
-                    <Text className="text-[11px] font-elms-bold uppercase tracking-widest text-grey/40">
+                    <Text className="text-[11px] font-sf-bold uppercase tracking-widest text-grey/40">
                         Edit details
                     </Text>
                 </TouchableOpacity>

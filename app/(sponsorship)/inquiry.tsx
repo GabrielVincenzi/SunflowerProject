@@ -114,7 +114,7 @@ export default function InquiryScreen() {
                             onChangeText={setQuestionTitle}
                             placeholder="What drives long-term GDP growth?"
                             placeholderTextColor="rgba(52,58,64,0.25)"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-5"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-5"
                         />
 
                         <FieldLabel>Body / context</FieldLabel>
@@ -124,7 +124,7 @@ export default function InquiryScreen() {
                             placeholder="Select the primary mechanism studied in structural economic models."
                             placeholderTextColor="rgba(52,58,64,0.25)"
                             multiline
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-5"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-5"
                             style={{ minHeight: 88, textAlignVertical: "top" }}
                         />
 
@@ -135,7 +135,7 @@ export default function InquiryScreen() {
                             placeholder="Capital accumulation and technology diffusion are the two consensus drivers..."
                             placeholderTextColor="rgba(52,58,64,0.25)"
                             multiline
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-8"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-8"
                             style={{ minHeight: 88, textAlignVertical: "top" }}
                         />
                     </>
@@ -164,7 +164,7 @@ export default function InquiryScreen() {
                                         onChangeText={(t) => updateChoice(choice.id, t)}
                                         placeholder={`Choice ${idx + 1}`}
                                         placeholderTextColor="rgba(52,58,64,0.2)"
-                                        className="px-4 py-3.5 font-elms-regular text-dark text-sm flex-1"
+                                        className="px-4 py-3.5 font-sf-regular text-dark text-sm flex-1"
                                     />
                                     <TouchableOpacity
                                         onPress={() => markCorrect(choice.id)}
@@ -184,7 +184,7 @@ export default function InquiryScreen() {
                                             )}
                                         </View>
                                         <Text
-                                            className={`text-[10px] font-elms-bold uppercase tracking-widest ${choice.correct ? "text-dark" : "text-grey/40"
+                                            className={`text-[10px] font-sf-bold uppercase tracking-widest ${choice.correct ? "text-dark" : "text-grey/40"
                                                 }`}
                                         >
                                             {choice.correct ? "Correct" : "Mark as correct"}
@@ -208,7 +208,7 @@ export default function InquiryScreen() {
                         <TextInput
                             placeholder="Search charts..."
                             placeholderTextColor="rgba(52,58,64,0.3)"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-3.5 font-elms-regular text-dark text-sm mb-4"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-3.5 font-sf-regular text-dark text-sm mb-4"
                         />
 
                         <View className="gap-2.5 mb-8">
@@ -235,14 +235,14 @@ export default function InquiryScreen() {
                                         />
                                         <View className="flex-1">
                                             <Text
-                                                className={`text-sm font-elms-bold mb-0.5 ${active ? "text-light" : "text-dark"
+                                                className={`text-sm font-sf-bold mb-0.5 ${active ? "text-light" : "text-dark"
                                                     }`}
                                                 numberOfLines={1}
                                             >
                                                 {chart.name}
                                             </Text>
                                             <Text
-                                                className={`text-[10px] font-elms-bold uppercase tracking-wide ${active ? "text-light/40" : "text-grey/40"
+                                                className={`text-[10px] font-sf-bold uppercase tracking-wide ${active ? "text-light/40" : "text-grey/40"
                                                     }`}
                                             >
                                                 {chart.category}
@@ -275,7 +275,7 @@ export default function InquiryScreen() {
                             onChangeText={setSponsorName}
                             placeholder="Inquiry Labs"
                             placeholderTextColor="rgba(52,58,64,0.25)"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-5"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-5"
                         />
 
                         <FieldLabel>Tagline</FieldLabel>
@@ -284,7 +284,7 @@ export default function InquiryScreen() {
                             onChangeText={setTagline}
                             placeholder="Advancing cognition through data."
                             placeholderTextColor="rgba(52,58,64,0.25)"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-5"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-5"
                         />
 
                         <FieldLabel>Link</FieldLabel>
@@ -295,7 +295,7 @@ export default function InquiryScreen() {
                             placeholderTextColor="rgba(52,58,64,0.25)"
                             autoCapitalize="none"
                             keyboardType="url"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-8"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-8"
                         />
                     </>
                 )}

@@ -30,13 +30,13 @@ function StatPill({
                 <Feather name={icon} size={14} color={accent ? '#1A1A18' : '#5F5E5A'} />
             </View>
             <Text
-                className="text-[19px] font-elms-bold italic mb-0.5"
+                className="text-[19px] font-sf-bold italic mb-0.5"
                 style={{ color: accent ? '#F7CE46' : '#1A1A18' }}
             >
                 {value}
             </Text>
             <Text
-                className="text-[9px] font-elms-bold uppercase tracking-[0.06em] text-center"
+                className="text-[9px] font-sf-bold uppercase tracking-[0.06em] text-center"
                 style={{ color: accent ? '#FFFFFF80' : '#A6A398' }}
             >
                 {label}

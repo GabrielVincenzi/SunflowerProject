@@ -199,7 +199,7 @@ export function SunSlider({
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                         {label && (
                             <Text style={{
-                                fontFamily: 'font-elms-bold',
+                                fontFamily: 'font-sf-bold',
                                 fontSize: 13,
                                 color: disabled ? THEME_COLORS.grey : THEME_COLORS.dark,
                                 letterSpacing: 0.2,
@@ -215,7 +215,7 @@ export function SunSlider({
                                 paddingVertical: 2,
                             }}>
                                 <Text style={{
-                                    fontFamily: 'font-elms-regular',
+                                    fontFamily: 'font-sf-regular',
                                     fontSize: 11,
                                     color: budgetWarning ? '#993C1D' : THEME_COLORS.grey,
                                     fontStyle: 'italic',
@@ -270,10 +270,10 @@ export function SunSlider({
                     justifyContent: 'space-between',
                     marginTop: 6,
                 }}>
-                    <Text style={{ fontFamily: 'font-elms-regular', fontSize: 10, color: THEME_COLORS.grey }}>
+                    <Text style={{ fontFamily: 'font-sf-regular', fontSize: 10, color: THEME_COLORS.grey }}>
                         {fmt(min)}
                     </Text>
-                    <Text style={{ fontFamily: 'font-elms-regular', fontSize: 10, color: THEME_COLORS.grey }}>
+                    <Text style={{ fontFamily: 'font-sf-regular', fontSize: 10, color: THEME_COLORS.grey }}>
                         {fmt(max)}
                     </Text>
                 </View>
@@ -318,7 +318,7 @@ function AnimatedValueLabel({
             alignItems: 'center',
         }}>
             <Text style={{
-                fontFamily: 'font-elms-bold',
+                fontFamily: 'font-sf-bold',
                 fontSize: 13,
                 color: color === THEME_COLORS.dark ? THEME_COLORS.primary : color,
             }}>

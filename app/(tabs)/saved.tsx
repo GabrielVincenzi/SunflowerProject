@@ -43,11 +43,11 @@ const Saved = () => {
                 <Animated.View entering={FadeInDown.duration(800).delay(100)} className="mb-12">
                     <View className="flex-row items-center gap-3 mb-4">
                         <View className="h-[2px] w-10 bg-dark" />
-                        <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
+                        <Text className="text-[10px] uppercase font-sf-bold tracking-[0.4em] text-dark/40">
                             {t.saved.header.label}
                         </Text>
                     </View>
-                    <Text className="text-dark text-5xl tracking-tighter font-elms-bold italic leading-tight">
+                    <Text className="text-dark text-5xl tracking-tighter font-sf-bold italic leading-tight">
                         {t.saved.header.title}
                     </Text>
                 </Animated.View>
@@ -70,7 +70,7 @@ const Saved = () => {
                         ListEmptyComponent={() => (
                             <View className="mt-20 items-center opacity-30">
                                 <View className="w-16 h-1 bg-primary mb-8" />
-                                <Text className="text-2xl font-elms-bold italic text-dark text-center">
+                                <Text className="text-2xl font-sf-bold italic text-dark text-center">
                                     {t.saved.emptyState}
                                 </Text>
                             </View>
@@ -78,8 +78,8 @@ const Saved = () => {
                     />
                 ) : (
                     <View className="mt-20 items-center justify-center p-10 bg-white rounded-[40px] border-2 border-dark">
-                        <Text className="text-dark font-elms-bold italic text-3xl text-center">{t.saved.accessRestricted.title}</Text>
-                        <Text className="text-dark/40 font-elms-regular italic mt-4 text-center leading-relaxed">
+                        <Text className="text-dark font-sf-bold italic text-3xl text-center">{t.saved.accessRestricted.title}</Text>
+                        <Text className="text-dark/40 font-sf-regular italic mt-4 text-center leading-relaxed">
                             {t.saved.accessRestricted.description}
                         </Text>
                     </View>

@@ -67,7 +67,7 @@ const SunSavedCard = ({
                         style={{ backgroundColor: topicStyle.bg }}
                     >
                         <Text
-                            className="text-[11px] font-elms-bold"
+                            className="text-[11px] font-sf-bold"
                             style={{ color: topicStyle.text }}
                         >
                             {category || db_name || 'General'}
@@ -78,13 +78,13 @@ const SunSavedCard = ({
 
                 {/* 2. Headline + description */}
                 <Text
-                    className="text-lg font-elms-bold italic text-dark tracking-tight leading-snug mb-2"
+                    className="text-cardtitle"
                     numberOfLines={2}
                 >
                     {title}
                 </Text>
                 <Text
-                    className="text-[13px] font-elms-regular text-dark/55 leading-relaxed mb-4"
+                    className="text-description"
                     numberOfLines={2}
                 >
                     {description || "No description available for this saved chart yet."}
@@ -96,11 +96,11 @@ const SunSavedCard = ({
                 <View className="flex-row items-center justify-between pt-3 border-t border-dark/5">
                     <View className="flex-row items-center gap-1.5">
                         <View className="w-[7px] h-[7px] rounded-full bg-primary" />
-                        <Text className="text-[11px] font-elms-bold text-dark/60 uppercase tracking-[0.05em]">
+                        <Text className="text-[11px] font-sf-bold text-dark/60 uppercase tracking-[0.05em]">
                             Open chart
                         </Text>
                     </View>
-                    <Text className="text-[11px] font-elms-regular text-dark/35">
+                    <Text className="text-[11px] font-sf-regular text-dark/35">
                         Saved {formattedDate}
                     </Text>
                 </View>

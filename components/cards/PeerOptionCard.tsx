@@ -73,7 +73,7 @@ export default function PeerOptionCard({
                 }}
             >
                 <View className="flex-1">
-                    <Text className="font-elms-bold text-md text-dark">
+                    <Text className="font-sf-bold text-md text-dark">
                         {label}
                     </Text>
                 </View>
@@ -97,7 +97,7 @@ export default function PeerOptionCard({
                         <Feather name="check" size={14} color={THEME_COLORS.background} />
                     ) : (
                         <Text
-                            className="text-sm font-elms-bold"
+                            className="text-sm font-sf-bold"
                             style={{ color: isCohort ? THEME_COLORS.dark : "rgba(52,58,64,0.4)" }}
                         >
                             {pct}%

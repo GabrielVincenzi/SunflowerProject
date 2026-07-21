@@ -1,7 +1,7 @@
 import { FeatureExtractionPipeline, pipeline } from '@huggingface/transformers';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const MODEL_ID = 'Xenova/multilingual-e5-small';
+const MODEL_ID = 'intfloat/multilingual-e5-small';
 const MODEL_CACHED_KEY = 'model_cached_v1';
 
 export type ModelStatus = 'idle' | 'downloading' | 'warming' | 'ready' | 'error';
@@ -67,8 +67,9 @@ export async function encodeQuery(query: string): Promise<number[]> {
     // If init was never called or failed, try again
     if (!extractor) await initModel();
     if (!extractor) throw new Error('Model unavailable');
+    const text = query.trim().toLowerCase();
 
-    const output = await extractor(`query: ${query.trim()}`, {
+    const output = await extractor(`query: ${text}`, {
         pooling: 'mean',
         normalize: true,
     });

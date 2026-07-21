@@ -45,15 +45,15 @@ export default function JourneyCard({ toolsCompleted, onPress }: JourneyCardProp
 
                 <View className="flex-row items-center gap-2 mb-3">
                     <Feather name="map" size={13} color="#F7CE46" />
-                    <Text className="text-[11px] font-elms-bold uppercase tracking-[0.15em] text-primary/75">
+                    <Text className="text-[11px] font-sf-bold uppercase tracking-[0.15em] text-primary/75">
                         The Journey
                     </Text>
                 </View>
 
-                <Text className="text-[22px] font-elms-bold italic text-white leading-snug mb-2">
+                <Text className="text-[22px] font-sf-bold italic text-white leading-snug mb-2">
                     All nine tools, one guided path
                 </Text>
-                <Text className="text-[13px] font-elms-regular text-white/55 leading-relaxed mb-5">
+                <Text className="text-[13px] font-sf-regular text-white/55 leading-relaxed mb-5">
                     A single thread through everything in the greenhouse — from your first
                     bent chart to your last calibrated guess.
                 </Text>
@@ -67,13 +67,13 @@ export default function JourneyCard({ toolsCompleted, onPress }: JourneyCardProp
                             style={{ width: `${Math.max(progressPct, started ? 4 : 0)}%` }}
                         />
                     </View>
-                    <Text className="text-[10px] font-elms-bold text-white/40 uppercase tracking-[0.08em]">
+                    <Text className="text-[10px] font-sf-bold text-white/40 uppercase tracking-[0.08em]">
                         {toolsCompleted} of 9 tools bloomed
                     </Text>
                 </View>
 
                 <View className="self-start bg-primary px-5 py-2.5 rounded-full flex-row items-center gap-2">
-                    <Text className="text-[11px] font-elms-bold text-dark uppercase tracking-[0.08em]">
+                    <Text className="text-[11px] font-sf-bold text-dark uppercase tracking-[0.08em]">
                         {started ? 'Continue the journey' : 'Begin the journey'}
                     </Text>
                     <Feather name="arrow-up-right" size={12} color="#1A1A18" />

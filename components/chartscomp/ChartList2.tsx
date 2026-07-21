@@ -213,10 +213,10 @@ export default function ChartList({
         return (
             <View className="mt-20 px-10 items-center">
                 <View className="w-12 h-[2px] bg-primary mb-6" />
-                <Text className="text-dark font-elms-bold text-center text-xl leading-snug">
+                <Text className="text-dark font-sf-bold text-center text-xl leading-snug">
                     {error ? "Something went wrong" : `No charts found for "${searchCategory}"`}
                 </Text>
-                <Text className="mt-3 text-dark/40 font-elms-regular text-center text-[13px]">
+                <Text className="mt-3 text-dark/40 font-sf-regular text-center text-[13px]">
                     Check your connection or try a different search.
                 </Text>
             </View>

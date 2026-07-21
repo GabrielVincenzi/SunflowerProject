@@ -55,7 +55,7 @@ function FilterPill({ label, active, onPress }: { label: string; active: boolean
             }}
         >
             <Text style={{
-                fontSize: 12, fontFamily: 'elms-bold',
+                fontSize: 12, fontFamily: 'sf-bold',
                 color: active ? THEME_COLORS.primary : THEME_COLORS.dark,
             }}>
                 {label}
@@ -67,7 +67,7 @@ function FilterPill({ label, active, onPress }: { label: string; active: boolean
 function SectionLabel({ children }: { children: string }) {
     return (
         <Text style={{
-            fontSize: 10, fontFamily: 'elms-bold',
+            fontSize: 10, fontFamily: 'sf-bold',
             textTransform: 'uppercase', letterSpacing: 1.2,
             color: THEME_COLORS.dark, marginBottom: 10,
         }}>
@@ -121,7 +121,7 @@ export default function FilterSheet({
                 style={{ alignSelf: 'flex-end', marginBottom: 16, marginTop: -8 }}
             >
                 <Text style={{
-                    fontSize: 11, fontFamily: 'elms-bold',
+                    fontSize: 11, fontFamily: 'sf-bold',
                     color: THEME_COLORS.grey,
                 }}>
                     Clear all

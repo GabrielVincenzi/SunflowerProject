@@ -34,14 +34,14 @@ export default function SponsorshipEntry() {
                 <Animated.View entering={FadeInDown.duration(800).delay(100)} className="px-6 mt-12 mb-8">
                     <View className="flex-row items-center gap-2 mb-2">
                         <View className="h-[1px] w-8 bg-primary" />
-                        <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-grey/60">
+                        <Text className="text-[10px] uppercase font-sf-bold tracking-[0.4em] text-grey/60">
                             Sponsorship
                         </Text>
                     </View>
-                    <Text className="text-dark text-5xl tracking-tighter font-elms-bold capitalize leading-tight">
+                    <Text className="text-dark text-5xl tracking-tighter font-sf-bold capitalize leading-tight">
                         Amplify{"\n"}your signal.
                     </Text>
-                    <Text className="text-base font-elms-regular text-grey leading-relaxed">
+                    <Text className="text-base font-sf-regular text-grey leading-relaxed">
                         Choose how you want to reach the Sunflower community.
                     </Text>
                 </Animated.View>
@@ -67,11 +67,11 @@ export default function SponsorshipEntry() {
                                 {/* Choice Text */}
                                 <View className="flex-1">
                                     <Text
-                                        className={`text-xl font-elms-bold tracking-tight leading-tight mb-1 ${card.dark ? "text-light" : "text-dark"
+                                        className={`text-xl font-sf-bold tracking-tight leading-tight mb-1 ${card.dark ? "text-light" : "text-dark"
                                             }`}>{card.label}
                                     </Text>
                                     <Text
-                                        className={`text-xs font-elms-regular leading-relaxed ${card.dark ? "text-light/40" : "text-grey"
+                                        className={`text-xs font-sf-regular leading-relaxed ${card.dark ? "text-light/40" : "text-grey"
                                             }`}
                                     >
                                         {card.sub}
@@ -91,7 +91,7 @@ export default function SponsorshipEntry() {
                     entering={FadeInDown.duration(600).delay(600)}
                     className="mt-8 items-center"
                 >
-                    <Text className="text-[10px] font-elms-bold uppercase tracking-widest text-grey/30">
+                    <Text className="text-[10px] font-s-bold uppercase tracking-widest text-grey/30">
                         All sponsorships reviewed within 24 h
                     </Text>
                 </Animated.View>

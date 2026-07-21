@@ -60,9 +60,9 @@ export default function OptionCard({
             >
                 {icon && <Feather name={icon as any} size={16} color={THEME_COLORS.grey} />}
                 <View className="flex-1">
-                    <Text className="font-elms-bold text-[13.5px]" style={{ color: THEME_COLORS.dark }}>{label}</Text>
+                    <Text className="font-sf-bold text-[13.5px]" style={{ color: THEME_COLORS.dark }}>{label}</Text>
                     {description && (
-                        <Text className="font-elms-regular text-[11.5px] mt-0.5" style={{ color: "rgba(52,58,64,0.55)" }}>
+                        <Text className="font-sf-regular text-[11.5px] mt-0.5" style={{ color: "rgba(52,58,64,0.55)" }}>
                             {description}
                         </Text>
                     )}

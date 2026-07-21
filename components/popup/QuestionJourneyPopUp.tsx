@@ -96,13 +96,13 @@ function BeliefElicitationView({
             {/* Belief prompt label */}
             <View className="flex-row items-center gap-3 mb-5">
                 <View className="h-[2px] w-6 bg-dark/30" />
-                <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.3em]">
+                <Text className="text-[10px] uppercase font-sf-bold text-dark/40 tracking-[0.3em]">
                     FIRST ENCOUNTER — RECORD YOUR BELIEF
                 </Text>
             </View>
 
             {/* Instruction */}
-            <Text className="text-base font-elms-regular italic text-dark/50 mb-6 leading-relaxed">
+            <Text className="text-base font-sf-regular italic text-dark/50 mb-6 leading-relaxed">
                 Before seeing any data, write what you genuinely think. There are no wrong answers —
                 only honest starting points.
             </Text>
@@ -118,13 +118,13 @@ function BeliefElicitationView({
                     multiline
                     numberOfLines={4}
                     textAlignVertical="top"
-                    className="bg-white border-2 border-dark/10 rounded-[28px] p-6 text-dark font-elms-regular italic text-lg leading-relaxed min-h-[130px]"
+                    className="bg-white border-2 border-dark/10 rounded-[28px] p-6 text-dark font-sf-regular italic text-lg leading-relaxed min-h-[130px]"
                     style={{ fontStyle: "italic" }}
                 />
             </View>
 
             {/* Confidence selector */}
-            <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.3em] mb-3">
+            <Text className="text-[10px] uppercase font-sf-bold text-dark/30 tracking-[0.3em] mb-3">
                 HOW CONFIDENT ARE YOU?
             </Text>
             <View className="flex-row gap-3 mb-10">
@@ -138,7 +138,7 @@ function BeliefElicitationView({
                                 }`}
                         >
                             <Text
-                                className={`text-xs font-elms-bold italic ${active ? "text-primary" : "text-dark/40"
+                                className={`text-xs font-sf-bold italic ${active ? "text-primary" : "text-dark/40"
                                     }`}
                             >
                                 {opt.label}
@@ -151,7 +151,7 @@ function BeliefElicitationView({
             {/* Anonymity note */}
             <View className="flex-row items-center gap-2 mb-8 px-1">
                 <Feather name="lock" size={12} color="rgba(20,20,20,0.3)" />
-                <Text className="text-xs font-elms-regular italic text-dark/30 flex-1 leading-relaxed">
+                <Text className="text-xs font-sf-regular italic text-dark/30 flex-1 leading-relaxed">
                     Your belief is stored anonymously. It will only be shown back to you — never shared individually.
                 </Text>
             </View>
@@ -166,7 +166,7 @@ function BeliefElicitationView({
                         }`}
                 >
                     <Text
-                        className={`text-md font-elms-bold italic uppercase tracking-[0.2em] ${canSubmit ? "text-primary" : "text-dark/30"
+                        className={`text-md font-sf-bold italic uppercase tracking-[0.2em] ${canSubmit ? "text-primary" : "text-dark/30"
                             }`}
                     >
                         RECORD BELIEF
@@ -192,11 +192,11 @@ function BeliefRecordedView({
                         <View className="w-12 h-12 rounded-2xl bg-primary items-center justify-center">
                             <Feather name="bookmark" size={22} color="#141414" />
                         </View>
-                        <Text className="text-4xl font-elms-bold italic text-dark tracking-tighter leading-none">
+                        <Text className="text-4xl font-sf-bold italic text-dark tracking-tighter leading-none">
                             BELIEF LOGGED
                         </Text>
                     </View>
-                    <Text className="text-dark/60 font-elms-regular italic text-lg leading-relaxed">
+                    <Text className="text-dark/60 font-sf-regular italic text-lg leading-relaxed">
                         Come back tomorrow. When this question returns, you will face the data —
                         and see where your thinking stands.
                     </Text>
@@ -214,7 +214,7 @@ function BeliefRecordedView({
                         <View className="w-8 h-8 rounded-xl bg-dark/5 items-center justify-center mt-0.5">
                             <Feather name={item.icon as any} size={16} color="#141414" />
                         </View>
-                        <Text className="flex-1 font-elms-regular italic text-dark/60 text-base leading-relaxed">
+                        <Text className="flex-1 font-sf-regular italic text-dark/60 text-base leading-relaxed">
                             {item.label}
                         </Text>
                     </View>
@@ -226,7 +226,7 @@ function BeliefRecordedView({
                     onPress={onClose}
                     className="py-4 rounded-[32px] bg-dark items-center"
                 >
-                    <Text className="text-primary font-elms-bold italic text-md uppercase tracking-widest">
+                    <Text className="text-primary font-sf-bold italic text-md uppercase tracking-widest">
                         RETURN TO FEED
                     </Text>
                 </TouchableOpacity>
@@ -242,12 +242,12 @@ function ReturnEncounterHeader({ priorBelief }: { priorBelief?: string }) {
         <Animated.View entering={FadeInDown.delay(300)} className="mb-8">
             <View className="flex-row items-center gap-3 mb-3">
                 <View className="h-[1px] w-6 bg-dark/20" />
-                <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.3em]">
+                <Text className="text-[10px] uppercase font-sf-bold text-dark/30 tracking-[0.3em]">
                     YOUR RECORDED BELIEF
                 </Text>
             </View>
             <View className="bg-primary/10 border border-dark/10 rounded-[20px] px-5 py-4">
-                <Text className="font-elms-regular italic text-dark/70 text-base leading-relaxed">
+                <Text className="font-sf-regular italic text-dark/70 text-base leading-relaxed">
                     "{priorBelief.replace(/ \[confidence: \w+\]/, "")}"
                 </Text>
             </View>
@@ -352,7 +352,7 @@ export default function QuestionJourneyPopup({ onClose, title = "Inquiry" }: any
                             <View className="w-10 h-10 rounded-2xl bg-dark items-center justify-center">
                                 <Feather name="cpu" size={20} color="#F7CE46" />
                             </View>
-                            <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
+                            <Text className="text-[10px] uppercase font-sf-bold tracking-[0.4em] text-dark/40">
                                 {isFirst ? "BELIEF_NODE // OPEN" : "SYNTHESIS_MODE // ACTIVE"}
                             </Text>
                         </View>
@@ -373,12 +373,12 @@ export default function QuestionJourneyPopup({ onClose, title = "Inquiry" }: any
                         <Animated.View entering={FadeInDown.delay(200)}>
                             <View className="flex-row items-center gap-3 mb-4">
                                 <View className="h-[2px] w-8 bg-dark" />
-                                <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.2em]">
+                                <Text className="text-[10px] uppercase font-sf-bold text-dark/40 tracking-[0.2em]">
                                     INQUIRY NODE {question.questionId}
                                 </Text>
                             </View>
 
-                            <Text className="text-4xl font-elms-bold italic text-dark tracking-tighter leading-none mb-4">
+                            <Text className="text-4xl font-sf-bold italic text-dark tracking-tighter leading-none mb-4">
                                 {question.title}
                             </Text>
 
@@ -388,13 +388,13 @@ export default function QuestionJourneyPopup({ onClose, title = "Inquiry" }: any
                             )}
 
                             {phase === "elicit" && (
-                                <Text className="text-xl font-elms-regular italic text-dark/60 leading-relaxed mb-10">
+                                <Text className="text-xl font-sf-regular italic text-dark/60 leading-relaxed mb-10">
                                     {question.body}
                                 </Text>
                             )}
 
                             {phase === "choose" && (
-                                <Text className="text-xl font-elms-regular italic text-dark/60 leading-relaxed mb-8">
+                                <Text className="text-xl font-sf-regular italic text-dark/60 leading-relaxed mb-8">
                                     {question.body}
                                 </Text>
                             )}
@@ -429,7 +429,7 @@ export default function QuestionJourneyPopup({ onClose, title = "Inquiry" }: any
                                                 }`}
                                         >
                                             <Text
-                                                className={`text-xl font-elms-bold italic tracking-tight flex-1 mr-4 ${active ? "text-primary" : "text-dark"
+                                                className={`text-xl font-sf-bold italic tracking-tight flex-1 mr-4 ${active ? "text-primary" : "text-dark"
                                                     }`}
                                             >
                                                 {choice.content}
@@ -455,7 +455,7 @@ export default function QuestionJourneyPopup({ onClose, title = "Inquiry" }: any
                                         }`}
                                 >
                                     <Text
-                                        className={`text-md font-elms-bold italic uppercase tracking-[0.2em] ${selectedId ? "text-primary" : "text-dark/30"
+                                        className={`text-md font-sf-bold italic uppercase tracking-[0.2em] ${selectedId ? "text-primary" : "text-dark/30"
                                             }`}
                                     >
                                         {postMutation.isPending ? "Analysing..." : "Verify Synthesis"}
@@ -483,21 +483,21 @@ export default function QuestionJourneyPopup({ onClose, title = "Inquiry" }: any
                                                 color="white"
                                             />
                                         </View>
-                                        <Text className="text-4xl font-elms-bold italic text-dark tracking-tighter leading-none">
+                                        <Text className="text-4xl font-sf-bold italic text-dark tracking-tighter leading-none">
                                             {wasCorrect ? "VERIFIED" : "NOISE"}
                                         </Text>
                                     </View>
-                                    <Text className="text-dark/70 font-elms-regular italic text-lg leading-relaxed mb-6">
+                                    <Text className="text-dark/70 font-sf-regular italic text-lg leading-relaxed mb-6">
                                         {question.explanation}
                                     </Text>
 
                                     {/* Prior belief echo */}
                                     {question.priorBelief && (
                                         <View className="pt-5 border-t border-dark/10">
-                                            <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.3em] mb-2">
+                                            <Text className="text-[10px] uppercase font-sf-bold text-dark/30 tracking-[0.3em] mb-2">
                                                 WHERE YOU STARTED
                                             </Text>
-                                            <Text className="font-elms-regular italic text-dark/50 text-base leading-relaxed">
+                                            <Text className="font-sf-regular italic text-dark/50 text-base leading-relaxed">
                                                 "{question.priorBelief.replace(/ \[confidence: \w+\]/, "")}"
                                             </Text>
                                         </View>
@@ -508,10 +508,10 @@ export default function QuestionJourneyPopup({ onClose, title = "Inquiry" }: any
                             {/* Streak */}
                             <View className="mb-14 px-2">
                                 <View className="flex-row justify-between items-baseline mb-5">
-                                    <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/30">
+                                    <Text className="text-[10px] uppercase font-sf-bold tracking-[0.4em] text-dark/30">
                                         NEURAL_STREAK
                                     </Text>
-                                    <Text className="text-5xl font-elms-bold italic text-dark leading-none">
+                                    <Text className="text-5xl font-sf-bold italic text-dark leading-none">
                                         {streak}
                                     </Text>
                                 </View>
@@ -531,17 +531,17 @@ export default function QuestionJourneyPopup({ onClose, title = "Inquiry" }: any
                                 <View className="relative w-full">
                                     <View className="absolute inset-0 bg-dark rounded-[40px] translate-x-1.5 translate-y-1.5 opacity-5" />
                                     <View className="bg-white/40 p-10 rounded-[40px] border-2 border-dark/5">
-                                        <Text className="text-[10px] uppercase font-elms-bold tracking-[0.3em] text-dark/30 mb-6">
+                                        <Text className="text-[10px] uppercase font-sf-bold tracking-[0.3em] text-dark/30 mb-6">
                                             POWERED BY THE ARCHIVE
                                         </Text>
-                                        <Text className="text-4xl font-elms-bold italic text-dark tracking-tighter leading-none mb-6">
+                                        <Text className="text-4xl font-sf-bold italic text-dark tracking-tighter leading-none mb-6">
                                             {question.sponsor}
                                         </Text>
-                                        <Text className="text-xl font-elms-regular italic text-dark/60 leading-relaxed mb-8">
+                                        <Text className="text-xl font-sf-regular italic text-dark/60 leading-relaxed mb-8">
                                             {question.sponsorBody}
                                         </Text>
                                         <TouchableOpacity className="flex-row items-center gap-3">
-                                            <Text className="text-xl font-elms-bold italic text-dark border-b-4 border-primary leading-none">
+                                            <Text className="text-xl font-sf-bold italic text-dark border-b-4 border-primary leading-none">
                                                 EXPLORE NODE
                                             </Text>
                                             <Feather name="external-link" size={18} color="#141414" />
@@ -556,7 +556,7 @@ export default function QuestionJourneyPopup({ onClose, title = "Inquiry" }: any
                                     onPress={onClose}
                                     className="py-4 rounded-[32px] bg-dark items-center"
                                 >
-                                    <Text className="text-primary font-elms-bold italic text-md uppercase tracking-widest">
+                                    <Text className="text-primary font-sf-bold italic text-md uppercase tracking-widest">
                                         RETURN TO FEED
                                     </Text>
                                 </TouchableOpacity>

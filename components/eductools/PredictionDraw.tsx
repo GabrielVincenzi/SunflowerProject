@@ -470,7 +470,7 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
                                     <View className="w-9 h-9 rounded-full items-center justify-center bg-dark">
                                         <Feather name="clock" size={15} color="#F7CE46" />
                                     </View>
-                                    <Text className="text-[11px] font-elms-bold uppercase tracking-[0.12em] text-dark/40">
+                                    <Text className="text-[11px] font-sf-bold uppercase tracking-[0.12em] text-dark/40">
                                         The Time Machine
                                     </Text>
                                 </View>
@@ -484,10 +484,10 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
 
                             {/* ── Scenario framing ───────────────────────── */}
                             <Animated.View entering={FadeInDown.delay(80)} className="mb-5">
-                                <Text className="text-[11px] font-elms-bold uppercase tracking-[0.12em] text-dark/35 mb-1">
+                                <Text className="text-[11px] font-sf-bold uppercase tracking-[0.12em] text-dark/35 mb-1">
                                     {scenario.title}
                                 </Text>
-                                <Text className="text-[20px] font-elms-bold italic text-dark leading-snug">
+                                <Text className="text-[20px] font-sf-bold italic text-dark leading-snug">
                                     {scenario.claim}
                                 </Text>
                             </Animated.View>
@@ -701,20 +701,20 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
                                 <View className="flex-row gap-4 px-1 mt-2">
                                     <View className="flex-row items-center gap-1.5">
                                         <View className="w-3 h-1.5 rounded-full bg-primary" />
-                                        <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.06em]">
+                                        <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-[0.06em]">
                                             Known history
                                         </Text>
                                     </View>
                                     <View className="flex-row items-center gap-1.5">
                                         <View className="w-3 h-1.5 rounded-full bg-[#5B8DB8]" style={{ borderStyle: 'dashed' }} />
-                                        <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.06em]">
+                                        <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-[0.06em]">
                                             Your prediction
                                         </Text>
                                     </View>
                                     {phase === 'reveal' && (
                                         <View className="flex-row items-center gap-1.5">
                                             <View className="w-3 h-1.5 rounded-full bg-primary" />
-                                            <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.06em]">
+                                            <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-[0.06em]">
                                                 Reality
                                             </Text>
                                         </View>
@@ -729,7 +729,7 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
                                     {!hasStartedDrawing && (
                                         <View className="bg-[#FCEFC4] rounded-2xl px-4 py-3.5 mb-4 flex-row items-center gap-3">
                                             <Feather name="edit-2" size={14} color="#B8941F" />
-                                            <Text className="text-[12.5px] font-elms-regular text-[#6B5A12] flex-1 leading-relaxed">
+                                            <Text className="text-[12.5px] font-sf-regular text-[#6B5A12] flex-1 leading-relaxed">
                                                 Draw on the grey area to the right of the dashed line — that's the future you're predicting.
                                             </Text>
                                         </View>
@@ -739,10 +739,10 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
                                     {hasStartedDrawing && (
                                         <View className="mb-4">
                                             <View className="flex-row items-center justify-between mb-1.5">
-                                                <Text className="text-[10px] font-elms-bold text-dark/35 uppercase tracking-[0.08em]">
+                                                <Text className="text-[10px] font-sf-bold text-dark/35 uppercase tracking-[0.08em]">
                                                     Prediction coverage
                                                 </Text>
-                                                <Text className="text-[10px] font-elms-bold text-dark/50">
+                                                <Text className="text-[10px] font-sf-bold text-dark/50">
                                                     {progressPct}%
                                                 </Text>
                                             </View>
@@ -763,7 +763,7 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
                                             className="flex-1 flex-row items-center justify-center gap-2 py-3.5 bg-white border border-dark/10 rounded-[20px]"
                                         >
                                             <Feather name="rotate-ccw" size={14} color="#5F5E5A" />
-                                            <Text className="text-[12px] font-elms-bold text-dark/50 uppercase tracking-[0.06em]">
+                                            <Text className="text-[12px] font-sf-bold text-dark/50 uppercase tracking-[0.06em]">
                                                 Reset
                                             </Text>
                                         </TouchableOpacity>
@@ -781,7 +781,7 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
                                                 color={isComplete ? '#F7CE46' : '#A6A398'}
                                             />
                                             <Text
-                                                className={`text-[12px] font-elms-bold uppercase tracking-[0.06em] ${isComplete ? 'text-primary' : 'text-dark/30'
+                                                className={`text-[12px] font-sf-bold uppercase tracking-[0.06em] ${isComplete ? 'text-primary' : 'text-dark/30'
                                                     }`}
                                             >
                                                 {isComplete ? 'Reveal reality' : `Draw all ${totalFuture} points`}
@@ -824,15 +824,15 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
                                                     />
                                                 </View>
                                                 <View>
-                                                    <Text className="text-[18px] font-elms-bold italic text-dark leading-none">
+                                                    <Text className="text-[18px] font-sf-bold italic text-dark leading-none">
                                                         {score.headline}
                                                     </Text>
-                                                    <Text className="text-[11px] font-elms-regular text-dark/40 mt-0.5">
+                                                    <Text className="text-[11px] font-sf-regular text-dark/40 mt-0.5">
                                                         {score.meanAbsErrorPct}% mean error
                                                     </Text>
                                                 </View>
                                             </View>
-                                            <Text className="text-[13px] font-elms-regular text-dark/60 leading-relaxed">
+                                            <Text className="text-[13px] font-sf-regular text-dark/60 leading-relaxed">
                                                 {score.explanation}
                                             </Text>
                                         </View>
@@ -840,13 +840,13 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
 
                                     {/* Real story */}
                                     <View className="bg-[#FCEFC4] rounded-2xl p-5 mb-6">
-                                        <Text className="text-[11px] font-elms-bold uppercase tracking-[0.1em] text-[#8A6B1A] mb-2">
+                                        <Text className="text-[11px] font-sf-bold uppercase tracking-[0.1em] text-[#8A6B1A] mb-2">
                                             What actually happened
                                         </Text>
-                                        <Text className="text-[13px] font-elms-regular text-[#5C4A12] leading-relaxed">
+                                        <Text className="text-[13px] font-sf-regular text-[#5C4A12] leading-relaxed">
                                             {scenario.realStory}
                                         </Text>
-                                        <Text className="text-[10px] font-elms-regular text-[#8A6B1A]/70 mt-2.5">
+                                        <Text className="text-[10px] font-sf-regular text-[#8A6B1A]/70 mt-2.5">
                                             Source: {scenario.sourceName}
                                         </Text>
                                     </View>
@@ -859,7 +859,7 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
                                             className="flex-1 flex-row items-center justify-center gap-2 py-4 bg-white border border-dark/10 rounded-[24px]"
                                         >
                                             <Feather name="refresh-cw" size={14} color="#5F5E5A" />
-                                            <Text className="text-[12px] font-elms-bold text-dark/50 uppercase tracking-[0.06em]">
+                                            <Text className="text-[12px] font-sf-bold text-dark/50 uppercase tracking-[0.06em]">
                                                 New scenario
                                             </Text>
                                         </TouchableOpacity>
@@ -868,7 +868,7 @@ export default function TimeMachine({ onClose, onComplete }: TimeMachineProps) {
                                             activeOpacity={0.9}
                                             className="flex-1 py-4 bg-dark rounded-[24px] items-center"
                                         >
-                                            <Text className="text-[12px] font-elms-bold text-primary uppercase tracking-[0.06em]">
+                                            <Text className="text-[12px] font-sf-bold text-primary uppercase tracking-[0.06em]">
                                                 Done
                                             </Text>
                                         </TouchableOpacity>

@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.text-title {
+    @apply text-dark text-5xl tracking-tighter font-sf-bold italic capitalize leading-none mb-4 mt-6;
+}
+
+.text-description {
+    @apply text-[13px] font-sf-regular text-dark/55 leading-relaxed mb-4 mt-2
+}
+
+.text-cardtitle {
+    @apply text-[18px] font-sf-bold text-dark tracking-tight leading-snug mb-2
+}
+
+.text-subtitle {
+    @apply text-[21px] font-sf-bold italic text-dark tracking-tight leading-[30px]
+}
+
+.text-motto {
+    @apply text-[10px] font-sf-bold text-dark/45 uppercase tracking-[0.22em]
+}

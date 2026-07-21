@@ -43,13 +43,13 @@ export default function ToolTile({ tool, stage, onPress }: ToolTileProps) {
 
                 <View>
                     <Text
-                        className="text-[14.5px] font-elms-bold italic text-dark leading-snug mb-1"
+                        className="text-[14.5px] font-sf-bold italic text-dark leading-snug mb-1"
                         numberOfLines={2}
                     >
                         {tool.title}
                     </Text>
                     <Text
-                        className="text-[11px] font-elms-regular text-dark/45 leading-snug mb-2.5"
+                        className="text-[11px] font-sf-regular text-dark/45 leading-snug mb-2.5"
                         numberOfLines={2}
                     >
                         {tool.subtitle}
@@ -57,7 +57,7 @@ export default function ToolTile({ tool, stage, onPress }: ToolTileProps) {
 
                     <View className="flex-row items-center justify-between">
                         <Text
-                            className="text-[9.5px] font-elms-bold uppercase tracking-[0.06em]"
+                            className="text-[9.5px] font-sf-bold uppercase tracking-[0.06em]"
                             style={{ color: visuals.tint }}
                         >
                             {visuals.label}

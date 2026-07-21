@@ -44,7 +44,7 @@ export default function SunButton({
                         className={`flex-row items-center justify-center rounded-full py-3.5 px-5 gap-2 ${filled ? "border-0" : "border-[1.5px] border-[rgba(52,58,64,0.25)]"}`}
                         style={{ backgroundColor: filled ? THEME_COLORS.dark : "transparent" }}
                     >
-                        <Text className="font-elms-bold text-sm" style={{ color: filled ? THEME_COLORS.background : THEME_COLORS.dark }}>
+                        <Text className="font-sf-bold text-sm" style={{ color: filled ? THEME_COLORS.background : THEME_COLORS.dark }}>
                             {label}
                         </Text>
                         {icon}

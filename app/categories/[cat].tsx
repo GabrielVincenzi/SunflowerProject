@@ -43,13 +43,13 @@ const CategoryPage = () => {
             {/* System Path Tracker */}
             <View className="flex-row items-center gap-3 mb-4">
                 <View className="h-[2px] w-10 bg-dark" />
-                <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
+                <Text className="text-[10px] uppercase font-sf-bold tracking-[0.4em] text-dark/40">
                     {t.category?.archiveLabel || "ARCHIVE"} // {category.toUpperCase()}
                 </Text>
             </View>
 
             {/* Editorial Title Heading */}
-            <Text className="text-dark text-5xl tracking-tighter font-elms-bold italic capitalize leading-none mb-4">
+            <Text className="text-title">
                 {category
                     .split("-")
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -71,8 +71,8 @@ const CategoryPage = () => {
             {committedQuery ? (
                 <View className="space-y-4">
                     <View className="flex-row items-baseline gap-2">
-                        <Text className="text-2xl font-elms-bold text-dark tracking-tighter italic">{t.search.resultsFor}</Text>
-                        <Text className="text-2xl font-elms-bold italic text-white">"{committedQuery}"</Text>
+                        <Text className="text-2xl font-sf-bold text-dark tracking-tighter italic">{t.search.resultsFor}</Text>
+                        <Text className="text-2xl font-sf-bold italic text-white">"{committedQuery}"</Text>
                     </View>
 
                     <TouchableOpacity
@@ -80,7 +80,7 @@ const CategoryPage = () => {
                         activeOpacity={0.6}
                         className="py-3 border-b-2 border-dark/5 self-start"
                     >
-                        <Text className="text-[10px] font-elms-bold uppercase tracking-[0.3em] text-dark/40">
+                        <Text className="text-[10px] font-sf-bold uppercase tracking-[0.3em] text-dark/40">
                             {t.search.requestData.prompt} <Text className="text-dark/60">{t.search.requestData.cta}</Text>
                         </Text>
                     </TouchableOpacity>

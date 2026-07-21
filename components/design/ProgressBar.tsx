@@ -34,7 +34,7 @@ export default function ProgressBar({ value, pulse }: { value: number; pulse?: b
             <View className="flex-1 rounded h-1.5" style={{ backgroundColor: "rgba(52,58,64,0.1)", overflow: "visible" }}>
                 <Animated.View className="h-full rounded" style={[{ backgroundColor: THEME_COLORS.secondary }, fillStyle]} />
             </View>
-            <Text className="font-elms-bold text-[11px] min-w-[30px] text-right" style={{ color: "rgba(52,58,64,0.45)" }}>
+            <Text className="font-sf-bold text-[11px] min-w-[30px] text-right" style={{ color: "rgba(52,58,64,0.45)" }}>
                 {Math.round(value)}%
             </Text>
             {pulse && <SparklePulse />}

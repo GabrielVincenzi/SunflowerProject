@@ -40,10 +40,10 @@ export const FlowHeader = ({
             className="w-10 h-10 rounded-full bg-dark/5 items-center justify-center"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-            <Text className="text-dark font-elms-bold text-base">←</Text>
+            <Text className="text-dark font-sf-bold text-base">←</Text>
         </TouchableOpacity>
         <View className="px-4 py-1.5 bg-dark rounded-full">
-            <Text className="text-[9px] font-elms-bold uppercase tracking-[0.3em] text-primary">
+            <Text className="text-[9px] font-sf-bold uppercase tracking-[0.3em] text-primary">
                 {pathLabel}
             </Text>
         </View>
@@ -63,15 +63,15 @@ export const StepTitle = ({
     <View className="mb-8">
         <View className="flex-row items-center gap-2 mb-2">
             <View className="h-[1px] w-8 bg-primary" />
-            <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-grey/60">
+            <Text className="text-[10px] uppercase font-sf-bold tracking-[0.4em] text-grey/60">
                 {label}
             </Text>
         </View>
-        <Text className="text-4xl font-elms-bold text-dark tracking-tighter leading-tight mb-2">
+        <Text className="text-4xl font-sf-bold text-dark tracking-tighter leading-tight mb-2">
             {title}
         </Text>
         {subtitle ? (
-            <Text className="text-sm font-elms-regular text-grey leading-relaxed">
+            <Text className="text-sm font-sf-regular text-grey leading-relaxed">
                 {subtitle}
             </Text>
         ) : null}
@@ -80,7 +80,7 @@ export const StepTitle = ({
 
 // ─── Field label ─────────────────────────────────────────────────────────────
 export const FieldLabel = ({ children }: { children: string }) => (
-    <Text className="text-[10px] font-elms-bold uppercase tracking-widest text-grey/40 mb-2">
+    <Text className="text-[10px] font-sf-bold uppercase tracking-widest text-grey/40 mb-2">
         {children}
     </Text>
 );
@@ -104,14 +104,14 @@ export const ChipRow = ({
                     }`}
             >
                 <Text
-                    className={`text-sm font-elms-bold ${selected === i ? "text-light" : "text-dark"
+                    className={`text-sm font-sf-bold ${selected === i ? "text-light" : "text-dark"
                         }`}
                 >
                     {o.label}
                 </Text>
                 {o.sub ? (
                     <Text
-                        className={`text-[9px] font-elms-bold uppercase tracking-widest mt-0.5 ${selected === i ? "text-light/40" : "text-grey/40"
+                        className={`text-[9px] font-sf-bold uppercase tracking-widest mt-0.5 ${selected === i ? "text-light/40" : "text-grey/40"
                             }`}
                     >
                         {o.sub}
@@ -143,7 +143,7 @@ export const TagCloud = ({
                     }`}
             >
                 <Text
-                    className={`text-xs font-elms-bold ${selected.includes(t) ? "text-primary" : "text-dark"
+                    className={`text-xs font-sf-bold ${selected.includes(t) ? "text-primary" : "text-dark"
                         }`}
                 >
                     {t}
@@ -167,11 +167,11 @@ export const ReviewRow = ({
         className={`flex-row justify-between items-center py-4 ${!last ? "border-b border-dark/5" : ""
             }`}
     >
-        <Text className="text-[10px] font-elms-bold uppercase tracking-widest text-grey/40">
+        <Text className="text-[10px] font-sf-bold uppercase tracking-widest text-grey/40">
             {label}
         </Text>
         <Text
-            className="text-xs font-elms-bold text-dark text-right flex-1 ml-4"
+            className="text-xs font-sf-bold text-dark text-right flex-1 ml-4"
             numberOfLines={1}
         >
             {value}
@@ -194,16 +194,16 @@ export const SuccessScreen = ({
 
             <View className="flex-row items-center gap-3 mb-4">
                 <View className="h-[1px] w-8 bg-dark/15" />
-                <Text className="text-[10px] font-elms-bold uppercase tracking-[0.4em] text-grey/50">
+                <Text className="text-[10px] font-sf-bold uppercase tracking-[0.4em] text-grey/50">
                     Signal Sent
                 </Text>
                 <View className="h-[1px] w-8 bg-dark/15" />
             </View>
 
-            <Text className="text-4xl font-elms-bold text-dark tracking-tighter text-center leading-tight mb-3">
+            <Text className="text-4xl font-sf-bold text-dark tracking-tighter text-center leading-tight mb-3">
                 {"Your sponsorship\nis live."}
             </Text>
-            <Text className="text-sm font-elms-regular text-grey text-center leading-relaxed mb-10 max-w-[260px]">
+            <Text className="text-sm font-sf-regular text-grey text-center leading-relaxed mb-10 max-w-[260px]">
                 Our team will review within 24 hours. You'll be notified when it goes live in the feed.
             </Text>
 

@@ -409,13 +409,13 @@ const SelectionScreen = ({ onSelect }: { onSelect: (m: string) => void }) => {
                     <View className="h-[2px] w-12 bg-dark mb-8" />
 
                     <Animated.View entering={FadeInDown.delay(80).duration(800)}>
-                        <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.4em] mb-3">
+                        <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-[0.4em] mb-3">
                             Municipal Intelligence
                         </Text>
-                        <Text className="text-7xl font-elms-bold italic tracking-tighter text-dark leading-none">
+                        <Text className="text-7xl font-sf-bold italic tracking-tighter text-dark leading-none">
                             Your{'\n'}City.
                         </Text>
-                        <Text className="text-xl font-elms-bold italic text-dark/55 mt-5 leading-snug">
+                        <Text className="text-xl font-sf-bold italic text-dark/55 mt-5 leading-snug">
                             Select a municipality to explore its financial health and civic priorities.
                         </Text>
                     </Animated.View>
@@ -424,7 +424,7 @@ const SelectionScreen = ({ onSelect }: { onSelect: (m: string) => void }) => {
                         <ShadowCard radius={24} className="flex-row items-center px-5 py-4">
                             <Ionicons name="search" size={18} color="#343a40" style={{ opacity: 0.35 }} />
                             <TextInput
-                                className="flex-1 ml-3 font-elms-regular text-dark text-base"
+                                className="flex-1 ml-3 font-sf-regular text-dark text-base"
                                 placeholder="Search municipality..."
                                 placeholderTextColor="rgba(52,58,64,0.3)"
                                 value={search}
@@ -434,7 +434,7 @@ const SelectionScreen = ({ onSelect }: { onSelect: (m: string) => void }) => {
                     </Animated.View>
 
                     <Animated.View entering={FadeInDown.delay(420).duration(800)} className="mt-10">
-                        <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.4em] mb-5">
+                        <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-[0.4em] mb-5">
                             Popular Cities
                         </Text>
                         <View className="flex-row flex-wrap gap-3">
@@ -449,7 +449,7 @@ const SelectionScreen = ({ onSelect }: { onSelect: (m: string) => void }) => {
                                         activeOpacity={0.85}
                                         className="bg-dark px-5 py-3 rounded-full border-2 border-dark"
                                     >
-                                        <Text className="text-[10px] font-elms-bold text-primary uppercase tracking-widest">
+                                        <Text className="text-[10px] font-sf-bold text-primary uppercase tracking-widest">
                                             {city}
                                         </Text>
                                     </TouchableOpacity>
@@ -762,7 +762,7 @@ const MunicipalityBalanceSheetScreen = () => {
             <SafeAreaView className="flex-1 bg-primary justify-center items-center px-8">
                 <View className="h-[2px] w-12 bg-dark mb-12" />
                 <ActivityIndicator size="large" color="#343a40" />
-                <Text className="mt-6 font-elms-bold text-dark uppercase tracking-[0.4em] text-[10px]">
+                <Text className="mt-6 font-sf-bold text-dark uppercase tracking-[0.4em] text-[10px]">
                     Fetching Intelligence...
                 </Text>
             </SafeAreaView>
@@ -773,7 +773,7 @@ const MunicipalityBalanceSheetScreen = () => {
         return (
             <SafeAreaView className="flex-1 bg-primary justify-center items-center px-8">
                 <View className="h-[2px] w-12 bg-dark mb-8" />
-                <Text className="text-dark font-elms-bold text-5xl italic tracking-tighter mb-6 leading-none">
+                <Text className="text-dark font-sf-bold text-5xl italic tracking-tighter mb-6 leading-none">
                     Something{'\n'}went wrong.
                 </Text>
                 <ShadowCard radius={24} className="w-full">
@@ -782,7 +782,7 @@ const MunicipalityBalanceSheetScreen = () => {
                         activeOpacity={0.85}
                         className="bg-dark rounded-[24px] py-4 items-center"
                     >
-                        <Text className="text-[10px] font-elms-bold text-primary uppercase tracking-[0.4em]">
+                        <Text className="text-[10px] font-sf-bold text-primary uppercase tracking-[0.4em]">
                             Go Back
                         </Text>
                     </TouchableOpacity>

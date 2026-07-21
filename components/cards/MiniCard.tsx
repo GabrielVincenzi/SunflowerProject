@@ -1,126 +1,65 @@
 import { THEME_COLORS } from "@/constants/utilities";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 
-interface MiniCardProps {
-    icon?: string;
-    iconGlyph?: keyof typeof Feather.glyphMap;
+const CARD_GAP = 14;
+const CARDS_VISIBLE = 1.6; // how many cards peek on screen at once
+const CARD_WIDTH =
+    (Dimensions.get("window").width - 24 * 2 - CARD_GAP * (CARDS_VISIBLE - 1)) / CARDS_VISIBLE;
+
+interface TodayCardProps {
+    iconGlyph: keyof typeof Feather.glyphMap;
     title: string;
     subtitle?: string;
     onPress: () => void;
-    featured?: boolean;
     isDark?: boolean;
-    onPressIn?: () => void;
-    onPressOut?: () => void;
 }
 
-
-export const MiniCard = ({
-    icon,
+// Compact, fixed-width sibling of MiniCard — same shadow-offset /
+// rounded-corner / icon-circle language, but sized for a horizontal
+// scroll row instead of a square grid tile. isDark is reused the
+// same way MiniCard uses it: the one item that should read as the
+// "main" pick in the row (here, the search hint) goes dark.
+export default function MiniCard({
     iconGlyph,
     title,
     subtitle,
     onPress,
-    featured = false,
     isDark = false,
-    onPressIn,
-    onPressOut,
-}: MiniCardProps) => {
+}: TodayCardProps) {
     const bgColor = isDark ? THEME_COLORS.dark : THEME_COLORS.background;
-    const borderColor = featured ? THEME_COLORS.dark : `${THEME_COLORS.dark}10`;
     const titleColor = isDark ? THEME_COLORS.background : THEME_COLORS.dark;
     const subtitleColor = isDark ? `${THEME_COLORS.background}40` : `${THEME_COLORS.dark}40`;
-    const iconBgColor = featured ? THEME_COLORS.background : THEME_COLORS.primary;
-    const iconColor = featured ? THEME_COLORS.dark : THEME_COLORS.dark;
-
 
     return (
-        <View className="flex-1 relative aspect-square">
-            {/* Shadow Layer */}
+        <View className="relative h-[124px]" style={{ width: CARD_WIDTH }}>
+            {/* Shadow layer */}
             <View
-                className="absolute inset-0 bg-dark rounded-[40px]"
-                style={{ transform: [{ translateX: featured ? 6 : 4 }, { translateY: featured ? 6 : 4 }] }}
+                className="absolute inset-0 bg-dark rounded-[28px]"
+                style={{ transform: [{ translateX: 4 }, { translateY: 4 }] }}
             />
 
-            {featured && (
-                <>
-                    <View
-                        pointerEvents="none"
-                        style={{
-                            position: 'absolute',
-                            top: -36,
-                            right: -36,
-                            width: 130,
-                            height: 130,
-                            borderRadius: 65,
-                            backgroundColor: THEME_COLORS.primary,
-                            opacity: 0.16,
-                        }}
-                    />
-                    <View
-                        pointerEvents="none"
-                        style={{
-                            position: 'absolute',
-                            top: -14,
-                            right: -10,
-                            width: 64,
-                            height: 64,
-                            borderRadius: 32,
-                            backgroundColor: THEME_COLORS.primary,
-                            opacity: 0.22,
-                        }}
-                    />
-                </>
-            )}
-
-            {/* Main Card */}
+            {/* Content layer */}
             <TouchableOpacity
                 onPress={onPress}
-                onPressIn={onPressIn}
-                onPressOut={onPressOut}
                 activeOpacity={0.9}
-                className="flex-1 rounded-[40px] p-6 justify-between overflow-hidden border-2"
-                style={{
-                    backgroundColor: bgColor,
-                    borderColor: borderColor,
-                }}
+                className="flex-1 rounded-[28px] p-4 justify-between overflow-hidden border-[1.5px]"
+                style={{ backgroundColor: bgColor, borderColor: THEME_COLORS.dark }}
             >
-                {/* Left accent strip - featured cards get primary yellow */}
                 <View
-                    className="absolute left-0 top-[16%] bottom-[16%] w-[4px]"
-                    style={{
-                        backgroundColor: featured ? THEME_COLORS.primary : `${THEME_COLORS.dark}10`
-                    }}
-                />
-
-                {/* Icon */}
-                <View
-                    className="w-10 h-10 rounded-full items-center justify-center"
-                    style={{ backgroundColor: iconBgColor }}
+                    className="w-9 h-9 rounded-full items-center justify-center"
+                    style={{ backgroundColor: THEME_COLORS.primary }}
                 >
-                    {iconGlyph ? (
-                        <Feather name={iconGlyph} size={16} color={iconColor} />
-                    ) : (
-                        <Text className={`text-xs font-elms-bold italic ${isDark ? 'text-white' : 'text-dark'}`}>
-                            {icon}
-                        </Text>
-                    )}
+                    <Feather name={iconGlyph} size={15} color={THEME_COLORS.dark} />
                 </View>
 
-                {/* Title & Subtitle */}
                 <View>
-                    <Text
-                        className="text-2xl font-elms-bold tracking-tighter italic leading-tight"
-                        style={{ color: titleColor }}
-                    >
+                    <Text className="text-cardtitle" style={{ color: titleColor }}>
                         {title}
                     </Text>
                     {subtitle && (
-                        <Text
-                            className="text-[10px] mt-1 uppercase font-elms-regular tracking-widest leading-none"
-                            style={{ color: subtitleColor }}
-                        >
+                        <Text className="text-motto" style={{ color: subtitleColor }}>
                             {subtitle}
                         </Text>
                     )}

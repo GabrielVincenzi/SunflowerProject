@@ -60,11 +60,11 @@ export default function SearchScreen() {
         <View className="px-6 pt-14 pb-2">
             {/* Top label + title */}
             <View className="flex-row items-center gap-2 mb-1">
-                <Text className="text-[11px] font-elms-bold uppercase tracking-[0.12em] text-dark/40">
+                <Text className="text-[11px] font-sf-bold uppercase tracking-[0.12em] text-dark/40">
                     Explore signals
                 </Text>
             </View>
-            <Text className="text-[22px] font-elms-bold italic text-dark mb-4">
+            <Text className="text-[22px] font-sf-bold italic text-dark mb-4">
                 Find your next chart
             </Text>
 
@@ -92,7 +92,7 @@ export default function SearchScreen() {
                             style={{ width: `${Math.round(progress * 100)}%` }}
                         />
                     </View>
-                    <Text className="text-[11px] font-elms-regular text-dark/35">
+                    <Text className="text-[11px] font-sf-regular text-dark/35">
                         {Math.round(progress * 100)}%
                     </Text>
                 </View>
@@ -101,7 +101,7 @@ export default function SearchScreen() {
             {isWarming && (
                 <View className="flex-row items-center gap-2 mt-2">
                     <ActivityIndicator size="small" color={THEME_COLORS.primary} />
-                    <Text className="text-[11px] font-elms-regular text-dark/35">
+                    <Text className="text-[11px] font-sf-regular text-dark/35">
                         Preparing search...
                     </Text>
                 </View>
@@ -111,15 +111,15 @@ export default function SearchScreen() {
             {isSearching && (
                 <View className="mb-3">
                     <View className="flex-row items-baseline gap-2 mb-2">
-                        <Text className="text-base font-elms-bold text-dark">Results for</Text>
-                        <Text className="text-base font-elms-bold italic text-dark">"{committedQuery}"</Text>
+                        <Text className="text-base font-sf-bold text-dark">Results for</Text>
+                        <Text className="text-base font-sf-bold italic text-dark">"{committedQuery}"</Text>
                     </View>
                     <TouchableOpacity
                         onPress={() => setRequestVisible(true)}
                         activeOpacity={0.7}
                         className="self-start"
                     >
-                        <Text className="text-[11px] font-elms-bold uppercase tracking-[0.1em] text-dark/35">
+                        <Text className="text-[11px] font-sf-bold uppercase tracking-[0.1em] text-dark/35">
                             Can't find what you need? <Text className="text-dark/60">Request it</Text>
                         </Text>
                     </TouchableOpacity>
@@ -127,7 +127,7 @@ export default function SearchScreen() {
             )}
 
             {!isSearching && (
-                <Text className="text-[11px] font-elms-bold uppercase tracking-[0.12em] text-dark/40 mb-1">
+                <Text className="text-[11px] font-sf-bold uppercase tracking-[0.12em] text-dark/40 mb-1">
                     {mode === 'recommended' ? 'Recommended for you' : 'Picked at random'}
                 </Text>
             )}

@@ -112,7 +112,7 @@ const SunCard = ({
                         style={{ backgroundColor: featured ? '#FFFFFF' : topicStyle.bg }}
                     >
                         <Text
-                            className="text-[11px] font-elms-bold"
+                            className="text-[11px] font-sf-bold"
                             style={{ color: featured ? 'text-dark' : topicStyle.text }}
                         >
                             {category || db_name || 'General'}
@@ -123,7 +123,7 @@ const SunCard = ({
 
                 {/* 2. Headline */}
                 <Text
-                    className="text-lg font-elms-bold italic text-dark tracking-tight leading-snug mb-2"
+                    className="text-cardtitle"
                     numberOfLines={2}
                 >
                     {title}
@@ -131,7 +131,7 @@ const SunCard = ({
 
                 {/* 3. Description */}
                 <Text
-                    className="text-[13px] font-elms-regular text-dark/55 leading-relaxed mb-4"
+                    className="text-description"
                     numberOfLines={2}
                 >
                     {description || "No description available for this chart yet."}
@@ -141,7 +141,7 @@ const SunCard = ({
                     text instruction. A quiet label stays for accessibility/
                     clarity but is visually secondary to the icon. */}
                 <View className="flex-row items-center justify-between">
-                    <Text className="text-[11px] font-elms-regular text-dark/35">
+                    <Text className="text-[11px] font-sf-regular text-dark/35">
                         {featured ? "Today's pick" : "Tap to explore"}
                     </Text>
                     <View

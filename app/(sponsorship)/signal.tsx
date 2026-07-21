@@ -126,7 +126,7 @@ export default function SignalScreen() {
                             onChangeText={setSponsorName}
                             placeholder="Inquiry Labs"
                             placeholderTextColor="rgba(52,58,64,0.25)"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-5"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-5"
                         />
 
                         <FieldLabel>Tagline</FieldLabel>
@@ -136,7 +136,7 @@ export default function SignalScreen() {
                             placeholder="Advancing cognition through data."
                             placeholderTextColor="rgba(52,58,64,0.25)"
                             multiline
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-5"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-5"
                             style={{ minHeight: 88, textAlignVertical: "top" }}
                         />
 
@@ -148,7 +148,7 @@ export default function SignalScreen() {
                             placeholderTextColor="rgba(52,58,64,0.25)"
                             autoCapitalize="none"
                             keyboardType="url"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-8"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-8"
                         />
                     </>
                 )}

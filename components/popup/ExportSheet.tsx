@@ -27,7 +27,7 @@ export const ExportSheet: React.FC<ExportSheetProps> = ({
         >
             {/* Format section label */}
             <Text style={{
-                fontSize: 10, fontFamily: 'elms-bold',
+                fontSize: 10, fontFamily: 'sf-bold',
                 textTransform: 'uppercase', letterSpacing: 1.2,
                 color: 'rgba(20,20,18,0.35)', marginBottom: 12,
             }}>
@@ -69,13 +69,13 @@ export const ExportSheet: React.FC<ExportSheetProps> = ({
                             {/* Label + sublabel */}
                             <View style={{ flex: 1 }}>
                                 <Text style={{
-                                    fontSize: 15, fontFamily: 'elms-bold',
+                                    fontSize: 15, fontFamily: 'sf-bold',
                                     fontStyle: 'italic', color: active ? THEME_COLORS.primary : THEME_COLORS.dark,
                                 }}>
                                     {opt.label}
                                 </Text>
                                 <Text style={{
-                                    fontSize: 11, fontFamily: 'elms-regular',
+                                    fontSize: 11, fontFamily: 'sf-regular',
                                     color: active ? THEME_COLORS.primary : THEME_COLORS.dark,
                                     marginTop: 1,
                                 }}>
@@ -111,7 +111,7 @@ export const ExportSheet: React.FC<ExportSheetProps> = ({
                     borderRadius: 16, padding: 12, marginTop: 4,
                 }}>
                     <Feather name="alert-circle" size={14} color={THEME_COLORS.error} />
-                    <Text style={{ fontSize: 11, fontFamily: 'elms-bold', fontStyle: 'italic', color: THEME_COLORS.error, flex: 1 }}>
+                    <Text style={{ fontSize: 11, fontFamily: 'sf-bold', fontStyle: 'italic', color: THEME_COLORS.error, flex: 1 }}>
                         {exportError}
                     </Text>
                 </View>

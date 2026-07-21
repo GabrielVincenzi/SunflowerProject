@@ -29,7 +29,7 @@ const SearchPage = () => {
                 <View className="w-20 h-20 bg-white rounded-[24px] items-center justify-center">
                     <Image source={images.logoMain} className="w-14 h-14" resizeMode="contain" />
                 </View>
-                <Text className="text-[10px] uppercase font-elms-bold tracking-[0.5em] text-dark/30 mt-6 text-center">
+                <Text className="text-[10px] uppercase font-sf-bold tracking-[0.5em] text-dark/30 mt-6 text-center">
                     {t.search.engineLabel}
                 </Text>
             </Animated.View>
@@ -48,8 +48,8 @@ const SearchPage = () => {
             {committedQuery ? (
                 <View className="space-y-4">
                     <View className="flex-row items-baseline gap-2">
-                        <Text className="text-2xl font-elms-bold text-dark tracking-tighter italic">{t.search.resultsFor}</Text>
-                        <Text className="text-2xl font-elms-bold italic text-white">"{committedQuery}"</Text>
+                        <Text className="text-2xl font-sf-bold text-dark tracking-tighter italic">{t.search.resultsFor}</Text>
+                        <Text className="text-2xl font-sf-bold italic text-white">"{committedQuery}"</Text>
                     </View>
 
                     <TouchableOpacity
@@ -57,7 +57,7 @@ const SearchPage = () => {
                         activeOpacity={0.6}
                         className="py-3 border-b-2 border-dark/5 self-start"
                     >
-                        <Text className="text-[10px] font-elms-bold uppercase tracking-[0.3em] text-dark/40">
+                        <Text className="text-[10px] font-sf-bold uppercase tracking-[0.3em] text-dark/40">
                             {t.search.requestData.prompt} <Text className="text-dark/60">{t.search.requestData.cta}</Text>
                         </Text>
                     </TouchableOpacity>
@@ -75,7 +75,7 @@ const SearchPage = () => {
                             {renderHeader()}
                             <View className="flex-1 justify-center items-center pb-32 px-10">
                                 <View className="w-2 h-2 rounded-full bg-primary mb-6 animate-pulse" />
-                                <Text className="text-center text-dark/40 font-elms-bold italic text-2xl tracking-tighter leading-tight">
+                                <Text className="text-center text-dark/40 font-sf-bold italic text-2xl tracking-tighter leading-tight">
                                     {t.search.emptyState.tagline}
                                 </Text>
 
@@ -84,7 +84,7 @@ const SearchPage = () => {
                                     activeOpacity={0.8}
                                     className="mt-12 flex-row items-center gap-3 px-8 py-4 rounded-full border-2 border-dark bg-white"
                                 >
-                                    <Text className="text-[10px] font-elms-bold uppercase tracking-[0.4em] text-dark">
+                                    <Text className="text-[10px] font-sf-bold uppercase tracking-[0.4em] text-dark">
                                         {t.search.emptyState.button}
                                     </Text>
                                 </TouchableOpacity>

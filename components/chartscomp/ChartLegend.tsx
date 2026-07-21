@@ -27,7 +27,7 @@ export default function ChartLegend({ items, yUnitLabel }: ChartLegendProps) {
                         />
 
                         {/* Label: Bold Italic, tight tracking, editorial uppercase */}
-                        <Text className="text-sm font-elms-bold italic text-dark tracking-[0.15em] leading-none">
+                        <Text className="text-sm font-sf-bold italic text-dark tracking-[0.15em] leading-none">
                             {item.label}
                         </Text>
                     </View>
@@ -38,7 +38,7 @@ export default function ChartLegend({ items, yUnitLabel }: ChartLegendProps) {
             {yUnitLabel ? (
                 <View className="mt-10 flex-row items-center gap-4">
                     <View className="h-[1px] w-8 bg-dark/10" />
-                    <Text className="text-[9px] font-elms-bold text-dark/20 uppercase tracking-[0.5em]">
+                    <Text className="text-[9px] font-sf-bold text-dark/20 uppercase tracking-[0.5em]">
                         SIGNAL_DOMAIN // {yUnitLabel.toUpperCase()}
                     </Text>
                     <View className="h-[1px] w-8 bg-dark/10" />

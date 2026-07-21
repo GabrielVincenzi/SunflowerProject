@@ -39,7 +39,7 @@ export default function SearchBarWithFilter({
                     placeholder="Search by topic, country, theme..."
                     placeholderTextColor={THEME_COLORS.grey}
                     returnKeyType="search"
-                    className="h-[46px] pl-11 pr-4 rounded-[23px] border border-dark/10 bg-white text-[14px] font-elms-regular text-dark"
+                    className="h-[46px] pl-11 pr-4 rounded-[23px] border border-dark/10 bg-white text-[14px] font-sf-regular text-dark"
                 />
             </View>
 
@@ -52,7 +52,7 @@ export default function SearchBarWithFilter({
                 <Feather name="sliders" size={17} color={THEME_COLORS.primary} />
                 {activeFilterCount > 0 && (
                     <View className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary items-center justify-center">
-                        <Text className="text-[9px] font-elms-bold text-dark">
+                        <Text className="text-[9px] font-sf-bold text-dark">
                             {activeFilterCount}
                         </Text>
                     </View>

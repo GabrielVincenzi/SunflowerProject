@@ -1,3 +1,4 @@
+import { THEME_COLORS } from "@/constants/utilities";
 import React, { forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import Animated, {
@@ -10,14 +11,6 @@ import Animated, {
 } from "react-native-reanimated";
 import Svg, { Defs, Ellipse, FeGaussianBlur, Filter, Path, Pattern, Rect } from "react-native-svg";
 
-// ─── Palette (mirrors THEME_COLORS) ────────────────────────────────────────────
-const C = {
-    primary: "#FCD34D",
-    secondary: "#D99201",
-    dark: "#343a40",
-    marked: "#84CC16",
-};
-
 const TEARDROP_D = "M0,-19 C9,-9 9,9 0,20 C-9,9 -9,-9 0,-19 Z";
 const CRESCENT_D = "M-3,-19 Q11,0 -3,19 Q-8,0 -3,-19 Z";
 
@@ -26,12 +19,12 @@ function WallPattern({ id }: { id: string }) {
     return (
         <Defs>
             <Pattern id={id} width={96} height={96} patternUnits="userSpaceOnUse">
-                <Rect width={96} height={96} fill={C.primary} />
-                <Ellipse cx={16} cy={14} rx={7} ry={16} fill={C.secondary} opacity={0.5} transform="rotate(18 16 14)" />
-                <Path d={TEARDROP_D} fill={C.dark} opacity={0.1} transform="translate(70,10) rotate(-30) scale(0.5)" />
-                <Ellipse cx={46} cy={58} rx={8} ry={18} fill={C.secondary} opacity={0.4} transform="rotate(64 46 58)" />
-                <Path d={CRESCENT_D} fill={C.marked} opacity={0.15} transform="translate(86,72) rotate(105) scale(0.55)" />
-                <Ellipse cx={8} cy={84} rx={6} ry={14} fill={C.secondary} opacity={0.45} transform="rotate(-42 8 84)" />
+                <Rect width={96} height={96} fill={THEME_COLORS.primary} />
+                <Ellipse cx={16} cy={14} rx={7} ry={16} fill={THEME_COLORS.secondary} opacity={0.5} transform="rotate(18 16 14)" />
+                <Path d={TEARDROP_D} fill={THEME_COLORS.dark} opacity={0.1} transform="translate(70,10) rotate(-30) scale(0.5)" />
+                <Ellipse cx={46} cy={58} rx={8} ry={18} fill={THEME_COLORS.secondary} opacity={0.4} transform="rotate(64 46 58)" />
+                <Path d={CRESCENT_D} fill={THEME_COLORS.marked} opacity={0.15} transform="translate(86,72) rotate(105) scale(0.55)" />
+                <Ellipse cx={8} cy={84} rx={6} ry={14} fill={THEME_COLORS.secondary} opacity={0.45} transform="rotate(-42 8 84)" />
             </Pattern>
         </Defs>
     );
@@ -193,7 +186,7 @@ const PetalWallTransition = forwardRef<PetalWallTransitionRef, Props>(({ onCover
     const petals = useMemo<Petal[]>(() => {
         if (phase === "idle" && runId === 0) return [];
         const shapes: ShapeType[] = ["oval", "teardrop", "crescent"];
-        const palette = [C.secondary, C.dark, C.secondary, C.primary];
+        const palette = [THEME_COLORS.secondary, THEME_COLORS.dark, THEME_COLORS.secondary, THEME_COLORS.primary];
         return Array.from({ length: 42 }).map((_, i) => {
             const r = Math.random();
             const depth: Petal["depth"] = r < 0.3 ? "far" : r < 0.65 ? "mid" : "near";
@@ -201,7 +194,7 @@ const PetalWallTransition = forwardRef<PetalWallTransitionRef, Props>(({ onCover
             const opacity = depth === "far" ? 0.35 + Math.random() * 0.2 : depth === "mid" ? 0.6 + Math.random() * 0.2 : 0.8 + Math.random() * 0.15;
             const blur = depth === "far" ? 1.4 : depth === "mid" ? 0.4 : 0;
             const duration = depth === "far" ? 1500 + Math.random() * 600 : depth === "mid" ? 1100 + Math.random() * 500 : 850 + Math.random() * 400;
-            const color = Math.random() < 0.08 ? C.marked : palette[i % palette.length];
+            const color = Math.random() < 0.08 ? THEME_COLORS.marked : palette[i % palette.length];
             return {
                 id: i,
                 left: 2 + Math.random() * 96,

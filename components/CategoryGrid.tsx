@@ -44,7 +44,7 @@ export default function CategoryGrid({ onSelectTopic, onSeeAllTopics }: { onSele
 
     return (
         <View className="py-2 mb-2">
-            <Text className="text-[11px] font-elms-bold uppercase tracking-[0.12em] text-dark/40 mb-3">
+            <Text className="text-[11px] font-sf-bold uppercase tracking-[0.12em] text-dark/40 mb-3">
                 Browse by topic
             </Text>
             <View className="flex-row flex-wrap gap-2.5">
@@ -58,7 +58,7 @@ export default function CategoryGrid({ onSelectTopic, onSeeAllTopics }: { onSele
                     >
                         <Feather name={topic.icon} size={17} color="#5F5E5A" style={{ marginBottom: 8 }} />
                         <Text
-                            className="text-[12.5px] font-elms-bold text-dark leading-snug"
+                            className="text-[12.5px] font-sf-bold text-dark leading-snug"
                             numberOfLines={2}
                         >
                             {topic.label}
@@ -71,10 +71,10 @@ export default function CategoryGrid({ onSelectTopic, onSeeAllTopics }: { onSele
                     className="bg-dark rounded-2xl px-4 py-3.5 justify-center"
                     style={{ width: '48%' }}
                 >
-                    <Text className="text-[12.5px] font-elms-bold text-primary leading-snug">
+                    <Text className="text-[12.5px] font-sf-bold text-primary leading-snug">
                         All topics
                     </Text>
-                    <Text className="text-[10px] font-elms-regular text-white/50 mt-0.5">
+                    <Text className="text-[10px] font-sf-regular text-white/50 mt-0.5">
                         {topics.length - VISIBLE_COUNT} more →
                     </Text>
                 </TouchableOpacity>

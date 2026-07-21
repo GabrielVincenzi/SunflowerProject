@@ -72,13 +72,13 @@ const LanguageSelection = () => {
 
                 <Animated.Text
                     style={animatedStyle}
-                    className="text-dark text-2xl font-elms-bold text-center mb-2 mt-4"
+                    className="text-dark text-2xl font-sf-bold text-center mb-2 mt-4"
                 >
                     {LANGUAGE_TITLES[index]}
                 </Animated.Text>
 
                 <Text
-                    className="font-elms-regular text-[13px] text-center mb-10"
+                    className="font-sf-regular text-[13px] text-center mb-10"
                     style={{ color: "rgba(52,58,64,0.5)" }}
                 >
                     Choose your language to continue

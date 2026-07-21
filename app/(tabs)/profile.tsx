@@ -1,3 +1,4 @@
+import { LogoIcon } from "@/components/icons/Logo";
 import { resetLanguageState } from "@/components/layoutcomp/LanguageContext";
 import SunButton from "@/components/SunButton2";
 import { THEME_COLORS } from "@/constants/utilities";
@@ -241,9 +242,9 @@ function StatRow({
                 <View className="w-8 h-8 rounded-full items-center justify-center bg-[#F0ECE0]">
                     <Feather name={icon} size={13} color="#5F5E5A" />
                 </View>
-                <Text className="text-[13px] font-elms-bold text-dark/70">{label}</Text>
+                <Text className="text-[13px] font-sf-bold text-dark/70">{label}</Text>
             </View>
-            <Text className="text-[15px] font-elms-bold italic text-dark">{value}</Text>
+            <Text className="text-[15px] font-sf-bold italic text-dark">{value}</Text>
         </View>
     );
 }
@@ -284,16 +285,13 @@ export default function ProfileScreen({
                     {/* Header */}
                     <Animated.View entering={FadeInDown.delay(80)} className="mb-2">
                         <View className="flex-row items-center gap-2.5 mb-2">
-                            <View className="w-9 h-9 rounded-full items-center justify-center bg-dark">
-                                <Feather name="sun" size={15} color="#F7CE46" />
+                            <View className="w-12 h-12 rounded-full items-center justify-center bg-dark">
+                                <LogoIcon color={THEME_COLORS.primary} size={24} />
                             </View>
-                            <Text className="text-[11px] font-elms-bold uppercase tracking-[0.12em] text-dark/40">
-                                Your light
+                            <Text className="text-[26px] font-sf-bold italic text-dark leading-tight">
+                                {displayName}
                             </Text>
                         </View>
-                        <Text className="text-[26px] font-elms-bold italic text-dark leading-tight">
-                            {displayName}
-                        </Text>
                     </Animated.View>
 
                     {/* ── The Sun System ─────────────────────────────────────
@@ -339,15 +337,15 @@ export default function ProfileScreen({
                                     ) : (
                                         <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(120)} className="items-center">
                                             <Feather name="zap" size={20} color="#1A1A18" />
-                                            <Text className="text-2xl font-elms-bold italic text-dark mt-1">{stats.dayStreak}</Text>
-                                            <Text className="text-[8px] font-elms-bold text-dark/60 uppercase tracking-[0.1em]">day streak</Text>
+                                            <Text className="text-2xl font-sf-bold italic text-dark mt-1">{stats.dayStreak}</Text>
+                                            <Text className="text-[8px] font-sf-bold text-dark/60 uppercase tracking-[0.1em]">day streak</Text>
                                         </Animated.View>
                                     )}
                                 </TouchableOpacity>
                             </View>
 
                             <View className="absolute -bottom-2">
-                                <Text className="text-[9px] font-elms-bold text-dark/30 uppercase tracking-[0.12em]">
+                                <Text className="text-[9px] font-sf-bold text-dark/30 uppercase tracking-[0.12em]">
                                     {statsRevealed ? 'Tap to see yourself' : 'Tap to see your growth'}
                                 </Text>
                             </View>
@@ -363,10 +361,10 @@ export default function ProfileScreen({
                                     style={{ transform: [{ translateX: 5 }, { translateY: 5 }] }}
                                 />
                                 <View className="bg-white border border-dark/10 rounded-[32px] p-6">
-                                    <Text className="text-[11px] font-elms-bold uppercase tracking-[0.12em] text-dark/35 mb-1">
+                                    <Text className="text-[11px] font-sf-bold uppercase tracking-[0.12em] text-dark/35 mb-1">
                                         Your growth so far
                                     </Text>
-                                    <Text className="text-[18px] font-elms-bold italic text-dark mb-3 leading-snug">
+                                    <Text className="text-[18px] font-sf-bold italic text-dark mb-3 leading-snug">
                                         {stats.toolsCompleted === 0
                                             ? "Every flower starts as a seed."
                                             : `${stats.toolsCompleted} of 9 tools in full bloom.`}
@@ -383,7 +381,7 @@ export default function ProfileScreen({
 
                     {/* Options list */}
                     <Animated.View entering={FadeInDown.delay(320)} className="mt-12">
-                        <Text className="text-[11px] font-elms-bold uppercase tracking-[0.12em] text-dark/40 mb-4">
+                        <Text className="text-[11px] font-sf-bold uppercase tracking-[0.12em] text-dark/40 mb-4">
                             Settings
                         </Text>
 
@@ -404,7 +402,7 @@ export default function ProfileScreen({
                                     <View className="w-9 h-9 items-center justify-center rounded-2xl bg-[#F0ECE0]">
                                         <Feather name={item.icon} size={16} color={THEME_COLORS.grey} />
                                     </View>
-                                    <Text className="text-[14px] font-elms-bold italic text-dark ml-3.5 tracking-tight flex-1">
+                                    <Text className="text-[14px] font-sf-bold italic text-dark ml-3.5 tracking-tight flex-1">
                                         {item.label}
                                     </Text>
                                     <Feather name="chevron-right" size={16} color="#A6A398" />
@@ -419,7 +417,7 @@ export default function ProfileScreen({
                             className="flex-row items-center justify-center py-4 border-[1.5px] border-dark/15 rounded-[24px] mt-8"
                         >
                             <Feather name="log-out" size={15} color="#5F5E5A" style={{ marginRight: 8 }} />
-                            <Text className="text-[13px] font-elms-bold text-dark/60 uppercase tracking-[0.1em]">
+                            <Text className="text-[13px] font-sf-bold text-dark/60 uppercase tracking-[0.1em]">
                                 Sign out
                             </Text>
                         </TouchableOpacity>
@@ -430,7 +428,7 @@ export default function ProfileScreen({
                             className="flex-row items-center justify-center py-4 border-[1.5px] border-dark/15 rounded-[24px] mt-8"
                         >
                             <Feather name="repeat" size={15} color="#5F5E5A" style={{ marginRight: 8 }} />
-                            <Text className="text-[13px] font-elms-bold text-dark/60 uppercase tracking-[0.1em]">
+                            <Text className="text-[13px] font-sf-bold text-dark/60 uppercase tracking-[0.1em]">
                                 Welcome
                             </Text>
                         </TouchableOpacity>
@@ -442,7 +440,7 @@ export default function ProfileScreen({
                             className="flex-row items-center justify-center py-3.5 mt-3"
                         >
                             <Feather name="globe" size={13} color="#A6A398" style={{ marginRight: 7 }} />
-                            <Text className="text-[12px] font-elms-bold text-dark/35 uppercase tracking-[0.08em]">
+                            <Text className="text-[12px] font-sf-bold text-dark/35 uppercase tracking-[0.08em]">
                                 Change language
                             </Text>
                         </TouchableOpacity>

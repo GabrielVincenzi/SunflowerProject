@@ -82,7 +82,7 @@ const SignIn = () => {
                 style={{ backgroundColor: THEME_COLORS.background, borderColor: THEME_COLORS.dark }}
             >
                 <AntDesign name={icon} size={20} color={THEME_COLORS.dark} />
-                <Text className="text-base font-elms-bold" style={{ color: THEME_COLORS.dark }}>{label}</Text>
+                <Text className="text-base font-sf-bold" style={{ color: THEME_COLORS.dark }}>{label}</Text>
             </TouchableOpacity>
         </View>
     );
@@ -120,7 +120,7 @@ const SignIn = () => {
                                 </View>
                             </View>
                             <Text
-                                className="font-elms-bold italic text-[32px] text-center"
+                                className="font-sf-bold italic text-[32px] text-center"
                                 style={{ color: THEME_COLORS.dark, lineHeight: 34 }}
                             >
                                 {t.signIn.title}
@@ -135,7 +135,7 @@ const SignIn = () => {
                         <View className="flex-row items-center my-8 gap-3">
                             <View className="flex-1 h-[1.5px]" style={{ backgroundColor: "rgba(52,58,64,0.12)" }} />
                             <Text
-                                className="font-elms-bold text-[10px] uppercase tracking-[0.25em]"
+                                className="font-sf-bold text-[10px] uppercase tracking-[0.25em]"
                                 style={{ color: "rgba(52,58,64,0.35)" }}
                             >
                                 {t.signIn.orSeparator}
@@ -150,7 +150,7 @@ const SignIn = () => {
                                 like a button, which it isn't. Focus state just darkens
                                 the border, which is the correct signal for a field. */}
                             <TextInput
-                                className="py-4 px-5 rounded-[20px] font-elms-regular text-base border-[1.5px]"
+                                className="py-4 px-5 rounded-[20px] font-sf-regular text-base border-[1.5px]"
                                 style={{
                                     backgroundColor: THEME_COLORS.background,
                                     borderColor: isEmailFocused ? THEME_COLORS.dark : "rgba(52,58,64,0.16)",
@@ -187,7 +187,7 @@ const SignIn = () => {
                                     style={{ backgroundColor: THEME_COLORS.dark, opacity: emailReady ? 1 : 0.5 }}
                                 >
                                     <Text
-                                        className="font-elms-bold italic text-lg tracking-wide"
+                                        className="font-sf-bold italic text-lg tracking-wide"
                                         style={{ color: THEME_COLORS.background }}
                                     >
                                         {isSubmitting ? "..." : t.signIn.nextButton}
@@ -198,7 +198,7 @@ const SignIn = () => {
                             <Link href={"/(tabs)/home"} replace asChild>
                                 <TouchableOpacity className="py-4 items-center">
                                     <Text
-                                        className="font-elms-regular text-[13px] underline"
+                                        className="font-sf-regular text-[13px] underline"
                                         style={{ color: "rgba(52,58,64,0.5)" }}
                                     >
                                         {t.signIn.skip}

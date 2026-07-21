@@ -75,7 +75,7 @@ export default function QuestionJourneyCard({
                                 className={`w-2 h-2 rounded-full ${isFirstEncounter ? "bg-primary opacity-80" : "bg-dark opacity-20"
                                     }`}
                             />
-                            <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.3em]">
+                            <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-[0.3em]">
                                 {isFirstEncounter ? "First Encounter" : "Daily Synthesis"}
                             </Text>
 
@@ -83,7 +83,7 @@ export default function QuestionJourneyCard({
                             {!isFirstEncounter && streak > 0 && (
                                 <View className="ml-auto flex-row items-center gap-1 bg-dark/5 px-2 py-0.5 rounded-full">
                                     <Feather name="zap" size={10} color="#141414" />
-                                    <Text className="text-[10px] font-elms-bold text-dark/50">
+                                    <Text className="text-[10px] font-sf-bold text-dark/50">
                                         {streak}
                                     </Text>
                                 </View>
@@ -92,7 +92,7 @@ export default function QuestionJourneyCard({
 
                         {/* Title */}
                         <Text
-                            className="text-3xl font-elms-bold italic text-dark tracking-tighter leading-tight"
+                            className="text-3xl font-sf-bold italic text-dark tracking-tighter leading-tight"
                             numberOfLines={2}
                         >
                             {title}
@@ -101,7 +101,7 @@ export default function QuestionJourneyCard({
                         {/* First encounter: show description as usual */}
                         {isFirstEncounter && description && (
                             <Text
-                                className="text-sm font-elms-regular italic text-dark/60 mt-3 leading-relaxed"
+                                className="text-sm font-sf-regular italic text-dark/60 mt-3 leading-relaxed"
                                 numberOfLines={2}
                             >
                                 {description}
@@ -111,11 +111,11 @@ export default function QuestionJourneyCard({
                         {/* Return visit: show the user's prior belief as a teaser */}
                         {!isFirstEncounter && cleanBelief && (
                             <View className="mt-3 bg-primary/10 rounded-[12px] px-3 py-2">
-                                <Text className="text-[10px] font-elms-bold text-dark/30 uppercase tracking-[0.2em] mb-1">
+                                <Text className="text-[10px] font-sf-bold text-dark/30 uppercase tracking-[0.2em] mb-1">
                                     YOUR BELIEF
                                 </Text>
                                 <Text
-                                    className="text-sm font-elms-regular italic text-dark/60 leading-relaxed"
+                                    className="text-sm font-sf-regular italic text-dark/60 leading-relaxed"
                                     numberOfLines={2}
                                 >
                                     "{cleanBelief}"
@@ -126,7 +126,7 @@ export default function QuestionJourneyCard({
                         {/* Return visit, no prior belief recorded yet */}
                         {!isFirstEncounter && !cleanBelief && description && (
                             <Text
-                                className="text-sm font-elms-regular italic text-dark/60 mt-3 leading-relaxed"
+                                className="text-sm font-sf-regular italic text-dark/60 mt-3 leading-relaxed"
                                 numberOfLines={2}
                             >
                                 {description}
@@ -137,7 +137,7 @@ export default function QuestionJourneyCard({
 
                 {/* Bottom row — CTA hint */}
                 <View className="flex-row items-center justify-end mt-5 gap-1 opacity-30">
-                    <Text className="text-[10px] font-elms-bold uppercase tracking-[0.2em] text-dark">
+                    <Text className="text-[10px] font-sf-bold uppercase tracking-[0.2em] text-dark">
                         {isFirstEncounter ? "Record belief" : "Test synthesis"}
                     </Text>
                     <Feather name="arrow-right" size={12} color="#141414" />

@@ -52,11 +52,11 @@ export default function GreenhouseScreen({
                             <View className="w-9 h-9 rounded-full items-center justify-center bg-dark">
                                 <Feather name="sun" size={15} color="#F7CE46" />
                             </View>
-                            <Text className="text-[11px] font-elms-bold uppercase tracking-[0.12em] text-dark/40">
+                            <Text className="text-[11px] font-sf-bold uppercase tracking-[0.12em] text-dark/40">
                                 The Greenhouse
                             </Text>
                         </View>
-                        <Text className="text-[26px] font-elms-bold italic text-dark leading-tight">
+                        <Text className="text-[26px] font-sf-bold italic text-dark leading-tight">
                             Everything you can grow
                         </Text>
                     </Animated.View>
@@ -76,7 +76,7 @@ export default function GreenhouseScreen({
 
                     {/* Tool grid — sprout, then seed, then bloom */}
                     <Animated.View entering={FadeInDown.duration(700).delay(320)}>
-                        <Text className="text-[11px] font-elms-bold uppercase tracking-[0.12em] text-dark/40 mb-4">
+                        <Text className="text-[11px] font-sf-bold uppercase tracking-[0.12em] text-dark/40 mb-4">
                             Nine tools to grow with
                         </Text>
                         <View className="flex-row flex-wrap justify-between gap-y-4">

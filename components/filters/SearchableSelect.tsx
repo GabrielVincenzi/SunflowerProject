@@ -35,7 +35,7 @@ export const SearchableSelect = ({
                                 onPress={() => onToggle(opt.value)}
                                 className={`px-6 py-4 rounded-[24px] border-2 border-dark ${active ? "bg-primary" : "bg-white"}`}
                             >
-                                <Text className="font-elms-bold italic text-dark text-lg">{opt.label}</Text>
+                                <Text className="font-sf-bold italic text-dark text-lg">{opt.label}</Text>
                             </TouchableOpacity>
                         </View>
                     );
@@ -62,7 +62,7 @@ export const SearchableSelect = ({
                                 onPress={() => onToggle(v)}
                                 className="flex-row items-center gap-2 bg-primary border-2 border-dark px-4 py-2 rounded-full"
                             >
-                                <Text className="font-elms-bold italic text-dark text-sm">{label}</Text>
+                                <Text className="font-sf-bold italic text-dark text-sm">{label}</Text>
                                 <Feather name="x" size={12} color="#141414" />
                             </TouchableOpacity>
                         );
@@ -77,7 +77,7 @@ export const SearchableSelect = ({
                     onPress={() => setOpen(o => !o)}
                     className="flex-row items-center justify-between px-5 py-4 rounded-[20px] border-2 border-dark bg-white"
                 >
-                    <Text className="font-elms-bold italic text-dark/40 text-base">
+                    <Text className="font-sf-bold italic text-dark/40 text-base">
                         {placeholder}
                     </Text>
                     <Feather name={open ? "chevron-up" : "chevron-down"} size={16} color="#141414" />
@@ -95,7 +95,7 @@ export const SearchableSelect = ({
                             onChangeText={setQuery}
                             placeholder="Type to filter..."
                             placeholderTextColor="#14141440"
-                            className="flex-1 font-elms-regular italic text-dark text-base"
+                            className="flex-1 font-sf-regular italic text-dark text-base"
                             autoFocus
                         />
                         {query.length > 0 && (
@@ -108,7 +108,7 @@ export const SearchableSelect = ({
                     {/* Options list */}
                     <ScrollView style={{ maxHeight: 220 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
                         {filtered.length === 0 ? (
-                            <Text className="px-5 py-4 font-elms-regular italic text-dark/30 text-sm">
+                            <Text className="px-5 py-4 font-sf-regular italic text-dark/30 text-sm">
                                 No results
                             </Text>
                         ) : (
@@ -120,7 +120,7 @@ export const SearchableSelect = ({
                                         onPress={() => onToggle(opt.value)}
                                         className={`flex-row items-center justify-between px-5 py-4 border-b border-dark/5 ${active ? "bg-primary/20" : ""}`}
                                     >
-                                        <Text className="font-elms-bold italic text-dark text-base flex-1 mr-4">{opt.label}</Text>
+                                        <Text className="font-sf-bold italic text-dark text-base flex-1 mr-4">{opt.label}</Text>
                                         {active && <Feather name="check" size={16} color="#141414" />}
                                     </TouchableOpacity>
                                 );

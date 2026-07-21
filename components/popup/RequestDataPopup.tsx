@@ -60,7 +60,7 @@ export default function RequestDataPopup({ visible, onClose, prefillQuery = "" }
                                 <View className="w-10 h-10 rounded-2xl bg-dark items-center justify-center">
                                     <Feather name="inbox" size={18} color="#F7CE46" />
                                 </View>
-                                <Text className="text-[10px] uppercase font-elms-bold tracking-[0.4em] text-dark/40">
+                                <Text className="text-[10px] uppercase font-sf-bold tracking-[0.4em] text-dark/40">
                                     DATA REQUEST
                                 </Text>
                             </View>
@@ -74,10 +74,10 @@ export default function RequestDataPopup({ visible, onClose, prefillQuery = "" }
                         </View>
 
                         {/* Title */}
-                        <Text className="text-4xl font-elms-bold italic text-dark tracking-tighter leading-tight mb-3">
+                        <Text className="text-4xl font-sf-bold italic text-dark tracking-tighter leading-tight mb-3">
                             Send Request
                         </Text>
-                        <Text className="text-base font-elms-regular italic text-dark/60 leading-relaxed mb-8">
+                        <Text className="text-base font-sf-regular italic text-dark/60 leading-relaxed mb-8">
                             Describe what datasets or signal archives you'd like added to the synthesis engine.
                         </Text>
 
@@ -91,7 +91,7 @@ export default function RequestDataPopup({ visible, onClose, prefillQuery = "" }
                                 textAlignVertical="top"
                                 placeholder="Describe the information nodes..."
                                 placeholderTextColor="rgba(20,20,20,0.15)"
-                                className="font-elms-bold italic text-dark text-lg leading-tight flex-1"
+                                className="font-sf-bold italic text-dark text-lg leading-tight flex-1"
                                 editable={!submitted}
                             />
                         </View>

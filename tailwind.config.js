@@ -8,14 +8,11 @@ module.exports = {
     extend: {
       colors: THEME_COLORS,
       fontFamily: {
-        "geist-regular": ["Geist-Regular"],
-        "geist-extrabold": ["Geist-ExtraBold"],
-        "geist-extralight": ["Geist-ExtraLight"],
-        "elms-regular": ["Elms-Regular"],
-        "elms-extrabold": ["Elms-ExtraBold"],
-        "elms-bold": ["Elms-Bold"],
-        "elms-extralight": ["Elms-ExtraLight"],
-        "elms-thin": ["Elms-Thin"],
+        "sf-extrathin": ["Elms-ExtraLight"],
+        "sf-thin": ["Elms-Thin"],
+        "sf-regular": ["Elms-Regular"],
+        "sf-bold": ["Elms-Bold"],
+        "sf-extrabold": ["Elms-ExtraBold"],
       }
     },
   },

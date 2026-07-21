@@ -22,7 +22,7 @@ const SunButton = ({ text, onPress, className, disabled }: SunButtonProps) => {
                 disabled={disabled}
                 className={`${disabled ? "bg-dark/10 opacity-50" : "bg-dark"} border-2 border-white flex-row items-center justify-center py-4 px-4 rounded-[32px] ${className}`}
             >
-                <Text className={`font-elms-bold italic uppercase tracking-[0.25em] text-center ${disabled ? "text-dark/40" : "text-primary text-md"}`}>
+                <Text className={`font-sf-bold italic uppercase tracking-[0.25em] text-center ${disabled ? "text-dark/40" : "text-primary text-md"}`}>
                     {text}
                 </Text>
             </TouchableOpacity>

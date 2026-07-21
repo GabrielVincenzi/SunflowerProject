@@ -35,7 +35,7 @@ function ChartDispatcher({ card, cardWidth }: ChartDispatcherProps) {
         default:
             return (
                 <View className="flex-1 items-center justify-center">
-                    <Text className="text-[10px] font-elms-bold text-dark/25 uppercase tracking-widest">
+                    <Text className="text-[10px] font-sf-bold text-dark/25 uppercase tracking-widest">
                         Data not available
                     </Text>
                 </View>
@@ -117,12 +117,12 @@ function StatCard({
                     <View className={`h-[1px] ${dividerClass} mb-2`} />
                     <View className="flex-row items-center justify-between">
                         <Text
-                            className={`${mutedClass} text-[8px] font-elms-regular uppercase tracking-widest flex-1 mr-3`}
+                            className={`${mutedClass} text-[8px] font-sf-regular uppercase tracking-widest flex-1 mr-3`}
                             numberOfLines={1}
                         >
                             {card.source}
                         </Text>
-                        <Text className={`${tapHintClass} text-[9px] font-elms-bold uppercase tracking-widest`}>
+                        <Text className={`${tapHintClass} text-[9px] font-sf-bold uppercase tracking-widest`}>
                             Tap to explore ↗
                         </Text>
                     </View>

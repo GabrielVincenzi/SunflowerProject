@@ -1,10 +1,11 @@
+import { THEME_COLORS } from '@/constants/utilities';
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { LogoIcon } from '../icons/Logo';
 
 export default function HomeHeader({
     userName,
-    logo,
     onLogoPress = () => { },
     onNotifPress = () => { },
 }: HomeHeaderProps) {
@@ -20,15 +21,16 @@ export default function HomeHeader({
                     <TouchableOpacity
                         onPress={onLogoPress}
                         activeOpacity={0.85}
-                        className="w-14 h-14 bg-white rounded-[20px] items-center justify-center"
+                        className="w-14 h-14 bg-background rounded-[20px] items-center justify-center"
                     >
-                        <Image source={logo} className="w-10 h-10" resizeMode="contain" />
+                        {/* <Image source={logo} className="w-10 h-10" resizeMode="contain" />*/}
+                        <LogoIcon size={40} color={THEME_COLORS.dark} />
                     </TouchableOpacity>
 
                     <View className="flex-shrink">
                         {/* Greeting: Bold Italic with tight tracking for editorial impact */}
                         <Text
-                            className="text-2xl font-elms-bold text-dark tracking-tighter italic leading-none"
+                            className="text-2xl font-sf-bold text-dark tracking-tighter italic leading-none"
                             numberOfLines={2}
                         >
                             {timeGreeting}{userName ? `, ${userName}` : '!'}

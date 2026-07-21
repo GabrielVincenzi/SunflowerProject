@@ -63,7 +63,7 @@ function SectionLabel({ children }: { children: string }) {
     return (
         <View className="flex-row items-center gap-3 mb-4">
             <View className="h-[2px] w-8 bg-dark" />
-            <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.15em]">
+            <Text className="text-[10px] uppercase font-sf-bold text-dark/40 tracking-[0.15em]">
                 {children}
             </Text>
         </View>
@@ -93,20 +93,20 @@ function SocialScreen({
     return (
         <Animated2.View entering={FadeInDown.delay(100)}>
             <SectionLabel>WHAT OTHERS THINK</SectionLabel>
-            <Text className="text-sm font-elms-regular italic text-dark/50 mb-6 leading-relaxed">
+            <Text className="text-sm font-sf-regular italic text-dark/50 mb-6 leading-relaxed">
                 Anonymised responses from {question.cohortLabel.toLowerCase()} like you (n≥50).
                 No individual data is stored or shown.
             </Text>
 
             <View className="bg-primary/10 border border-dark/10 rounded-[24px] px-5 py-4 mb-6">
-                <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.15em] mb-1">
+                <Text className="text-[10px] uppercase font-sf-bold text-dark/40 tracking-[0.15em] mb-1">
                     YOUR COHORT · {question.cohortLabel.toUpperCase()}
                 </Text>
-                <Text className="font-elms-regular italic text-dark/70 text-sm leading-relaxed">
+                <Text className="font-sf-regular italic text-dark/70 text-sm leading-relaxed">
                     Most {question.cohortLabel.toLowerCase()} answered{" "}
-                    <Text className="font-elms-bold text-dark">{question.peerMedianLabel}</Text>
+                    <Text className="font-sf-bold text-dark">{question.peerMedianLabel}</Text>
                     {". You answered "}
-                    <Text className="font-elms-bold text-dark">{userAnswer}</Text>.
+                    <Text className="font-sf-bold text-dark">{userAnswer}</Text>.
                 </Text>
             </View>
 
@@ -117,7 +117,7 @@ function SocialScreen({
                 <>
                     <View className="flex-row items-center gap-3 mb-4">
                         <View className="h-[1px] w-6 bg-dark/20" />
-                        <Text className="text-[10px] uppercase font-elms-bold text-dark/30 tracking-[0.15em]">
+                        <Text className="text-[10px] uppercase font-sf-bold text-dark/30 tracking-[0.15em]">
                             WANT TO REVISE?
                         </Text>
                     </View>
@@ -155,7 +155,7 @@ function SocialScreen({
                             : onKeep()} />
                 {!isFirstEncounter && revisedId !== null && (
                     <TouchableOpacity onPress={onKeep} className="py-3 items-center">
-                        <Text className="text-dark/35 font-elms-regular italic text-sm">
+                        <Text className="text-dark/35 font-sf-regular italic text-sm">
                             Keep my original answer
                         </Text>
                     </TouchableOpacity>
@@ -197,7 +197,7 @@ function NumericGapBar({ userValue, correctValue, unit }: {
 
     return (
         <View className="mt-4">
-            <Text className="text-sm font-elms-regular italic text-dark/50 mb-4">
+            <Text className="text-sm font-sf-regular italic text-dark/50 mb-4">
                 {gap === 0 ? "Exact match — remarkable." : `Your estimate was ${gap}${unit} ${direction} the real value.`}
             </Text>
             <View className="h-8 bg-dark/5 rounded-full relative overflow-hidden mb-2">
@@ -215,11 +215,11 @@ function NumericGapBar({ userValue, correctValue, unit }: {
             <View className="flex-row gap-5 px-1">
                 <View className="flex-row items-center gap-1.5">
                     <View className="w-2.5 h-2.5 rounded-full bg-primary" />
-                    <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.15em]">You · {userValue}{unit}</Text>
+                    <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-[0.15em]">You · {userValue}{unit}</Text>
                 </View>
                 <View className="flex-row items-center gap-1.5">
                     <View className="w-2.5 h-2.5 rounded-full bg-dark" />
-                    <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.15em]">Reality · {correctValue}{unit}</Text>
+                    <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-[0.15em]">Reality · {correctValue}{unit}</Text>
                 </View>
             </View>
         </View>
@@ -240,7 +240,7 @@ function NearFarSelector({ onRate }: { onRate: (v: number) => void }) {
     const [selected, setSelected] = useState<number | null>(null);
     return (
         <View className="mt-5">
-            <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.15em] mb-3">
+            <Text className="text-[10px] uppercase font-sf-bold text-dark/40 tracking-[0.15em] mb-3">
                 HOW CLOSE WERE YOU?
             </Text>
             <View className="flex-row gap-2 mb-5">
@@ -253,7 +253,7 @@ function NearFarSelector({ onRate }: { onRate: (v: number) => void }) {
                             className={`flex-1 py-3 rounded-[24px] border-2 items-center gap-1.5 ${active ? "bg-dark border-dark" : "bg-white border-dark/10"}`}
                         >
                             <Feather name={opt.icon} size={16} color={active ? THEME_COLORS.primary : "rgba(52,58,64,0.3)"} />
-                            <Text className={`text-[9px] font-elms-bold text-center leading-tight ${active ? "text-primary" : "text-dark/35"}`}>
+                            <Text className={`text-[9px] font-sf-bold text-center leading-tight ${active ? "text-primary" : "text-dark/35"}`}>
                                 {opt.label}
                             </Text>
                         </TouchableOpacity>
@@ -270,7 +270,7 @@ function NearFarSelector({ onRate }: { onRate: (v: number) => void }) {
                     onPress={() => selected !== null && onRate(selected)}
                     className={`py-4 rounded-[32px] border-2 border-dark items-center ${selected !== null ? "bg-dark" : "bg-dark/10"}`}
                 >
-                    <Text className={`text-lg font-elms-bold italic ${selected !== null ? "text-primary" : "text-dark/30"}`}>
+                    <Text className={`text-lg font-sf-bold italic ${selected !== null ? "text-primary" : "text-dark/30"}`}>
                         Log my rating
                     </Text>
                 </TouchableOpacity>
@@ -290,17 +290,17 @@ function SponsorBlock({ question }: { question: typeof DUMMY_QUESTION }) {
                     style={{ transform: [{ translateX: 6 }, { translateY: 6 }] }}
                 />
                 <View className="bg-white p-8 rounded-[40px] border border-dark/10">
-                    <Text className="text-[10px] uppercase font-elms-bold tracking-[0.15em] text-dark/40 mb-5">
+                    <Text className="text-[10px] uppercase font-sf-bold tracking-[0.15em] text-dark/40 mb-5">
                         SPONSORED DATA
                     </Text>
-                    <Text className="text-3xl font-elms-bold italic text-dark tracking-tighter leading-none mb-4">
+                    <Text className="text-3xl font-sf-bold italic text-dark tracking-tighter leading-none mb-4">
                         {question.sponsor}
                     </Text>
-                    <Text className="text-lg font-elms-regular italic text-dark/60 leading-relaxed mb-6">
+                    <Text className="text-lg font-sf-regular italic text-dark/60 leading-relaxed mb-6">
                         {question.sponsorBody}
                     </Text>
                     <TouchableOpacity className="flex-row items-center gap-3">
-                        <Text className="text-lg font-elms-bold italic text-dark border-b-4 border-primary leading-none">
+                        <Text className="text-lg font-sf-bold italic text-dark border-b-4 border-primary leading-none">
                             Explore the source
                         </Text>
                         <Feather name="external-link" size={16} color={THEME_COLORS.dark} />
@@ -389,7 +389,7 @@ export default function QuestionPopup({ onClose }: { onClose: () => void }) {
                         <View className="flex-row justify-between items-center mb-10">
                             <View className="flex-row items-center gap-3">
                                 <View className="h-[2px] w-8 bg-dark" />
-                                <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.15em]">
+                                <Text className="text-[10px] uppercase font-sf-bold text-dark/40 tracking-[0.15em]">
                                     {headerLabel}
                                 </Text>
                             </View>
@@ -410,10 +410,10 @@ export default function QuestionPopup({ onClose }: { onClose: () => void }) {
                         {/* ── Question title — input + choose phases ───────── */}
                         {(phase === "input" || phase === "choose") && (
                             <Animated2.View entering={FadeInDown.delay(150)} className="mb-8">
-                                <Text className="text-3xl font-elms-bold italic text-dark tracking-tighter leading-none mb-4">
+                                <Text className="text-3xl font-sf-bold italic text-dark tracking-tighter leading-none mb-4">
                                     {question.title}
                                 </Text>
-                                <Text className="text-xl font-elms-regular italic text-dark/60 leading-relaxed">
+                                <Text className="text-xl font-sf-regular italic text-dark/60 leading-relaxed">
                                     {question.body}
                                 </Text>
                             </Animated2.View>
@@ -434,20 +434,20 @@ export default function QuestionPopup({ onClose }: { onClose: () => void }) {
                                             placeholder=""
                                             placeholderTextColor="rgba(52,58,64,0.2)"
                                             keyboardType="default"
-                                            className="flex-1 text-3xl font-elms-bold italic text-dark"
+                                            className="flex-1 text-3xl font-sf-bold italic text-dark"
                                             style={{ fontStyle: "italic" }}
                                             returnKeyType="done"
                                             onSubmitEditing={handleInputSubmit}
                                             autoFocus
                                         />
                                         {isNumeric(inputValue) && question.unit
-                                            ? <Text className="text-2xl font-elms-regular italic text-dark/25">{question.unit}</Text>
+                                            ? <Text className="text-2xl font-sf-regular italic text-dark/25">{question.unit}</Text>
                                             : null}
                                     </View>
                                 </View>
                                 <View className="flex-row gap-2 mb-8">
                                     <Feather name="lock" size={12} color="rgba(52,58,64,0.3)" style={{ marginTop: 2 }} />
-                                    <Text className="text-xs font-elms-regular italic text-dark/40 flex-1 leading-relaxed">
+                                    <Text className="text-xs font-sf-regular italic text-dark/40 flex-1 leading-relaxed">
                                         Your answer is stored anonymously.
                                     </Text>
                                 </View>
@@ -461,7 +461,7 @@ export default function QuestionPopup({ onClose }: { onClose: () => void }) {
                                         onPress={handleInputSubmit}
                                         className={`py-4 rounded-[32px] border-2 border-dark items-center ${inputValue.trim() ? "bg-dark" : "bg-dark/10"}`}
                                     >
-                                        <Text className={`text-lg font-elms-bold italic ${inputValue.trim() ? "text-primary" : "text-dark/30"}`}>
+                                        <Text className={`text-lg font-sf-bold italic ${inputValue.trim() ? "text-primary" : "text-dark/30"}`}>
                                             Turn towards it
                                         </Text>
                                     </TouchableOpacity>
@@ -510,19 +510,19 @@ export default function QuestionPopup({ onClose }: { onClose: () => void }) {
                                             <View className="w-12 h-12 rounded-2xl bg-primary items-center justify-center">
                                                 <Feather name="sun" size={22} color={THEME_COLORS.dark} />
                                             </View>
-                                            <Text className="text-3xl font-elms-bold italic text-dark tracking-tighter leading-none">
+                                            <Text className="text-3xl font-sf-bold italic text-dark tracking-tighter leading-none">
                                                 Belief logged
                                             </Text>
                                         </View>
                                         <View className="mb-4">
-                                            <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.15em] mb-1">YOUR ANSWER</Text>
-                                            <Text className="text-2xl font-elms-bold italic text-dark/80">
+                                            <Text className="text-[10px] uppercase font-sf-bold text-dark/40 tracking-[0.15em] mb-1">YOUR ANSWER</Text>
+                                            <Text className="text-2xl font-sf-bold italic text-dark/80">
                                                 {userAnswer}{showGapBar ? question.unit : ""}
                                             </Text>
                                         </View>
                                         <View className="mb-2">
-                                            <Text className="text-[10px] uppercase font-elms-bold text-dark/40 tracking-[0.15em] mb-1">REALITY</Text>
-                                            <Text className="text-2xl font-elms-bold italic text-dark">
+                                            <Text className="text-[10px] uppercase font-sf-bold text-dark/40 tracking-[0.15em] mb-1">REALITY</Text>
+                                            <Text className="text-2xl font-sf-bold italic text-dark">
                                                 {correctAnswer}{correctIsNumeric ? question.unit : ""}
                                             </Text>
                                         </View>
@@ -539,11 +539,11 @@ export default function QuestionPopup({ onClose }: { onClose: () => void }) {
                                         {!showGapBar && nearFarDone && (
                                             <View className="flex-row items-center gap-2 mt-4">
                                                 <Feather name="check-circle" size={14} color="rgba(52,58,64,0.3)" />
-                                                <Text className="text-xs font-elms-regular italic text-dark/40">Self-rating logged.</Text>
+                                                <Text className="text-xs font-sf-regular italic text-dark/40">Self-rating logged.</Text>
                                             </View>
                                         )}
                                         <View className="pt-5 mt-5 border-t border-dark/10">
-                                            <Text className="text-dark/60 font-elms-regular italic text-base leading-relaxed">
+                                            <Text className="text-dark/60 font-sf-regular italic text-base leading-relaxed">
                                                 {question.explanation}
                                             </Text>
                                         </View>
@@ -570,27 +570,27 @@ export default function QuestionPopup({ onClose }: { onClose: () => void }) {
                                             >
                                                 <Feather name={wasCorrect ? "check" : "x"} size={26} color={THEME_COLORS.background} />
                                             </View>
-                                            <Text className="text-3xl font-elms-bold italic text-dark tracking-tighter leading-none">
+                                            <Text className="text-3xl font-sf-bold italic text-dark tracking-tighter leading-none">
                                                 {wasCorrect ? "Right on the mark" : "Not quite"}
                                             </Text>
                                         </View>
                                         {revised && (
                                             <View className="flex-row items-center gap-2 mb-4">
                                                 <Feather name="refresh-cw" size={12} color="rgba(52,58,64,0.35)" />
-                                                <Text className="text-xs font-elms-regular italic text-dark/40">
+                                                <Text className="text-xs font-sf-regular italic text-dark/40">
                                                     You revised your answer after seeing peer data.
                                                 </Text>
                                             </View>
                                         )}
-                                        <Text className="text-dark/70 font-elms-regular italic text-lg leading-relaxed">
+                                        <Text className="text-dark/70 font-sf-regular italic text-lg leading-relaxed">
                                             {question.explanation}
                                         </Text>
                                     </View>
                                 </View>
                                 <View className="mb-14 px-2">
                                     <View className="flex-row justify-between items-baseline mb-5">
-                                        <Text className="text-[10px] uppercase font-elms-bold tracking-[0.15em] text-dark/40">DAY STREAK</Text>
-                                        <Text className="text-5xl font-elms-bold italic text-dark leading-none">{streak}</Text>
+                                        <Text className="text-[10px] uppercase font-sf-bold tracking-[0.15em] text-dark/40">DAY STREAK</Text>
+                                        <Text className="text-5xl font-sf-bold italic text-dark leading-none">{streak}</Text>
                                     </View>
                                     <View className="flex-row gap-2 h-3">
                                         {Array.from({ length: 8 }).map((_, i) => (

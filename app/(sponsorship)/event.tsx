@@ -88,7 +88,7 @@ export default function EventScreen() {
                             onChangeText={setEventTitle}
                             placeholder="Signal Summit 2025"
                             placeholderTextColor="rgba(52,58,64,0.25)"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-5"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-5"
                         />
 
                         <FieldLabel>Description</FieldLabel>
@@ -98,7 +98,7 @@ export default function EventScreen() {
                             placeholder="A gathering for data-driven thinkers exploring cognitive models..."
                             placeholderTextColor="rgba(52,58,64,0.25)"
                             multiline
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-5"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-5"
                             style={{ minHeight: 88, textAlignVertical: "top" }}
                         />
 
@@ -110,7 +110,7 @@ export default function EventScreen() {
                                     onChangeText={setDate}
                                     placeholder="12 Oct 2025"
                                     placeholderTextColor="rgba(52,58,64,0.25)"
-                                    className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm"
+                                    className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm"
                                 />
                             </View>
                             <View className="flex-1">
@@ -120,7 +120,7 @@ export default function EventScreen() {
                                     onChangeText={setLocation}
                                     placeholder="Bologna, IT"
                                     placeholderTextColor="rgba(52,58,64,0.25)"
-                                    className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm"
+                                    className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm"
                                 />
                             </View>
                         </View>
@@ -133,7 +133,7 @@ export default function EventScreen() {
                             placeholderTextColor="rgba(52,58,64,0.25)"
                             autoCapitalize="none"
                             keyboardType="url"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-8"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-8"
                         />
                     </>
                 )}
@@ -153,7 +153,7 @@ export default function EventScreen() {
                             onChangeText={setOrganiserName}
                             placeholder="Inquiry Labs"
                             placeholderTextColor="rgba(52,58,64,0.25)"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-5"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-5"
                         />
 
                         <FieldLabel>Short bio</FieldLabel>
@@ -163,7 +163,7 @@ export default function EventScreen() {
                             placeholder="Advancing human cognition through structured visualization."
                             placeholderTextColor="rgba(52,58,64,0.25)"
                             multiline
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-5"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-5"
                             style={{ minHeight: 72, textAlignVertical: "top" }}
                         />
 
@@ -175,7 +175,7 @@ export default function EventScreen() {
                             placeholderTextColor="rgba(52,58,64,0.25)"
                             autoCapitalize="none"
                             keyboardType="url"
-                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-elms-regular text-dark text-sm mb-6"
+                            className="bg-light/50 border border-dark/10 rounded-2xl px-4 py-4 font-sf-regular text-dark text-sm mb-6"
                         />
 
                         <FieldLabel>Promotion reach</FieldLabel>

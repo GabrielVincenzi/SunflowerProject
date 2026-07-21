@@ -29,7 +29,7 @@ const SearchBar = ({
                             placeholderTextColor="rgba(20, 20, 20, 0.2)"
                             autoFocus={autoFocus}
                             // Bold Italic input style
-                            className="flex-1 font-elms-bold italic text-dark text-lg tracking-tight"
+                            className="flex-1 font-sf-bold italic text-dark text-lg tracking-tight"
                             returnKeyType="search"
                             onSubmitEditing={() => onPress?.()}
                         />
@@ -43,7 +43,7 @@ const SearchBar = ({
                             style={{ opacity: value.trim() ? 1 : 0.4 }}
                         >
                             <Image
-                                source={require("../assets/icons/search.png")}
+                                source={require("../../assets/icons/search.png")}
                                 className="w-5 h-5"
                                 resizeMode="contain"
                                 tintColor="#F7CE46"
@@ -57,12 +57,12 @@ const SearchBar = ({
                         activeOpacity={0.7}
                     >
                         <Image
-                            source={require("../assets/icons/search.png")}
+                            source={require("../../assets/icons/search.png")}
                             className="w-4 h-4 mr-4 opacity-40"
                             resizeMode="contain"
                             tintColor="#141414"
                         />
-                        <Text className="text-dark/40 font-elms-bold italic text-lg tracking-tight">
+                        <Text className="text-dark/40 font-sf-bold italic text-lg tracking-tight">
                             {placeholder}
                         </Text>
                     </TouchableOpacity>

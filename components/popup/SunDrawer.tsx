@@ -110,7 +110,7 @@ export default function SunDrawer({
                                     <Feather name={icon} size={15} color="#F7CE46" />
                                 </View>
                                 <Text style={{
-                                    fontSize: 10, fontFamily: 'elms-bold',
+                                    fontSize: 10, fontFamily: 'sf-bold',
                                     textTransform: 'uppercase', letterSpacing: 1.4,
                                     color: 'rgba(20,20,18,0.4)',
                                 }}>
@@ -119,7 +119,7 @@ export default function SunDrawer({
                             </View>
                             {/* Title */}
                             <Text style={{
-                                fontSize: 22, fontFamily: 'elms-bold',
+                                fontSize: 22, fontFamily: 'sf-bold',
                                 fontStyle: 'italic', color: THEME_COLORS.dark,
                                 lineHeight: 27, letterSpacing: -0.5,
                             }}>
@@ -163,7 +163,7 @@ export default function SunDrawer({
                         }}
                     >
                         <Text style={{
-                            fontSize: 12, fontFamily: 'elms-bold',
+                            fontSize: 12, fontFamily: 'sf-bold',
                             color: '#F7CE46',
                             textTransform: 'uppercase', letterSpacing: 1.2,
                         }}>

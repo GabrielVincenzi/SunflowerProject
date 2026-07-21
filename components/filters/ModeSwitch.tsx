@@ -19,7 +19,7 @@ export default function ModeSwitch({ mode, onChange }: ModeSwitchProps) {
                 }`}
             >
                 <Text
-                    className={`text-xs font-elms-bold ${
+                    className={`text-xs font-sf-bold ${
                         mode === 'recommended' ? 'text-primary' : 'text-dark/50'
                     }`}
                 >
@@ -35,7 +35,7 @@ export default function ModeSwitch({ mode, onChange }: ModeSwitchProps) {
                 }`}
             >
                 <Text
-                    className={`text-xs font-elms-bold ${
+                    className={`text-xs font-sf-bold ${
                         mode === 'random' ? 'text-primary' : 'text-dark/50'
                     }`}
                 >

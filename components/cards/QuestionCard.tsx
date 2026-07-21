@@ -16,20 +16,15 @@ const QuestionCard = ({ title, description, image, onOpenPopup, streak = 0 }: Qu
     return (
         <View className="relative w-full mb-4">
             <View
-                className="absolute inset-0 bg-dark rounded-[40px]"
-                style={{ transform: [{ translateX: 8 }, { translateY: 8 }] }}
+                className="absolute inset-0 bg-dark rounded-[24px]"
+                style={{ transform: [{ translateX: 4 }, { translateY: 4 }] }}
             />
 
             <TouchableOpacity
                 activeOpacity={0.9}
                 onPress={onOpenPopup}
-                className="bg-white p-7 rounded-[40px] border-[1.5px] border-dark relative overflow-hidden"
+                className="bg-white h-[200px] p-6 rounded-[24px] border-[1.5px] border-dark relative overflow-hidden justify-between"
             >
-                {/* Sunflower glow — the same featured-emphasis device used on
-                    SunCard, but doubled here (two layered circles) since
-                    this is the single most recurring ritual in the app and
-                    deserves the strongest pull of the "turn towards the
-                    light" motif. */}
                 <View
                     pointerEvents="none"
                     style={{
@@ -59,40 +54,25 @@ const QuestionCard = ({ title, description, image, onOpenPopup, streak = 0 }: Qu
                         />
                     )}
                     <View className="flex-1 justify-center">
-                        {/* Micro-tag — sun icon instead of a plain dot, the
-                            small unique identifier of this card vs every
-                            other featured card in the app */}
                         <View className="flex-row items-center gap-1.5 mb-2.5">
                             <Feather name="sun" size={11} color="#B8941F" />
-                            <Text className="text-[10px] font-elms-bold text-dark/45 uppercase tracking-[0.22em]">
+                            <Text className="text-motto">
                                 Today's question
                             </Text>
                         </View>
 
-                        <Text
-                            className="text-[26px] font-elms-bold italic text-dark tracking-tight leading-[30px]"
-                            numberOfLines={2}
-                        >
+                        <Text className="text-subtitle" numberOfLines={2}>
                             {title}
                         </Text>
 
                         {description && (
-                            <Text
-                                className="text-[13px] font-elms-regular text-dark/55 mt-2.5 leading-relaxed"
-                                numberOfLines={2}
-                            >
+                            <Text className="text-description" numberOfLines={2}>
                                 {description}
                             </Text>
                         )}
                     </View>
                 </View>
 
-                {/* Streak pip row — the unique daily-ritual identity. Reads
-                    "you've shown up N days running" at a glance, distinct
-                    from any other card on the home screen. Degrades
-                    gracefully: if streak is 0, shows an inviting empty row
-                    instead of disappearing, so first-time users still see
-                    the mechanic exists. */}
                 <View className="flex-row items-center justify-between mt-5 pt-4 border-t border-dark/[0.06]">
                     <View className="flex-row gap-1.5">
                         {Array.from({ length: 7 }).map((_, i) => (
@@ -105,8 +85,8 @@ const QuestionCard = ({ title, description, image, onOpenPopup, streak = 0 }: Qu
                             />
                         ))}
                     </View>
-                    <Text className="text-[10px] font-elms-bold text-dark/35 uppercase tracking-[0.1em]">
-                        {streak > 0 ? `${streak} day streak` : 'Start your streak'}
+                    <Text className="text-motto">
+                        {streak > 0 ? `${streak} day streak` : 'Fuel your streak'}
                     </Text>
                 </View>
             </TouchableOpacity>

@@ -158,10 +158,10 @@ export default function ChartList({
         return (
             <View className="mt-20 px-10 items-center">
                 <View className="w-12 h-[2px] bg-[#FCD34D] mb-6" />
-                <Text className="text-[#343a40] font-elms-bold text-center uppercase tracking-tighter text-2xl leading-tight">
+                <Text className="text-[#343a40] font-sf-bold text-center uppercase tracking-tighter text-2xl leading-tight">
                     {error ? "SYSTEM FAILURE" : `NO SIGNALS DETECTED\nFOR "${searchCategory}"`}
                 </Text>
-                <Text className="mt-4 text-[#6c757d] font-elms-regular text-center uppercase text-[10px] tracking-[0.3em]">
+                <Text className="mt-4 text-[#6c757d] font-sf-regular text-center uppercase text-[10px] tracking-[0.3em]">
                     Check connection or refine search
                 </Text>
             </View>

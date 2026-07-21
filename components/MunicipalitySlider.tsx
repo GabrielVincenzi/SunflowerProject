@@ -196,7 +196,7 @@ function SwipeHint({ visible }: { visible: boolean }) {
             pointerEvents="none"
         >
             <View className="flex-1 h-[1px] bg-dark/10" />
-            <Text className="text-[9px] font-elms-bold text-dark/30 uppercase tracking-widest">
+            <Text className="text-[9px] font-sf-bold text-dark/30 uppercase tracking-widest">
                 Swipe to explore
             </Text>
             <Animated.Text className="text-dark/30 text-base" style={arrowStyle}>
@@ -286,24 +286,24 @@ function BottomSheet({
                     {/* Category pill */}
                     <View className="flex-row items-center gap-3 mb-4">
                         <View className="bg-dark px-3 py-1.5 rounded-full border-2 border-dark">
-                            <Text className="text-primary text-[9px] font-elms-bold uppercase tracking-widest">
+                            <Text className="text-primary text-[9px] font-sf-bold uppercase tracking-widest">
                                 {card.emoji}  {card.category}
                             </Text>
                         </View>
-                        <Text className="text-dark/40 text-[9px] font-elms-bold uppercase tracking-widest">
+                        <Text className="text-dark/40 text-[9px] font-sf-bold uppercase tracking-widest">
                             {municipalityName} · {card.year}
                         </Text>
                     </View>
 
                     {/* Headline */}
-                    <Text className="text-5xl font-elms-bold italic tracking-tighter text-dark leading-none mb-1">
+                    <Text className="text-5xl font-sf-bold italic tracking-tighter text-dark leading-none mb-1">
                         {card.headline}
                         {card.headlineUnit ? (
-                            <Text className="text-xl text-dark/40 font-elms-regular"> {card.headlineUnit}</Text>
+                            <Text className="text-xl text-dark/40 font-sf-regular"> {card.headlineUnit}</Text>
                         ) : null}
                     </Text>
 
-                    <Text className="text-sm font-elms-regular italic text-dark/60 leading-snug mb-5">
+                    <Text className="text-sm font-sf-regular italic text-dark/60 leading-snug mb-5">
                         {card.interpretiveLine}
                     </Text>
 
@@ -316,10 +316,10 @@ function BottomSheet({
                             key={i}
                             className="flex-row items-center justify-between py-2.5 border-b border-dark/5"
                         >
-                            <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-widest">
+                            <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-widest">
                                 {row.label}
                             </Text>
-                            <Text className="text-sm font-elms-bold italic text-dark tracking-tight">
+                            <Text className="text-sm font-sf-bold italic text-dark tracking-tight">
                                 {row.value}
                             </Text>
                         </View>
@@ -327,7 +327,7 @@ function BottomSheet({
 
                     {/* Source */}
                     <View className="mt-4 mb-6">
-                        <Text className="text-[8px] font-elms-regular text-dark/30 uppercase tracking-widest">
+                        <Text className="text-[8px] font-sf-regular text-dark/30 uppercase tracking-widest">
                             Source · {card.source}
                         </Text>
                     </View>
@@ -343,7 +343,7 @@ function BottomSheet({
                             activeOpacity={0.85}
                             className="bg-dark rounded-[20px] border-2 border-dark py-4 items-center"
                         >
-                            <Text className="text-[10px] font-elms-bold text-primary uppercase tracking-[0.4em]">
+                            <Text className="text-[10px] font-sf-bold text-primary uppercase tracking-[0.4em]">
                                 ↗  Share this stat
                             </Text>
                         </TouchableOpacity>
@@ -388,14 +388,14 @@ function ChartTooltip({ text, onDismiss }: ChartTooltipProps) {
                     {/* Tooltip accent + heading */}
                     <View className="flex-row items-center gap-2 mb-3">
                         <View className="w-2 h-2 rounded-full bg-primary" />
-                        <Text className="text-[9px] font-elms-bold text-primary/60 uppercase tracking-widest">
+                        <Text className="text-[9px] font-sf-bold text-primary/60 uppercase tracking-widest">
                             How to read this chart
                         </Text>
                     </View>
-                    <Text className="text-sm font-elms-regular italic text-primary/85 leading-relaxed">
+                    <Text className="text-sm font-sf-regular italic text-primary/85 leading-relaxed">
                         {text}
                     </Text>
-                    <Text className="text-[8px] font-elms-bold text-primary/30 uppercase tracking-widest mt-4 text-right">
+                    <Text className="text-[8px] font-sf-bold text-primary/30 uppercase tracking-widest mt-4 text-right">
                         Tap to dismiss
                     </Text>
                 </View>
@@ -525,11 +525,11 @@ function MunicipalitySlider({
                     {/* Municipality identity */}
                     <View className='flex-col'>
                         <View className="h-[2px] w-10 bg-dark mb-4" />
-                        <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.4em] mb-1">
+                        <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-[0.4em] mb-1">
                             {provinceCode} · {population.toLocaleString()} citizens
                         </Text>
                         <Text
-                            className="font-elms-bold italic tracking-tighter text-dark leading-none mb-4"
+                            className="font-sf-bold italic tracking-tighter text-dark leading-none mb-4"
                             style={{ fontSize: 42 }}
                         >
                             {municipalityName}
@@ -541,7 +541,7 @@ function MunicipalitySlider({
                         <View className="flex-row items-center justify-between mb-4">
                             {onBack ? (
                                 <TouchableOpacity onPress={onBack} activeOpacity={0.7}>
-                                    <Text className="text-[10px] font-elms-bold text-dark/40 uppercase tracking-[0.4em]">
+                                    <Text className="text-[10px] font-sf-bold text-dark/40 uppercase tracking-[0.4em]">
                                         ← Back
                                     </Text>
                                 </TouchableOpacity>
